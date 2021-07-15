@@ -21,7 +21,7 @@ import {
 } from "../utils/utils";
 import { useConnection } from "../utils/connection";
 import { Transaction } from "@solana/web3.js";
-import { useMarket, useMarkPrice } from "../utils/market";
+import { useMarket, useMarkPrice, MAX_LEVERAGE } from "../utils/market";
 import { useWallet } from "../utils/wallet";
 import { sendTransaction } from "../utils/send";
 import Spin from "./Spin";
@@ -363,7 +363,7 @@ const TradeForm = () => {
           value={leverage}
           onChange={(e, v) => handleChangeLeverage(v as number)}
           valueLabelDisplay="auto"
-          max={20}
+          max={MAX_LEVERAGE}
         />
       </div>
       {!!userBalance && !!leverage && (

@@ -31,6 +31,7 @@ import {
   checkTextFieldNumberInput,
   roundToDecimal,
   USDC_DECIMALS,
+  sleep,
 } from "../utils/utils";
 import { useAvailableCollateral } from "../utils/perpetuals";
 import { notify } from "../utils/notifications";
@@ -547,7 +548,6 @@ const AccountRow = ({ acc }: { acc: UserAccount | undefined | null }) => {
         connection: connection,
         signers: signers,
       });
-      setRefreshUserAccount((prev) => !prev);
     } catch (err) {
       console.warn(
         `Error closing user account ${acc.address.toBase58()} - err ${err}`
@@ -556,7 +556,8 @@ const AccountRow = ({ acc }: { acc: UserAccount | undefined | null }) => {
         message: `Error closing user account ${acc.address.toBase58()} - err ${err}`,
       });
     } finally {
-      refreshAllCaches();
+      await sleep(5_000);
+      setRefreshUserAccount((prev) => !prev);
     }
   };
 

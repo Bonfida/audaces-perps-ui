@@ -4,7 +4,6 @@ import { Grid, Button } from "@material-ui/core";
 import { useAvailableCollateral } from "../utils/perpetuals";
 import { useConnection } from "../utils/connection";
 import { notify } from "../utils/notifications";
-import { refreshAllCaches } from "../utils/fetch-loop";
 import { sendTransaction } from "../utils/send";
 import { Transaction } from "@solana/web3.js";
 import { useWallet } from "../utils/wallet";
@@ -14,7 +13,7 @@ import {
 } from "@audaces/perps";
 import { useMarket } from "../utils/market";
 import Spin from "./Spin";
-import { USDC_MINT } from "../utils/utils";
+import { USDC_MINT, sleep } from "../utils/utils";
 
 const useStyles = makeStyles({
   table: {
@@ -49,7 +48,7 @@ const CreateUserAccountButton = () => {
       setLoading(true);
       if (!collateral?.collateralAddress) {
         notify({
-          message: "You don't USDC in your wallet.",
+          message: "You have don't USDC in your wallet.",
           variant: "error",
         });
         return;
@@ -87,7 +86,6 @@ const CreateUserAccountButton = () => {
         signers: signers,
         connection: connection,
       });
-      setRefreshUserAccount((prev) => !prev);
       notify({
         message: "Account created",
         variant: "success",
@@ -99,7 +97,8 @@ const CreateUserAccountButton = () => {
         variant: "error",
       });
     } finally {
-      refreshAllCaches();
+      await sleep(5_000);
+      setRefreshUserAccount((prev) => !prev);
       setLoading(false);
     }
   };

@@ -193,6 +193,7 @@ export const useOraclePrice = () => {
 export const useUserData = () => {
   const { wallet, connected } = useWallet();
   const connection = useConnection();
+  const { refreshUserAccount } = useMarket();
   const get = async () => {
     if (!connected) {
       return null;
@@ -205,6 +206,11 @@ export const useUserData = () => {
   };
   return useAsyncData(
     get,
-    tuple("useUserData", connection, wallet?.publicKey?.toBase58())
+    tuple(
+      "useUserData",
+      connection,
+      wallet?.publicKey?.toBase58(),
+      refreshUserAccount
+    )
   );
 };

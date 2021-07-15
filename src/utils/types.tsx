@@ -89,6 +89,7 @@ export interface MarketContextValues {
   setUserAccount: (arg: UserAccount | null | undefined) => void;
   autoApprove: boolean;
   setAutoApprove: (arg: boolean) => void;
+  refreshUserAccount: boolean;
   setRefreshUserAccount: (arg: any) => void;
 }
 

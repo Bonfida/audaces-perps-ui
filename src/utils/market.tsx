@@ -93,6 +93,7 @@ export const MarketProvider = ({ children }) => {
         setUserAccount,
         autoApprove,
         setAutoApprove,
+        refreshUserAccount,
         setRefreshUserAccount,
       }}
     >
@@ -117,6 +118,7 @@ export const useMarket = () => {
     setUserAccount: context.setUserAccount,
     autoApprove: context.autoApprove,
     setAutoApprove: context.setAutoApprove,
+    refreshUserAccount: context.refreshUserAccount,
     setRefreshUserAccount: context.setRefreshUserAccount,
   };
 };
