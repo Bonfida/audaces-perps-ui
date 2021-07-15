@@ -1,0 +1,6 @@
+node_modules/
+charting_library/
+datafeeds/
+.env
+.DS_Store
+._.DS_Store
