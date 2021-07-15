@@ -222,11 +222,8 @@ export const TVChartContainer = () => {
     const tvWidget = new widget(widgetOptions);
 
     tvWidget.onChartReady(() => {
-      tvWidgetRef.current = tvWidget;
-      tvWidget
-        // @ts-ignore
-        .subscribe("onAutoSaveNeeded", () => tvWidget.saveChartToServer());
       tvWidget.chart().createStudy("Index", false, true);
+      tvWidgetRef.current = tvWidget;
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [market, tvWidgetRef.current]);

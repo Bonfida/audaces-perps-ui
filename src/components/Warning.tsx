@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import Modal from "./Modal";
-import { useLocalStorageState, apiGet } from "../utils/utils";
+import { useLocalStorageState, apiGet, useSmallScreen } from "../utils/utils";
 import Emoji from "./Emoji";
 import { Typography, Button, Checkbox, Grid } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
@@ -21,6 +21,7 @@ const useStyles = makeStyles({
   },
   root: {
     maxWidth: "70vw",
+    overflow: "scroll",
   },
   button: {
     color: "white",
@@ -134,12 +135,18 @@ const Warning = () => {
   const [visible, setVisible] = useLocalStorageState("warning-visible", 0);
   const now = new Date().getTime();
   const openModal = now - visible > 14 * 24 * 60 * 60 * 1_000;
+  const smallScreen = useSmallScreen();
   return (
     <Modal openModal={openModal} setOpen={() => undefined} disableBackdropClick>
-      <div className={classes.root}>
-        <Typography align="center" variant="h2" className={classes.h2}>
-          Warning <Emoji emoji="⚠️" />
-        </Typography>
+      <Typography align="center" variant="h2" className={classes.h2}>
+        Warning <Emoji emoji="⚠️" />
+      </Typography>
+      <div
+        className={classes.root}
+        style={{
+          height: smallScreen ? 200 : undefined,
+        }}
+      >
         <Typography variant="body1" className={classes.text}>
           The Bonfida DEX is a fully decentralised digital asset exchange. No
           representation or warranty is made concerning any aspect of the

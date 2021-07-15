@@ -23,7 +23,7 @@ const URL_API_VOLUME = "https://serum-api.bonfida.com/perps/volume?market=";
 const URL_API_FUNDING =
   "https://serum-api.bonfida.com/perps/funding-payment?userAddress=";
 
-export const MAX_LEVERAGE = 20;
+export const MAX_LEVERAGE = 15;
 
 const MarketContext: React.Context<null | MarketContextValues> =
   React.createContext<null | MarketContextValues>(null);
@@ -53,7 +53,7 @@ export const MarketProvider = ({ children }) => {
   const [marketState, marketStateLoaded] = useAsyncData(
     getMarketState,
     tuple("getMarketState", connection),
-    { refreshInterval: 5_000 }
+    { refreshInterval: 1_000 }
   );
   const [refreshUserAccount, setRefreshUserAccount] = useState(false);
 
@@ -78,7 +78,7 @@ export const MarketProvider = ({ children }) => {
     };
     fn();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [connected, market, refreshUserAccount]);
+  }, [connected, market, refreshUserAccount, marketState]);
 
   return (
     <MarketContext.Provider
