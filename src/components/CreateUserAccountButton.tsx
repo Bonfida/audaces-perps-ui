@@ -48,7 +48,7 @@ const CreateUserAccountButton = () => {
       setLoading(true);
       if (!collateral?.collateralAddress) {
         notify({
-          message: "You have don't USDC in your wallet.",
+          message: "You don't have USDC in your wallet.",
           variant: "error",
         });
         return;

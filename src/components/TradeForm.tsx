@@ -57,6 +57,7 @@ const useStyles = makeStyles({
   },
   inputProps: {
     color: "white",
+    width: "100%",
     fontSize: 14,
   },
   whiteText: {
@@ -172,7 +173,8 @@ const TradeForm = () => {
     }
     if (!userBalance || value > userBalance * leverage || !markPrice) {
       return notify({
-        message: "User does not have enough balance - Increase your leverage",
+        message:
+          "User does not have enough balance - Increase your leverage or deposit more collateral",
         variant: "error",
       });
     }
@@ -203,7 +205,8 @@ const TradeForm = () => {
       !isNaN(newQuoteSize) && isFinite(newQuoteSize) ? newQuoteSize : null;
     if (!userBalance || newQuoteSize > userBalance * leverage || !markPrice) {
       notify({
-        message: "User does not have enough balance - Increase your leverage",
+        message:
+          "User does not have enough balance - Increase your leverage or deposit more collateral",
         variant: "error",
       });
       return;

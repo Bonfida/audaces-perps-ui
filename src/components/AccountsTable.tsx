@@ -37,7 +37,6 @@ import { useAvailableCollateral } from "../utils/perpetuals";
 import { notify } from "../utils/notifications";
 import { PublicKey, Transaction } from "@solana/web3.js";
 import { sendTransaction } from "../utils/send";
-import { refreshAllCaches } from "../utils/fetch-loop";
 import DeleteForeverIcon from "@material-ui/icons/DeleteForever";
 import CreateUserAccountButton from "./CreateUserAccountButton";
 import { InformationRow } from "./SummaryPosition";
@@ -277,8 +276,8 @@ export const ModalAdd = ({
         variant: "error",
       });
     } finally {
+      await sleep(3_000);
       setRefreshUserAccount((prev) => !prev);
-      refreshAllCaches();
       setLoading(false);
     }
   };
@@ -420,8 +419,8 @@ const ModalWithdraw = ({
         variant: "error",
       });
     } finally {
+      await sleep(3_000);
       setRefreshUserAccount((prev) => !prev);
-      refreshAllCaches();
       setLoading(false);
     }
   };
