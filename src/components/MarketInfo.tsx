@@ -34,8 +34,7 @@ const useStyles = makeStyles({
     opacity: 0.9,
     color: "white",
   },
-  headerContainer: {},
-  marketDateContainer: {},
+  marketDataContainer: {},
   addButton: {
     background: "#02C77A",
     maxWidth: 300,
@@ -94,7 +93,6 @@ const Header = () => {
       justify="center"
       alignItems="center"
       spacing={2}
-      className={classes.headerContainer}
     >
       <Grid item>
         <img src={getIcon(baseCurrency)} className={classes.img} alt="" />
@@ -121,7 +119,7 @@ const MarketData = () => {
 
   return (
     <>
-      <div className={classes.marketDateContainer}>
+      <div className={classes.marketDataContainer}>
         <Grid
           container
           justify="flex-start"

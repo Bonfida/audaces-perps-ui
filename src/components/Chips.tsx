@@ -4,6 +4,7 @@ import { Chip } from "@material-ui/core";
 import InfoIcon from "@material-ui/icons/Info";
 import { Grid } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
+import { useSmallScreen } from "../utils/utils";
 
 const useStyles = makeStyles({
   leverageWarning: {
@@ -83,11 +84,17 @@ export const InformationChip = withStyles({
 })(Chip);
 
 export const IsolatedPositionChip = () => {
+  const smallScreen = useSmallScreen();
   return (
     <ShortChip
       variant="outlined"
       label={
-        <Grid container justify="space-around" alignItems="center" spacing={3}>
+        <Grid
+          container
+          justify="space-around"
+          alignItems="center"
+          spacing={smallScreen ? undefined : 3}
+        >
           <Grid item>Positions are isolated</Grid>
           <Grid item>
             <InfoIcon style={{ fontSize: 18, marginTop: 4 }} />

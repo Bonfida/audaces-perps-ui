@@ -164,7 +164,7 @@ const Node = () => {
           justify="flex-start"
           alignItems="flex-start"
           direction="column"
-          style={{ maxWidth: 500, marginLeft: 40 }}
+          style={{ maxWidth: 500 }}
           spacing={5}
         >
           <Grid item>
