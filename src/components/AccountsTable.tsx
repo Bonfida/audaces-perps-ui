@@ -42,6 +42,7 @@ import CreateUserAccountButton from "./CreateUserAccountButton";
 import { InformationRow } from "./SummaryPosition";
 import LaunchIcon from "@material-ui/icons/Launch";
 import { ExplorerLink } from "./Link";
+import RefreshIcon from "@material-ui/icons/Refresh";
 
 const useStyles = makeStyles({
   table: {
@@ -178,10 +179,17 @@ const useStyles = makeStyles({
     fontSize: 14,
     color: "white",
   },
+  refreshIcon: {
+    marginTop: 5,
+    color: "white",
+    fontSize: 18,
+    cursor: "pointer",
+  },
 });
 
 const AccountTableHead = () => {
   const classes = useStyles();
+  const { setRefreshUserAccount } = useMarket();
   return (
     <TableHead>
       <TableRow>
@@ -194,7 +202,13 @@ const AccountTableHead = () => {
         <TableCell className={classes.tableCell}>Withdraw</TableCell>
         <TableCell className={classes.tableCell}>Funding</TableCell>
         <TableCell className={classes.tableCell}>Selected Acc.</TableCell>
-        <TableCell /> {/* Delete icon column */}
+        <TableCell>
+          {/* Refresh column */}
+          <RefreshIcon
+            onClick={() => setRefreshUserAccount((prev) => !prev)}
+            className={classes.refreshIcon}
+          />
+        </TableCell>
       </TableRow>
     </TableHead>
   );
