@@ -136,7 +136,7 @@ const TradeForm = () => {
   const handleSetSide = (event, newValue) => {
     setSide(newValue);
   };
-  // Hardcoded value for testing
+
   const marketName = "BTC-USDC";
   const baseCurrency = "BTC";
   const quoteCurrency = "USDC";

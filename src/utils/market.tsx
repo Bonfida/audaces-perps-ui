@@ -164,7 +164,9 @@ export const useMarketTrades = (marketAddress: PublicKey) => {
     const data: PastTrade[] = result.data;
     return data;
   };
-  return useAsyncData(fn, tuple("useMarketTrades", marketAddress.toBase58()));
+  return useAsyncData(fn, tuple("useMarketTrades", marketAddress.toBase58()), {
+    refreshInterval: 5_000,
+  });
 };
 
 export const useUserTrades = (marketAddress: PublicKey) => {
