@@ -237,7 +237,7 @@ const TradeForm = () => {
     }
 
     try {
-      const parsedSize = (parseFloat(quoteSize) * USDC_DECIMALS) / leverage;
+      const parsedSize = parseFloat(quoteSize) * USDC_DECIMALS;
       if (parsedSize <= 0) {
         notify({ message: "Size too small", variant: "error" });
         return;
