@@ -5,7 +5,6 @@ import TableBody from "@material-ui/core/TableBody";
 import TableCell from "@material-ui/core/TableCell";
 import TableHead from "@material-ui/core/TableHead";
 import TableRow from "@material-ui/core/TableRow";
-import { nanoid } from "nanoid";
 import { PastTrade } from "../utils/types";
 import { useWallet } from "../utils/wallet";
 import { Grid } from "@material-ui/core";
@@ -114,7 +113,7 @@ const TradeTable = () => {
         <TradeTableHead />
         <TableBody>
           {pastTrades?.map((row) => {
-            return <TradeRow {...row} key={nanoid()} />;
+            return <TradeRow {...row} key={row.signature} />;
           })}
         </TableBody>
       </Table>

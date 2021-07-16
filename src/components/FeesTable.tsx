@@ -8,7 +8,6 @@ import TableRow from "@material-ui/core/TableRow";
 import { makeStyles } from "@material-ui/core/styles";
 import { FeesRowProps } from "../utils/types";
 import { Grid } from "@material-ui/core";
-import { nanoid } from "nanoid";
 import MouseOverPopOver from "./MouseOverPopOver";
 import InfoIcon from "@material-ui/icons/Info";
 
@@ -143,7 +142,7 @@ const FeeTable = () => {
             <FeesTableHead />
             <TableBody style={{ maxHeight: 100, overflow: "scroll" }}>
               {FEES.map((row) => {
-                return <FeeTableRow {...row} key={nanoid()} />;
+                return <FeeTableRow {...row} key={`fee-tier-${row.fee}`} />;
               })}
             </TableBody>
           </Table>

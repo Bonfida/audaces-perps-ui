@@ -664,49 +664,44 @@ const AccountsTable = () => {
       return 0;
     });
 
-  if (!connected) {
-    return (
-      <Grid container justify="center">
-        <WalletConnect />
-      </Grid>
-    );
-  }
-
-  if (!userDataLoaded) {
-    return (
-      <Grid container justify="center">
-        <Spin size={20} />
-      </Grid>
-    );
-  }
-
-  if (!filteredUserData || filteredUserData?.length === 0) {
-    return (
-      <>
-        <Typography className={classes.text} align="center" variant="body1">
-          You don't have a trading account
-        </Typography>
-        <CreateUserAccountButton />
-      </>
-    );
-  }
-
   return (
-    <TableContainer className={classes.tableContainer}>
-      <Table>
-        <AccountTableHead />
-        <TableBody className={classes.tableBody}>
-          {filteredUserData?.map((row, i) => {
-            return (
-              <AccountRow
-                acc={row}
-                key={`${i}-${row?.address?.toBase58()}-account-table-row`}
-              />
-            );
-          })}
-        </TableBody>
-      </Table>
-    </TableContainer>
+    <>
+      <TableContainer className={classes.tableContainer}>
+        <Table>
+          <AccountTableHead />
+          <TableBody className={classes.tableBody}>
+            {filteredUserData?.map((row, i) => {
+              return (
+                <AccountRow
+                  acc={row}
+                  key={`${i}-${row?.address?.toBase58()}-account-table-row`}
+                />
+              );
+            })}
+          </TableBody>
+        </Table>
+      </TableContainer>
+      {!connected && (
+        <Grid container justify="center" style={{ marginTop: 30 }}>
+          <WalletConnect />
+        </Grid>
+      )}
+      {!userDataLoaded && (
+        <Grid container justify="center" style={{ marginTop: 30 }}>
+          <Spin size={20} />
+        </Grid>
+      )}
+      {(!filteredUserData || filteredUserData?.length === 0) &&
+        connected &&
+        userDataLoaded && (
+          <div style={{ marginTop: 30 }}>
+            <Typography className={classes.text} align="center" variant="body1">
+              You don't have a trading account
+            </Typography>
+            <CreateUserAccountButton />
+          </div>
+        )}
+    </>
   );
 };
 

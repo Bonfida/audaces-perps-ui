@@ -7,7 +7,6 @@ import TableHead from "@material-ui/core/TableHead";
 import TableRow from "@material-ui/core/TableRow";
 import { makeStyles } from "@material-ui/core/styles";
 import { Grid } from "@material-ui/core";
-import { nanoid } from "nanoid";
 import { FundingPayment } from "../utils/types";
 import LaunchIcon from "@material-ui/icons/Launch";
 import { ExplorerLink } from "./Link";
@@ -88,7 +87,7 @@ const FundingPaymentTable = () => {
         <FundingTableHead />
         <TableBody>
           {fundingPayments?.map((row) => {
-            return <FundingTableRow {...row} key={nanoid()} />;
+            return <FundingTableRow {...row} key={row.signature} />;
           })}
         </TableBody>
       </Table>
