@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import getIcon from "../utils/icons";
 import { Grid, Typography } from "@material-ui/core";
@@ -14,6 +14,7 @@ import {
 import { roundToDecimal, USDC_DECIMALS, useSmallScreen } from "../utils/utils";
 import MouseOverPopOver from "./MouseOverPopOver";
 import Countdown from "react-countdown";
+import useInterval from "../utils/useInterval";
 
 const useStyles = makeStyles({
   label: {
@@ -114,8 +115,15 @@ const MarketData = () => {
   const markPrice = useMarkPrice();
   const [volume] = use24hVolume();
   const fundingRatios = getFundingRate(marketState);
-  const fundingCountdown =
-    Date.now() + 60 * 60 * 1_000 - (Date.now() % (60 * 60 * 1_000));
+  const [fundingCountdown, setFundingCountdown] = useState<number>(
+    Date.now() + 60 * 60 * 1_000 - (Date.now() % (60 * 60 * 1_000))
+  );
+
+  useInterval(() => {
+    setFundingCountdown(
+      Date.now() + 60 * 60 * 1_000 - (Date.now() % (60 * 60 * 1_000))
+    );
+  }, 10_000);
 
   return (
     <>

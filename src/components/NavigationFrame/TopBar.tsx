@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import AppBar from "@material-ui/core/AppBar";
-import { useHistory } from "react-router-dom";
+import { useHistory, useLocation } from "react-router-dom";
 import Grid from "@material-ui/core/Grid";
 import Typography from "@material-ui/core/Typography";
 import WalletConnect from "../WalletConnect";
@@ -80,6 +80,7 @@ const Logo = () => {
 const TABS = topBarElement.map(({ href }) => href);
 
 const TopBar = () => {
+  const location = useLocation();
   const history = useHistory();
   const classes = useStyles();
   const [tab, setTab] = useState(0);
@@ -91,14 +92,14 @@ const TopBar = () => {
   };
 
   useEffect(() => {
-    if (window.location.href.includes("trade")) {
+    if (location.pathname.includes("trade")) {
       setTab(1);
-    } else if (window.location.href.includes("nodes")) {
+    } else if (location.pathname.includes("nodes")) {
       setTab(2);
-    } else if (window.location.href.includes("ref")) {
+    } else if (location.pathname.includes("ref")) {
       setTab(0);
     }
-  }, []);
+  }, [location.pathname]);
 
   return (
     <div className={classes.root}>
