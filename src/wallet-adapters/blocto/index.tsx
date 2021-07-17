@@ -13,7 +13,7 @@ type BloctoRequestMethod =
 interface BloctoProvider {
   isProgramWallet: boolean;
   publicKey?: PublicKey;
-  connected: boolean;
+  isConnected: boolean;
   autoApprove: boolean;
   signTransaction: (transaction: Transaction) => Promise<Transaction>;
   signAllTransactions: (transactions: Transaction[]) => Promise<Transaction[]>;
@@ -39,7 +39,7 @@ export class BloctoWalletAdapter
   }
   
   get connected() {
-    return this._provider?.connected || false;
+    return this._provider?.isConnected || false;
   }
 
   get autoApprove() {
