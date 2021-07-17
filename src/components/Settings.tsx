@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { makeStyles, createStyles, Theme } from "@material-ui/core/styles";
 import Popover from "@material-ui/core/Popover";
 import gear from "../assets/components/Settings/gear2.svg";
@@ -8,11 +8,13 @@ import { useLayout } from "../utils/layout";
 import { Button } from "@material-ui/core";
 import { useMarket } from "../utils/market";
 import { nanoid } from "nanoid";
+import { notify } from "../utils/notifications";
+import { useWallet } from "../utils/wallet";
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     root: {
-      height: 150,
+      height: 220,
       margin: 10,
       width: 280,
     },
@@ -123,9 +125,16 @@ const ToggleButton = ({
 
 const Settings = (): JSX.Element => {
   const classes = useStyles();
+  const { connected } = useWallet();
   const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
   const { locked, setLocked, resetLayout } = useLayout();
-  const { setAutoApprove, autoApprove } = useMarket();
+  const {
+    setAutoApprove,
+    autoApprove,
+    useIsolatedPositions,
+    setUseIsolatedPositions,
+    userAccount,
+  } = useMarket();
 
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     setAnchorEl(event.currentTarget);
@@ -135,8 +144,39 @@ const Settings = (): JSX.Element => {
     setAnchorEl(null);
   };
 
+  const handleChangeIsolatedPositions = () => {
+    // If no userAccount
+    if (!userAccount?.openPositions) {
+      setUseIsolatedPositions(!useIsolatedPositions);
+    }
+    // If 0 or 1 position can use isolated positions
+    else if (userAccount?.openPositions.length <= 1) {
+      setUseIsolatedPositions(!useIsolatedPositions);
+    }
+    // If 1 < positions can only use isolated positions
+    else if (useIsolatedPositions) {
+      notify({
+        message:
+          "You need to have only 1 position open to turn off the isolated positions mode",
+      });
+    } else {
+      setUseIsolatedPositions(!useIsolatedPositions);
+    }
+  };
+
   const open = Boolean(anchorEl);
   const id = open ? "simple-popover" : undefined;
+
+  useEffect(() => {
+    if (!connected || !userAccount) return;
+    if (
+      !!userAccount?.openPositions &&
+      userAccount?.openPositions.length > 1 &&
+      !useIsolatedPositions
+    ) {
+      setUseIsolatedPositions(true);
+    }
+  }, [connected, useIsolatedPositions, setUseIsolatedPositions, userAccount]);
 
   return (
     <div>
@@ -183,6 +223,12 @@ const Settings = (): JSX.Element => {
                 on={locked}
                 onClick={setLocked}
                 label="Lock Layout"
+              />
+              <ToggleButton
+                key={nanoid()}
+                on={useIsolatedPositions}
+                onClick={handleChangeIsolatedPositions}
+                label="Isolated Positions"
               />
               <Grid
                 container

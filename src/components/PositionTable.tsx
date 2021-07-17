@@ -416,7 +416,14 @@ const PositionTable = () => {
           }}
         >
           {positions?.map((row, i) => {
-            return <PositionRow {...row} key={`position-${i}`} />;
+            return (
+              <PositionRow
+                {...row}
+                key={`position-${i}-${row.userAccount.toBase58()}-${
+                  row.positionIndex
+                }`}
+              />
+            );
           })}
         </TableBody>
       </Table>

@@ -91,6 +91,8 @@ export interface MarketContextValues {
   setAutoApprove: (arg: boolean) => void;
   refreshUserAccount: boolean;
   setRefreshUserAccount: (arg: any) => void;
+  useIsolatedPositions: boolean;
+  setUseIsolatedPositions: (arg: boolean) => void;
 }
 
 export interface Position {

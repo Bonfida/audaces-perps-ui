@@ -41,6 +41,10 @@ export const MarketProvider = ({ children }) => {
   const [userAccount, setUserAccount] = useState<
     UserAccount | null | undefined
   >(null);
+  const [useIsolatedPositions, setUseIsolatedPositions] = useLocalStorageState(
+    "useIsolatedPositions",
+    false
+  );
   const { wallet, connected } = useWallet();
 
   const marketAddress = useMemo(() => new PublicKey(market), [market]);
@@ -95,6 +99,8 @@ export const MarketProvider = ({ children }) => {
         setAutoApprove,
         refreshUserAccount,
         setRefreshUserAccount,
+        useIsolatedPositions,
+        setUseIsolatedPositions,
       }}
     >
       {children}
@@ -120,6 +126,8 @@ export const useMarket = () => {
     setAutoApprove: context.setAutoApprove,
     refreshUserAccount: context.refreshUserAccount,
     setRefreshUserAccount: context.setRefreshUserAccount,
+    useIsolatedPositions: context.useIsolatedPositions,
+    setUseIsolatedPositions: context.setUseIsolatedPositions,
   };
 };
 

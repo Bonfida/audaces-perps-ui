@@ -13,14 +13,22 @@ import {
   AppBar,
   Grid,
 } from "@material-ui/core";
-import { PositionType, createPosition } from "@audaces/perps";
+import {
+  PositionType,
+  createPosition,
+  completeClosePosition,
+  increasePosition,
+  getDiscountAccount,
+  reducePositionBaseSize,
+} from "@audaces/perps";
 import {
   USDC_DECIMALS,
   checkTextFieldNumberInput,
   roundToDecimal,
+  BNB_ADDRESS,
 } from "../utils/utils";
 import { useConnection } from "../utils/connection";
-import { Transaction } from "@solana/web3.js";
+import { Transaction, Keypair, TransactionInstruction } from "@solana/web3.js";
 import { useMarket, useMarkPrice, MAX_LEVERAGE } from "../utils/market";
 import { useWallet } from "../utils/wallet";
 import { sendTransaction } from "../utils/send";
@@ -28,7 +36,7 @@ import Spin from "./Spin";
 import { refreshAllCaches } from "../utils/fetch-loop";
 import { IsolatedPositionChip } from "./Chips";
 import MouseOverPopOver from "./MouseOverPopOver";
-import { useReferrer } from "../utils/perpetuals";
+import { useReferrer, useOpenPositions } from "../utils/perpetuals";
 import Emoji from "./Emoji";
 import CreateUserAccountButton from "./CreateUserAccountButton";
 import { ModalAdd } from "./AccountsTable";
@@ -125,13 +133,14 @@ const TradeForm = () => {
   const [side, setSide] = useState(0);
   const [baseSize, setBaseSize] = useState("0");
   const [quoteSize, setQuoteSize] = useState("0");
-  const { userAccount, marketState } = useMarket();
+  const { userAccount, marketState, useIsolatedPositions } = useMarket();
   const connection = useConnection();
   const { wallet, connected, connect } = useWallet();
   const markPrice = useMarkPrice();
   const [slippage, setSlippage] = useState<null | number>(null);
   const referrer = useReferrer();
   const [openDeposit, setOpenDeposit] = useState(false);
+  const [openPositions] = useOpenPositions();
 
   const handleSetSide = (event, newValue) => {
     setSide(newValue);
@@ -159,6 +168,25 @@ const TradeForm = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [quoteSize]);
 
+  const currentPosition = openPositions?.find(
+    (p) => p.marketAddress.toBase58() === userAccount?.market.toBase58()
+  );
+
+  const isSameSide = (side === 0 ? "long" : "short") === currentPosition?.side;
+  const currentSize = currentPosition?.vCoinAmount || 0;
+  const canModifyPosition = currentPosition && !useIsolatedPositions;
+  const canDecrease = canModifyPosition && !isSameSide;
+  const canIncrease = canModifyPosition && isSameSide;
+  const canOpenPosition = useIsolatedPositions || !currentPosition;
+
+  const positionPercentage =
+    Math.floor(
+      (parseFloat(baseSize) /
+        // @ts-ignore (Can't be null)
+        (currentPosition?.vCoinAmount / USDC_DECIMALS)) *
+        100
+    ) || 0;
+
   // handleChange functions
   // Quote Size
   const handleChangeQuoteSize = (e) => {
@@ -171,10 +199,21 @@ const TradeForm = () => {
     if (!valid) {
       return setQuoteSize("0");
     }
-    if (!userBalance || value > userBalance * leverage || !markPrice) {
+    if (
+      !userBalance ||
+      ((canOpenPosition || canIncrease) && value > userBalance * leverage) ||
+      !markPrice
+    ) {
       return notify({
         message:
           "User does not have enough balance - Increase your leverage or deposit more collateral",
+        variant: "error",
+      });
+    }
+    if (canDecrease && value > (currentSize * markPrice) / USDC_DECIMALS) {
+      console.log(value, (currentSize * markPrice) / USDC_DECIMALS);
+      return notify({
+        message: "Amount is too big compared to position size",
         variant: "error",
       });
     }
@@ -203,71 +242,171 @@ const TradeForm = () => {
     const newQuoteSize = parseFloat(value) * markPrice;
     const newQuoteSizeValid =
       !isNaN(newQuoteSize) && isFinite(newQuoteSize) ? newQuoteSize : null;
-    if (!userBalance || newQuoteSize > userBalance * leverage || !markPrice) {
-      notify({
+    if (
+      !userBalance ||
+      ((canOpenPosition || canIncrease) &&
+        newQuoteSize > userBalance * leverage) ||
+      !markPrice
+    ) {
+      return notify({
         message:
           "User does not have enough balance - Increase your leverage or deposit more collateral",
         variant: "error",
       });
-      return;
+    }
+    if (canDecrease && value > currentSize / USDC_DECIMALS) {
+      return notify({
+        message: "Amount is too big compared to position size",
+        variant: "error",
+      });
     }
     setBaseSize(value);
     // Convert to quote size
     setQuoteSize(newQuoteSizeValid ? newQuoteSize.toString() : "0");
   };
-  // Reduce Only
+
   // Leverage
   const handleChangeLeverage = (leverage: number) => {
     setLeverage(leverage);
   };
 
+  // Create a position
   const onClick = async () => {
     if (!userBalance || !wallet || !userAccount) {
       return;
     }
 
-    if (parseFloat(quoteSize) > userBalance * leverage) {
-      notify({
-        message: `Size too big - Max size is ${(
-          userBalance * leverage
-        ).toLocaleString()}`,
-        variant: "error",
-      });
-      return;
-    }
-
-    try {
-      const parsedSize = parseFloat(quoteSize) * USDC_DECIMALS;
-      if (parsedSize <= 0) {
-        notify({ message: "Size too small", variant: "error" });
+    // Open a new position
+    if (canOpenPosition) {
+      if (parseFloat(quoteSize) > userBalance * leverage) {
+        notify({
+          message: `Size too big - Max size is ${(
+            userBalance * leverage
+          ).toLocaleString()}`,
+          variant: "error",
+        });
         return;
       }
-      setLoading(true);
-      notify({ message: "Opening position..." });
+      try {
+        const parsedSize = parseFloat(quoteSize) * USDC_DECIMALS;
+        if (parsedSize <= 0) {
+          notify({ message: "Size too small", variant: "error" });
+          return;
+        }
+        setLoading(true);
+        notify({ message: "Opening position..." });
 
-      const tx = new Transaction();
-      const [signers, instructions] = await createPosition(
-        connection,
-        side === 0 ? PositionType.Long : PositionType.Short,
-        parsedSize,
-        leverage,
-        userAccount,
-        referrer
-      );
-      tx.add(...instructions);
-      await sendTransaction({
-        transaction: tx,
-        wallet: wallet,
-        signers: signers,
-        connection: connection,
-        sendingMessage: "Opening position...",
-      });
-    } catch (err) {
-      console.warn(`Error opening position - ${err}`);
-      notify({ message: `Error opening position - ${err}`, variant: "error" });
-    } finally {
-      setLoading(false);
-      refreshAllCaches();
+        const tx = new Transaction();
+        const [signers, instructions] = await createPosition(
+          connection,
+          side === 0 ? PositionType.Long : PositionType.Short,
+          parsedSize,
+          leverage,
+          userAccount,
+          referrer
+        );
+        tx.add(...instructions);
+        return await sendTransaction({
+          transaction: tx,
+          wallet: wallet,
+          signers: signers,
+          connection: connection,
+          sendingMessage: "Opening position...",
+        });
+      } catch (err) {
+        console.warn(`Error opening position - ${err}`);
+        notify({
+          message: `Error opening position - ${err}`,
+          variant: "error",
+        });
+      } finally {
+        setLoading(false);
+        refreshAllCaches();
+      }
+    }
+
+    if (!currentPosition) return;
+
+    // Increase current position
+    if (canIncrease) {
+      try {
+        setLoading(true);
+        const tx = new Transaction();
+        const [signers, instructions] = await increasePosition(
+          connection,
+          currentPosition.marketAddress,
+          (parseFloat(quoteSize) * USDC_DECIMALS) / leverage,
+          leverage,
+          currentPosition.positionIndex,
+          userAccount.owner,
+          userAccount.address,
+          BNB_ADDRESS,
+          await getDiscountAccount(connection, wallet.publicKey),
+          wallet.publicKey,
+          referrer
+        );
+        tx.add(...instructions);
+        return await sendTransaction({
+          transaction: tx,
+          wallet: wallet,
+          signers: signers,
+          connection: connection,
+          sendingMessage: "Increasing position...",
+        });
+      } catch (err) {
+        console.warn(`Error increasing position ${err}`);
+        notify({
+          message: `Error increasing position ${err}`,
+          variant: "error",
+        });
+      } finally {
+        setLoading(false);
+        refreshAllCaches();
+      }
+    }
+
+    // Decrease current position
+    if (canDecrease) {
+      try {
+        setLoading(true);
+        const _size = parseFloat(baseSize) * USDC_DECIMALS;
+        const tx = new Transaction();
+        let signers: Keypair[] = [];
+        let instructions: TransactionInstruction[] = [];
+        if (_size === currentPosition.size) {
+          [signers, instructions] = await completeClosePosition(
+            connection,
+            currentPosition,
+            wallet.publicKey,
+            referrer
+          );
+        } else {
+          [signers, instructions] = await reducePositionBaseSize(
+            connection,
+            currentPosition,
+            _size,
+            wallet.publicKey,
+            referrer
+          );
+        }
+        tx.add(...instructions);
+        return await sendTransaction({
+          transaction: tx,
+          wallet: wallet,
+          signers: signers,
+          connection: connection,
+          sendingMessage: "Decreasing position...",
+        });
+      } catch (err) {
+        console.warn(`Error decreasing position ${err}`);
+        notify({
+          message: `Error decreasing position ${err}`,
+          variant: "error",
+        });
+      } finally {
+        setLoading(false);
+        refreshAllCaches();
+      }
     }
   };
 
@@ -283,20 +422,22 @@ const TradeForm = () => {
   return (
     <FloatingCard>
       {/* Select Side */}
-      <Grid container justify="center">
-        <MouseOverPopOver
-          popOverText={
-            <>
-              Positions and margins are isolated. <br />
-              If you already have a position and want to change it use the{" "}
-              <strong>EDIT</strong> button
-            </>
-          }
-          textClassName={undefined}
-        >
-          <IsolatedPositionChip />
-        </MouseOverPopOver>
-      </Grid>
+      {useIsolatedPositions && (
+        <Grid container justify="center">
+          <MouseOverPopOver
+            popOverText={
+              <>
+                Positions and margins are isolated. <br />
+                If you already have a position and want to change it use the{" "}
+                <strong>EDIT</strong> button
+              </>
+            }
+            textClassName={undefined}
+          >
+            <IsolatedPositionChip />
+          </MouseOverPopOver>
+        </Grid>
+      )}
       <AppBar className={classes.AppBar} position="static" elevation={0}>
         <Tabs
           value={side}
@@ -358,18 +499,43 @@ const TradeForm = () => {
       </Grid>
 
       {/* Set leverage */}
-      <div className={classes.leverageContainer}>
-        <Typography variant="body1" className={classes.whiteText}>
-          Leverage: {leverage}x
-        </Typography>
-        <LeverageSlider
-          value={leverage}
-          onChange={(e, v) => handleChangeLeverage(v as number)}
-          valueLabelDisplay="auto"
-          max={MAX_LEVERAGE}
-        />
-      </div>
-      {!!userBalance && !!leverage && (
+      {(canIncrease || canOpenPosition) && (
+        <div className={classes.leverageContainer}>
+          <Typography variant="body1" className={classes.whiteText}>
+            Leverage: {leverage}x
+          </Typography>
+          <LeverageSlider
+            value={leverage}
+            onChange={(e, v) => handleChangeLeverage(v as number)}
+            valueLabelDisplay="auto"
+            max={MAX_LEVERAGE}
+          />
+        </div>
+      )}
+      {/* Position Size */}
+      {canDecrease && (
+        <div className={classes.leverageContainer}>
+          <Typography variant="body1" className={classes.whiteText}>
+            Position Size: {positionPercentage}%
+          </Typography>
+          <LeverageSlider
+            value={positionPercentage}
+            onChange={(e, v) => {
+              if (markPrice && currentPosition) {
+                const baseSize =
+                  ((v as number) *
+                    (currentPosition?.vCoinAmount / USDC_DECIMALS)) /
+                  100;
+                setBaseSize(baseSize.toString());
+                setQuoteSize((baseSize * markPrice).toString());
+              }
+            }}
+            valueLabelDisplay="auto"
+            max={100}
+          />
+        </div>
+      )}
+      {!!userBalance && !!leverage && (canIncrease || canOpenPosition) && (
         <div className={classes.maxPositionContainer}>
           <Typography
             variant="body1"
@@ -400,7 +566,7 @@ const TradeForm = () => {
           </Typography>
         </div>
       )}
-      {leverage > 1 && (
+      {leverage > 1 && canOpenPosition && (
         <div className={classes.maxPositionContainer}>
           <Grid container justify="center" direction="column">
             {!!baseSize && !!quoteSize && expectedLiqPrice && (
@@ -440,6 +606,10 @@ const TradeForm = () => {
                 "Connect Wallet"
               ) : loading ? (
                 <Spin size={20} />
+              ) : canDecrease ? (
+                "Close"
+              ) : canIncrease && isSameSide ? (
+                "Increase"
               ) : side === 0 ? (
                 "Buy/Long"
               ) : (
