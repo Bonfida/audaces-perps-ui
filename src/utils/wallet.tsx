@@ -20,6 +20,7 @@ import { useConnectionConfig } from "../utils/connection";
 import { useLocalStorageState } from "../utils/utils";
 import { notify } from "../utils/notifications";
 import { makeStyles } from "@material-ui/core/styles";
+import blockto from "../assets/wallets/blocto.png";
 
 const useStyles = makeStyles({
   button: {
@@ -56,7 +57,7 @@ export const WALLET_PROVIDERS = [
   {
     name: "Blocto",
     url: "https://blocto.portto.io//",
-    icon: `../assets/wallets/blocto.png`,
+    icon: blockto,
     adapter: BloctoWalletAdapter,
   },
   {
