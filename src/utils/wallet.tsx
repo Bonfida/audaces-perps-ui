@@ -13,6 +13,7 @@ import {
   LedgerWalletAdapter,
   SolongWalletAdapter,
   PhantomWalletAdapter,
+  BloctoWalletAdapter,
   MathWalletAdapter,
 } from "../wallet-adapters";
 import { useConnectionConfig } from "../utils/connection";
@@ -51,6 +52,12 @@ export const WALLET_PROVIDERS = [
     url: "https://www.phantom.app",
     icon: `https://www.phantom.app/img/logo.png`,
     adapter: PhantomWalletAdapter,
+  },
+  {
+    name: "Blocto",
+    url: "https://blocto.portto.io//",
+    icon: `../assets/wallets/blocto.png`,
+    adapter: BloctoWalletAdapter,
   },
   {
     name: "sollet.io",
