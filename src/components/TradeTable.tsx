@@ -39,7 +39,6 @@ const useStyles = makeStyles({
     color: "#02C77A",
   },
   container: {
-    background: "#252930",
     maxHeight: 250,
     width: "100%",
   },

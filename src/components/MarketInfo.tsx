@@ -83,10 +83,7 @@ const Header = () => {
   const classes = useStyles();
   const marketName = "BTC/USDC";
   const baseCurrency = "BTC";
-  const smallScreen = useSmallScreen();
-  if (smallScreen) {
-    return null;
-  }
+
   return (
     <Grid
       container
@@ -118,6 +115,7 @@ const MarketData = () => {
   const [fundingCountdown, setFundingCountdown] = useState<number>(
     Date.now() + 60 * 60 * 1_000 - (Date.now() % (60 * 60 * 1_000))
   );
+  const smallScreen = useSmallScreen();
 
   useInterval(() => {
     setFundingCountdown(
@@ -130,16 +128,18 @@ const MarketData = () => {
       <div className={classes.marketDataContainer}>
         <Grid
           container
-          justify="flex-start"
+          justify="space-around"
           alignItems="center"
           direction="row"
           spacing={5}
         >
-          <Grid item>
-            <Header />
-          </Grid>
-          <Grid item>
-            {!!userAccount?.balance && (
+          {!smallScreen && (
+            <Grid item>
+              <Header />
+            </Grid>
+          )}
+          {!!userAccount?.balance && (
+            <Grid item>
               <InfoColumn
                 label="Available Collateral"
                 value={
@@ -152,18 +152,18 @@ const MarketData = () => {
                   </>
                 }
               />
-            )}
-          </Grid>
-          <Grid item>
-            {!!markPrice && (
+            </Grid>
+          )}
+          {!!markPrice && (
+            <Grid item>
               <InfoColumn
                 label="Mark Price"
                 value={`$${roundToDecimal(markPrice, 3)?.toLocaleString()}`}
               />
-            )}
-          </Grid>
-          <Grid item>
-            {!!indexPrice?.price && (
+            </Grid>
+          )}
+          {!!indexPrice?.price && (
+            <Grid item>
               <InfoColumn
                 label="Index Price"
                 value={`$${roundToDecimal(
@@ -171,8 +171,8 @@ const MarketData = () => {
                   3
                 )?.toLocaleString()}`}
               />
-            )}
-          </Grid>
+            </Grid>
+          )}
           {!!fundingRatios &&
             !!fundingRatios.fundingRatioLongs &&
             !isNaN(fundingRatios.fundingRatioLongs) &&

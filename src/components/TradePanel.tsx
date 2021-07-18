@@ -17,7 +17,6 @@ import { ExplorerLink } from "./Link";
 
 const useStyles = makeStyles({
   tableCell: {
-    background: "#252930",
     textTransform: "capitalize",
     fontSize: 12,
     color: "white",
@@ -35,11 +34,10 @@ const useStyles = makeStyles({
   title: {
     fontSize: 14,
     color: "white",
-    opacity: 0.8,
     margin: "unset",
+    fontWeight: 600,
   },
   container: {
-    background: "#252930",
     maxHeight: 350,
     width: "100%",
   },
@@ -95,7 +93,7 @@ const TradePanel = () => {
         <Typography className={classes.title} align="center" variant="body1">
           Market Trades
         </Typography>
-        <Table stickyHeader>
+        <Table>
           <TradeTableHead />
           <TableBody style={{ maxHeight: 100, overflow: "scroll" }}>
             {trades?.map((row) => {

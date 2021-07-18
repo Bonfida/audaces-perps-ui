@@ -12,7 +12,8 @@ const useStyles = makeStyles((theme: Theme) =>
       justifyContent: "center",
     },
     paper: {
-      backgroundColor: "rgb(39, 41,47)",
+      borderRadius: 10,
+      backgroundColor: "rgb(15,15,15)",
       boxShadow: theme.shadows[5],
       padding: theme.spacing(2, 4, 3),
     },

@@ -14,7 +14,7 @@ export const theme = createMuiTheme({
       "@global": {
         body: {
           background:
-            "linear-gradient(90deg, rgba(15,15,17,1) 0%, rgba(19,30,48,1) 50%, rgba(15,15,17,1) 100%)",
+            "linear-gradient(90deg, rgba(18,23,33,1) 0%, rgba(19,30,48,1) 50%, rgba(18,23,33,1) 100%)",
           backgroundRepeat: "no-repeat",
           backgroundAttachment: "fixed",
         },

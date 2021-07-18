@@ -1,15 +1,15 @@
 import React, { useState, useEffect } from "react";
 import { makeStyles, createStyles, Theme } from "@material-ui/core/styles";
 import Popover from "@material-ui/core/Popover";
-import gear from "../assets/components/Settings/gear2.svg";
 import Typography from "@material-ui/core/Typography";
 import Grid from "@material-ui/core/Grid";
 import { useLayout } from "../utils/layout";
-import { Button } from "@material-ui/core";
+import { Button, IconButton } from "@material-ui/core";
 import { useMarket } from "../utils/market";
 import { nanoid } from "nanoid";
 import { notify } from "../utils/notifications";
 import { useWallet } from "../utils/wallet";
+import MoreHorizIcon from "@material-ui/icons/MoreHoriz";
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -19,9 +19,15 @@ const useStyles = makeStyles((theme: Theme) =>
       width: 280,
     },
     button: {
+      color: "white",
       background: "transparent",
-      border: "none",
-      cursor: "pointer",
+      width: "auto",
+      borderRadius: 25,
+      height: "50px",
+      border: "2px solid",
+      borderColor: "#8BC6EC",
+      fontWeight: 600,
+      padding: 20,
     },
     item: {
       color: "white",
@@ -34,18 +40,17 @@ const useStyles = makeStyles((theme: Theme) =>
       width: 5,
       borderRadius: 15,
     },
-    slippageButtonSelected: {
+    resetButton: {
       color: "white",
-      border: "1px solid",
-      borderColor: "#00ADB5",
-      backgroundColor: "#00ADB5",
+      backgroundColor: "#8BC6EC",
+      backgroundImage: "linear-gradient(135deg, #8BC6EC 0%, #9599E2 100%)",
       width: 5,
-      borderRadius: 15,
+      borderRadius: 17,
       fontSize: 12,
       "&:hover": {
         color: "white",
-        borderColor: "#00ADB5",
-        backgroundColor: "#00ADB5",
+        backgroundColor: "#8BC6EC",
+        backgroundImage: "linear-gradient(135deg, #8BC6EC 0%, #9599E2 100%)",
       },
     },
     onOffButton: {
@@ -56,19 +61,21 @@ const useStyles = makeStyles((theme: Theme) =>
     },
     onOffButtonActive: {
       color: "white",
-      backgroundColor: "#00ADB5",
+      backgroundColor: "#8BC6EC",
+      backgroundImage: "linear-gradient(135deg, #8BC6EC 0%, #9599E2 100%)",
       width: 5,
       borderRadius: 15,
       fontSize: 12,
       "&:hover": {
         color: "white",
-        backgroundColor: "#00ADB5",
+        backgroundColor: "#8BC6EC",
+        backgroundImage: "linear-gradient(135deg, #8BC6EC 0%, #9599E2 100%)",
       },
     },
     onOffButtonContainer: {
       border: "1px solid",
-      borderColor: "#00ADB5",
-      borderRadius: 15,
+      borderColor: "#8BC6EC",
+      borderRadius: 17,
       width: 130,
       marginTop: 10,
       marginBottom: 10,
@@ -180,9 +187,9 @@ const Settings = (): JSX.Element => {
 
   return (
     <div>
-      <button onClick={handleClick} className={classes.button}>
-        <img src={gear} height="40px" alt="" />
-      </button>
+      <IconButton onClick={handleClick} className={classes.button}>
+        <MoreHorizIcon style={{ fontSize: 20, color: "white" }} />
+      </IconButton>
       <Popover
         id={id}
         open={open}
@@ -242,10 +249,7 @@ const Settings = (): JSX.Element => {
                   </Typography>
                 </Grid>
                 <Grid item>
-                  <Button
-                    onClick={resetLayout}
-                    className={classes.slippageButtonSelected}
-                  >
+                  <Button onClick={resetLayout} className={classes.resetButton}>
                     Reset
                   </Button>
                 </Grid>

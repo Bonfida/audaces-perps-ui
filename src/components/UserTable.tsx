@@ -27,7 +27,9 @@ const useStyles = makeStyles({
     width: "100%",
   },
   text: {
-    fontSize: 10,
+    fontSize: 14,
+    fontWeight: 600,
+    textTransform: "capitalize",
   },
   scrollButton: {
     color: "white",

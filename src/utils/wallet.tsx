@@ -26,10 +26,14 @@ const useStyles = makeStyles({
   button: {
     color: "white",
     background: "transparent",
-    borderRadius: 0,
+    borderRadius: 10,
     height: "50px",
     border: "2px solid",
-    borderColor: "#00ADB5",
+    borderColor: "#8BC6EC",
+    "&:hover": {
+      backgroundColor: "#8BC6EC",
+      backgroundImage: "linear-gradient(135deg, #8BC6EC 0%, #9599E2 100%)",
+    },
     width: 250,
     padding: 4,
   },

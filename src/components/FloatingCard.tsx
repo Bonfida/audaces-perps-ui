@@ -4,9 +4,10 @@ import Box from "@material-ui/core/Box";
 
 const useStyles = makeStyles((theme: Theme) => ({
   root: {
-    background: "#252930",
+    borderColor: "#8BC6EC",
+    border: "1px solid",
     padding: 10,
-    borderRadius: 0,
+    borderRadius: 10,
     height: "100%",
   },
 }));

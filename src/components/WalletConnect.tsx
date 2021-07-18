@@ -8,10 +8,12 @@ const useStyles = makeStyles({
     color: "white",
     background: "transparent",
     width: "auto",
-    borderRadius: 0,
+    borderRadius: 25,
     height: "50px",
-    border: "2px solid",
-    borderColor: "#00ADB5",
+    backgroundColor: "#8BC6EC",
+    backgroundImage: "linear-gradient(135deg, #8BC6EC 0%, #9599E2 100%)",
+    fontWeight: 600,
+    padding: 20,
   },
   lock: {
     marginRight: "10px",
@@ -27,7 +29,6 @@ export default function WalletConnect() {
       <Button
         disableRipple
         onClick={connected ? disconnect : select}
-        variant="outlined"
         className={classes.button}
       >
         {!connected ? <>Connect wallet</> : <>Disconnect</>}
