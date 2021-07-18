@@ -22,7 +22,6 @@ const useStyles = makeStyles({
     color: "white",
   },
   container: {
-    background: "#252930",
     maxHeight: 250,
     width: "100%",
   },
@@ -81,13 +80,17 @@ const FundingPaymentTable = () => {
     );
   }
 
+  if (!fundingPayments) {
+    return null;
+  }
+
   return (
     <TableContainer className={classes.container}>
       <Table>
         <FundingTableHead />
         <TableBody>
-          {fundingPayments?.map((row) => {
-            return <FundingTableRow {...row} key={row.signature} />;
+          {fundingPayments?.map((row, i) => {
+            return <FundingTableRow {...row} key={`funding-table-${i}`} />;
           })}
         </TableBody>
       </Table>

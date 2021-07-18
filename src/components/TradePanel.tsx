@@ -8,7 +8,6 @@ import TableContainer from "@material-ui/core/TableContainer";
 import TableHead from "@material-ui/core/TableHead";
 import TableRow from "@material-ui/core/TableRow";
 import { PastTrade } from "../utils/types";
-import { nanoid } from "nanoid";
 import { Typography } from "@material-ui/core";
 import { useMarket, useMarketTrades } from "../utils/market";
 import { roundToDecimal } from "../utils/utils";
@@ -96,8 +95,8 @@ const TradePanel = () => {
         <Table>
           <TradeTableHead />
           <TableBody style={{ maxHeight: 100, overflow: "scroll" }}>
-            {trades?.map((row) => {
-              return <TradeTableRow {...row} key={nanoid()} />;
+            {trades?.map((row, i) => {
+              return <TradeTableRow {...row} key={`market-trade-${i}`} />;
             })}
           </TableBody>
         </Table>

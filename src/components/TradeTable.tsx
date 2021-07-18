@@ -106,13 +106,17 @@ const TradeTable = () => {
     );
   }
 
+  if (!pastTrades) {
+    return null;
+  }
+
   return (
     <TableContainer className={classes.container}>
       <Table>
         <TradeTableHead />
         <TableBody>
-          {pastTrades?.map((row) => {
-            return <TradeRow {...row} key={row.signature} />;
+          {pastTrades?.map((row, i) => {
+            return <TradeRow {...row} key={`trade-table-${i}`} />;
           })}
         </TableBody>
       </Table>

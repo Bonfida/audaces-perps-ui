@@ -141,8 +141,8 @@ const FeeTable = () => {
           <Table>
             <FeesTableHead />
             <TableBody style={{ maxHeight: 100, overflow: "scroll" }}>
-              {FEES.map((row) => {
-                return <FeeTableRow {...row} key={`fee-tier-${row.fee}`} />;
+              {FEES.map((row, i) => {
+                return <FeeTableRow {...row} key={`fee-tier-${i}`} />;
               })}
             </TableBody>
           </Table>

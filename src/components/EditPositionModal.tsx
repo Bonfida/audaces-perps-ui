@@ -13,7 +13,7 @@ import TabPanel from "./TabPanel";
 
 const useStyles = makeStyles({
   indicator: {
-    backgroundColor: "#00ADB5",
+    backgroundColor: "#8BC6EC",
   },
   modalTitle: {
     color: "white",
@@ -29,19 +29,19 @@ const useStyles = makeStyles({
   },
   selectButtonActive: {
     color: "white",
-    backgroundColor: "#00ADB5",
+    backgroundColor: "#8BC6EC",
     width: 150,
     borderRadius: 15,
     fontSize: 18,
     "&:hover": {
       color: "white",
-      backgroundColor: "#00ADB5",
+      backgroundColor: "#8BC6EC",
     },
   },
   selectButtonContainer: {
     border: "1px solid",
-    borderColor: "#00ADB5",
-    borderRadius: 15,
+    borderColor: "#8BC6EC",
+    borderRadius: 20,
     width: 302,
     marginTop: 10,
     marginBottom: 10,
@@ -53,7 +53,7 @@ const useStyles = makeStyles({
     margin: 10,
   },
   divider: {
-    background: "#00ADB5",
+    background: "#8BC6EC",
     marginTop: 10,
     marginBottom: 10,
     width: "100%",

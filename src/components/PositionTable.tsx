@@ -371,10 +371,6 @@ const PositionRow = (props: Position) => {
 
 const PositionTable = () => {
   const classes = useStyles();
-  // Design ideads
-  // const positions = usePositions()
-
-  // Hard coded value
   const [positions, positionsLoaded] = useOpenPositions();
   const { connected } = useWallet();
 
@@ -405,6 +401,10 @@ const PositionTable = () => {
     );
   }
 
+  if (!positions) {
+    return null;
+  }
+
   return (
     <TableContainer style={{ maxHeight: 250 }}>
       <Table>
@@ -419,9 +419,7 @@ const PositionTable = () => {
             return (
               <PositionRow
                 {...row}
-                key={`position-${i}-${row.userAccount.toBase58()}-${
-                  row.positionIndex
-                }`}
+                key={`position-${i}-${row.positionIndex}`}
               />
             );
           })}

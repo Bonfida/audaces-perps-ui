@@ -39,6 +39,7 @@ const MouseOverPopOver = ({ children, popOverText, textClassName }) => {
   return (
     <div>
       <Typography
+        component={"div"}
         aria-owns={open ? "mouse-over-popover" : undefined}
         aria-haspopup="true"
         onMouseEnter={handlePopoverOpen}

@@ -203,7 +203,7 @@ export function WalletProvider({ children = null as any }) {
           direction="column"
           spacing={2}
         >
-          {WALLET_PROVIDERS.map((provider) => {
+          {WALLET_PROVIDERS.map((provider, i) => {
             const onClick = function () {
               setProviderUrl(provider.url);
               setAutoConnect(true);
@@ -211,7 +211,7 @@ export function WalletProvider({ children = null as any }) {
             };
 
             return (
-              <Grid item>
+              <Grid item key={`wallet-provider-${provider.name}`}>
                 <Button className={classes.button} onClick={onClick}>
                   <Grid container justify="space-around" alignItems="center">
                     <Grid item>{provider.name}</Grid>

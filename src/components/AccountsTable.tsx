@@ -580,7 +580,7 @@ const AccountRow = ({ acc }: { acc: UserAccount | undefined | null }) => {
         <Typography className={classes.marketName}>
           {marketNameFromAddress(acc.market.toBase58())}
         </Typography>
-        <Typography className={classes.userAccountAddress}>
+        <Typography component={"div"} className={classes.userAccountAddress}>
           <Grid container spacing={1} alignItems="center">
             <Grid item>{acc.address.toBase58()}</Grid>
             <Grid item style={{ marginTop: 5 }}>
@@ -671,12 +671,7 @@ const AccountsTable = () => {
           <AccountTableHead />
           <TableBody className={classes.tableBody}>
             {filteredUserData?.map((row, i) => {
-              return (
-                <AccountRow
-                  acc={row}
-                  key={`${i}-${row?.address?.toBase58()}-account-table-row`}
-                />
-              );
+              return <AccountRow acc={row} key={`${i}-account-table-row`} />;
             })}
           </TableBody>
         </Table>
