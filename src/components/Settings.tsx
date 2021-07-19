@@ -10,6 +10,7 @@ import { nanoid } from "nanoid";
 import { notify } from "../utils/notifications";
 import { useWallet } from "../utils/wallet";
 import MoreHorizIcon from "@material-ui/icons/MoreHoriz";
+import { useSmallScreen } from "../utils/utils";
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -142,6 +143,7 @@ const Settings = (): JSX.Element => {
     setUseIsolatedPositions,
     userAccount,
   } = useMarket();
+  const smallScreen = useSmallScreen();
 
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     setAnchorEl(event.currentTarget);
@@ -219,24 +221,32 @@ const Settings = (): JSX.Element => {
             direction="column"
           >
             <Grid item className={classes.item}>
-              <ToggleButton
-                key={nanoid()}
-                on={autoApprove}
-                onClick={setAutoApprove}
-                label="Auto Approve Funding"
-              />
-              <ToggleButton
-                key={nanoid()}
-                on={locked}
-                onClick={setLocked}
-                label="Lock Layout"
-              />
-              <ToggleButton
-                key={nanoid()}
-                on={useIsolatedPositions}
-                onClick={handleChangeIsolatedPositions}
-                label="Isolated Positions"
-              />
+              {!smallScreen && (
+                <Grid item>
+                  <ToggleButton
+                    key={nanoid()}
+                    on={autoApprove}
+                    onClick={setAutoApprove}
+                    label="Auto Approve Funding"
+                  />
+                </Grid>
+              )}
+              <Grid item>
+                <ToggleButton
+                  key={nanoid()}
+                  on={locked}
+                  onClick={setLocked}
+                  label="Lock Layout"
+                />
+              </Grid>
+              <Grid item>
+                <ToggleButton
+                  key={nanoid()}
+                  on={useIsolatedPositions}
+                  onClick={handleChangeIsolatedPositions}
+                  label="Isolated Positions"
+                />
+              </Grid>
               <Grid
                 container
                 alignItems="center"
