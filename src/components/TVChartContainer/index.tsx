@@ -76,9 +76,11 @@ export const TVChartContainer = () => {
         defaultProps.containerId as ChartingLibraryWidgetOptions["container_id"],
       library_path: defaultProps.libraryPath as string,
       auto_save_delay: 5,
-
       locale: "en",
-      disabled_features: ["use_localstorage_for_settings"],
+      disabled_features: [
+        "use_localstorage_for_settings",
+        "create_volume_indicator_by_default",
+      ],
       enabled_features: ["study_templates"],
       load_last_chart: true,
       client_id: defaultProps.clientId,
