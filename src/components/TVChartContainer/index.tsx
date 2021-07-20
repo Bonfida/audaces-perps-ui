@@ -34,7 +34,7 @@ export const TVChartContainer = () => {
   const defaultProps: ChartContainerProps = {
     symbol: "BTC-PERP",
     // @ts-ignore
-    interval: "60",
+    interval: "15",
     auto_save_delay: 5,
     theme: "Dark",
     containerId: "tv_chart_container",

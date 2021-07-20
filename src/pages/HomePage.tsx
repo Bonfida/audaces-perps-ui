@@ -258,7 +258,7 @@ const Introduction = () => {
               Fast and cheap
             </Typography>
             <Typography variant="body1" className={classes.text}>
-              Trade up to 20x leverage with near 0 network fees
+              Trade up to 15x leverage with near 0 network fees
             </Typography>
           </Grid>
           <Grid item>

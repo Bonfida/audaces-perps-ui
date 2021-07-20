@@ -98,6 +98,12 @@ const LiquidationButton = () => {
       }
       setNbCranked(nbCranked + 1);
     } catch (err) {
+      if (err.message.includes("no-op")) {
+        return notify({
+          message: `No liquidation to crank`,
+          variant: "success",
+        });
+      }
       console.warn(`Error - ${err}`);
       notify({
         message: `Error cranking transaction - ${err}`,
@@ -146,6 +152,9 @@ const FundingButton = () => {
       }
       setNbCranked(nbCranked + 1);
     } catch (err) {
+      if (err.message.includes("no-op")) {
+        return notify({ message: `No funding to crank`, variant: "success" });
+      }
       console.warn(`Error - ${err}`);
       notify({
         message: `Error cranking transaction - ${err}`,
