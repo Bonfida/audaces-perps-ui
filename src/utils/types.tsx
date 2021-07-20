@@ -131,3 +131,8 @@ export interface FundingPayment {
   fundingPayer: string;
   signature: string;
 }
+
+export interface Trader {
+  feePayer: string;
+  volume: number;
+}

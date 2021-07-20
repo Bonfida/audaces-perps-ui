@@ -5,7 +5,12 @@ import React, {
   useCallback,
   useEffect,
 } from "react";
-import { MarketContextValues, PastTrade, FundingPayment } from "./types";
+import {
+  MarketContextValues,
+  PastTrade,
+  FundingPayment,
+  Trader,
+} from "./types";
 import { PublicKey } from "@solana/web3.js";
 import { useAsyncData } from "./fetch-loop";
 import { useConnection } from "./connection";
@@ -23,6 +28,7 @@ const URL_API_TRADES = "https://serum-api.bonfida.com/perps/trades?market=";
 const URL_API_VOLUME = "https://serum-api.bonfida.com/perps/volume?market=";
 const URL_API_FUNDING =
   "https://serum-api.bonfida.com/perps/funding-payment?userAddress=";
+const URL_LEADERBOARD = "https://serum-api.bonfida.com/perps/leaderboard";
 
 export const MAX_LEVERAGE = 15;
 
@@ -247,4 +253,18 @@ export const useFidaAmount = () => {
     return accountInfo.value?.data.parsed.info.tokenAmount.uiAmount;
   };
   return useAsyncData(fn, tuple("useFidaAmount", connection, connected));
+};
+
+export const useLeaderBoard = () => {
+  const fn = async () => {
+    const result = await apiGet(URL_LEADERBOARD);
+    if (!result.success) {
+      throw new Error("Error fetching leaderboard");
+    }
+    const data: Trader[] = result.data;
+    return data.sort((a, b) => b.volume - a.volume);
+  };
+  return useAsyncData(fn, "useLeaderBoard", {
+    refreshInterval: 60 * 1_000 * 10,
+  });
 };

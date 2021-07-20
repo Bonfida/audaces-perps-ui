@@ -21,6 +21,7 @@ import { useLocalStorageState } from "../../utils/utils";
 import HomeIcon from "@material-ui/icons/Home";
 import BarChartIcon from "@material-ui/icons/BarChart";
 import AllInclusiveIcon from "@material-ui/icons/AllInclusive";
+import AssessmentIcon from "@material-ui/icons/Assessment";
 
 const drawerWidth = 280;
 
@@ -100,6 +101,11 @@ const topBarElement = [
     href: "/nodes",
     icon: <AllInclusiveIcon />,
   },
+  {
+    name: "leaderboard",
+    href: "/leaderboard",
+    icon: <AssessmentIcon />,
+  },
 ];
 
 //  For white label UIs change this
@@ -138,8 +144,8 @@ const TopBar = () => {
       setTab(1);
     } else if (location.pathname.includes("nodes")) {
       setTab(2);
-    } else if (location.pathname.includes("ref")) {
-      setTab(0);
+    } else if (location.pathname.includes("leaderboard")) {
+      setTab(3);
     } else {
       setTab(0);
     }

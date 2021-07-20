@@ -5,6 +5,7 @@ import { MAINNET_ENDPOINT } from "./connection";
 import useMediaQuery from "@material-ui/core/useMediaQuery/useMediaQuery";
 import useTheme from "@material-ui/core/styles/useTheme";
 import { TOKEN_PROGRAM_ID } from "@solana/spl-token";
+import words from "fun-word-list";
 
 export const BONFIDA_API_URL = "https://serum-api.bonfida.com/";
 
@@ -394,4 +395,30 @@ export const checkTextFieldNumberInput = (e) => {
   const parsed = parseFloat(trim);
   const valid = !(isNaN(parsed) || parsed < 0 || !isFinite(parsed));
   return { value: valid ? trim : null, valid: valid };
+};
+
+export const hashStringToInteger = (s: string) => {
+  let hash = 0,
+    i,
+    chr;
+  for (i = 0; i < s.length; i++) {
+    chr = s.charCodeAt(i);
+    hash = (hash << 5) - hash + chr;
+    hash |= 0; // Convert to 32bit integer
+  }
+  return hash;
+};
+
+export const getLeaderBoardName = (address: string) => {
+  const hashed = hashStringToInteger(address).toString();
+  // words.nouns.length === 1015
+  return (
+    words.nouns[parseInt(hashed.slice(1, 4)) % 1015][0] +
+    "-" +
+    words.nouns[parseInt(hashed.slice(2, 5)) % 1015][0] +
+    "-" +
+    words.nouns[parseInt(hashed.slice(3, 6)) % 1015][0]
+  )
+    .split(" ")
+    .join("-");
 };

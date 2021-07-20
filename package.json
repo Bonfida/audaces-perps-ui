@@ -24,6 +24,7 @@
     "borsh": "https://github.com/near/borsh-js.git",
     "bs58": "^4.0.1",
     "clsx": "^1.1.1",
+    "fun-word-list": "^1.0.0",
     "immutable-tuple": "^0.4.10",
     "nanoid": "^3.1.22",
     "notistack": "^1.0.5",

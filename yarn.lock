@@ -5759,6 +5759,11 @@ fsevents@^2.1.2, fsevents@^2.1.3, fsevents@~2.3.1:
   resolved "https://registry.yarnpkg.com/fsevents/-/fsevents-2.3.2.tgz#8a526f78b8fdf4623b709e0b975c52c24c02fd1a"
   integrity sha512-xiqMQR4xAeHTuB9uWm+fFRcIOgKBMiOBP+eXiyT7jsgVCq1bkVygt00oASowB7EdtpOHaaPgKt812P9ab+DDKA==
 
+fun-word-list@^1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/fun-word-list/-/fun-word-list-1.0.0.tgz#7db3caf9600b3f3f764fde19d6678e2462ff92bd"
+  integrity sha512-QA1w8ThwBSGL0wRL+vMBpFm7Z+in3AlMUaw1uIz+6Q2Yr1Rdnd1aTqJ8OD4pHUOkxK5XY1pCENxoAC6pDGAiIg==
+
 function-bind@^1.1.1:
   version "1.1.1"
   resolved "https://registry.yarnpkg.com/function-bind/-/function-bind-1.1.1.tgz#a56899d3ea3c9bab874bb9773b7c5ede92f4895d"
@@ -6034,6 +6039,11 @@ hash.js@^1.0.0, hash.js@^1.0.3:
   dependencies:
     inherits "^2.0.3"
     minimalistic-assert "^1.0.1"
+
+hashlib@^1.0.1:
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/hashlib/-/hashlib-1.0.1.tgz#68d7c4924c10f2f67dd20ede79316397e772107c"
+  integrity sha1-aNfEkkwQ8vZ90g7eeTFjl+dyEHw=
 
 he@^1.2.0:
   version "1.2.0"
