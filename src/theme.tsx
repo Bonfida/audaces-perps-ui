@@ -65,5 +65,12 @@ export const theme = createMuiTheme({
         borderBottom: "1px solid rgba(224, 224, 224, 0.5)",
       },
     },
+    MuiTableRow: {
+      root: {
+        "&:last-child td": {
+          borderBottom: 0,
+        },
+      },
+    },
   },
 });

@@ -55,6 +55,9 @@ export interface FeesRowProps {
   fee: string;
   feeHighLeverage: string;
   requirements: string;
+  min: number;
+  max: number;
+  isUserFeeTier?: boolean;
 }
 
 export interface LayoutContextValues {

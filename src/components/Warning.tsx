@@ -21,7 +21,7 @@ const useStyles = makeStyles({
   },
   root: {
     maxWidth: "70vw",
-    overflow: "scroll",
+    overflow: "auto",
   },
   button: {
     color: "white",

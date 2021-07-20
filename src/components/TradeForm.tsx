@@ -66,7 +66,7 @@ const useStyles = makeStyles({
   inputProps: {
     color: "white",
     width: "100%",
-    fontSize: 14,
+    fontSize: 16,
   },
   whiteText: {
     color: "white",
@@ -563,6 +563,21 @@ const TradeForm = () => {
             style={{ opacity: 0.6 }}
           >
             Expected slippage: {`${roundToDecimal(slippage * 100, 3)}%`}
+          </Typography>
+        </div>
+      )}
+      {!!slippage && markPrice && (
+        <div className={classes.maxPositionContainer}>
+          <Typography
+            variant="body1"
+            className={classes.whiteText}
+            style={{ opacity: 0.6 }}
+          >
+            Expected entry price:{" "}
+            {`${roundToDecimal(
+              markPrice * (1 + (side === 0 ? 1 : -1) * slippage),
+              2
+            )?.toLocaleString()}`}
           </Typography>
         </div>
       )}

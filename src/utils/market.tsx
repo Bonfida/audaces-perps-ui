@@ -13,6 +13,7 @@ import {
   MarketState,
   UserAccount,
   getUserAccountsForOwner,
+  getDiscountAccount,
 } from "@audaces/perps";
 import tuple from "immutable-tuple";
 import { useWallet } from "./wallet";
@@ -205,7 +206,15 @@ export const useUserFunding = () => {
     if (!result.success) {
       throw new Error("Error fetching funding");
     }
-    const data: FundingPayment[] = result.data;
+    let data: FundingPayment[] = result.data;
+    let vide: FundingPayment[] = [];
+    data = data.reduce((unique, o) => {
+      // Server returning funding payment might contain duplicates. Checking signature for unicity
+      if (!unique.some((obj) => obj.signature === o.signature)) {
+        unique.push(o);
+      }
+      return unique;
+    }, vide);
     return data;
   };
   return useAsyncData(
@@ -221,4 +230,21 @@ export const getMarketNameFromAddress = (name: string) => {
     default:
       return "Unknown";
   }
+};
+
+export const useFidaAmount = () => {
+  const { wallet, connected } = useWallet();
+  const connection = useConnection();
+  const fn = async () => {
+    if (!connected) return;
+    const discountAccount = await getDiscountAccount(
+      connection,
+      wallet.publicKey
+    );
+    if (!discountAccount) return 0;
+    const accountInfo = await connection.getParsedAccountInfo(discountAccount);
+    // @ts-ignore
+    return accountInfo.value?.data.parsed.info.tokenAmount.uiAmount;
+  };
+  return useAsyncData(fn, tuple("useFidaAmount", connection, connected));
 };

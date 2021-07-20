@@ -72,7 +72,7 @@ export const LayoutProvider = ({ children }) => {
   let tradePanelHeight = isLg ? 18 : isMd ? 15 : isSm ? 20 : 20;
   // Trade Form
   let tradeFormWidth = isLg ? 2 : isMd ? 3 : isSm ? 12 : 12;
-  let tradeFormHeight = isLg ? 25 : isMd ? 25 : isSm ? 24 : 24;
+  let tradeFormHeight = isLg ? 25 : isMd ? 25 : isSm ? 25 : 25;
   // MarketInfo
   let marketInfoWidth = isLg ? 10 : isMd ? 9 : isSm ? 12 : 12;
   let marketInfoHeight = isLg ? 3 : isMd ? 3 : isSm ? 3 : 3;
