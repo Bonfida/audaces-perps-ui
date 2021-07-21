@@ -15,6 +15,7 @@ import {
 import LaunchIcon from "@material-ui/icons/Launch";
 import { ExplorerLink } from "../components/Link";
 import { useWallet } from "../utils/wallet";
+import Spin from "../components/Spin";
 
 const useStyles = makeStyles({
   tableCell: {
@@ -50,6 +51,11 @@ const useStyles = makeStyles({
     color: "white",
     opacity: 0.8,
     marginTop: 5,
+  },
+  loading: {
+    display: "flex",
+    justifyContent: "center",
+    marginTop: 50,
   },
 });
 
@@ -104,8 +110,9 @@ const LeaderBoardTableRow = ({
 
 const LeaderboardPage = () => {
   const classes = useStyles();
-  const [leaderboard] = useLeaderBoard();
+  const [leaderboard, leaderboardLoaded] = useLeaderBoard();
   const { connected, wallet } = useWallet();
+
   return (
     <div className={classes.div}>
       <FloatinCard>
@@ -119,25 +126,35 @@ const LeaderboardPage = () => {
               {getLeaderBoardName(wallet.publicKey.toBase58())}
             </Typography>
           )}
-          <Table>
-            <LeaderBoardTableHead />
-            <TableBody style={{ maxHeight: 500, overflow: "scroll" }}>
-              {leaderboard?.map((row, i) => {
-                return (
-                  <LeaderBoardTableRow
-                    rank={i + 1}
-                    address={row.feePayer}
-                    key={`leaderboard-${i}`}
-                    isUser={
-                      connected
-                        ? wallet.publicKey.toBase58() === row.feePayer
-                        : false
-                    }
-                  />
-                );
-              })}
-            </TableBody>
-          </Table>
+
+          {leaderboardLoaded && (
+            <>
+              <Table>
+                <LeaderBoardTableHead />
+                <TableBody style={{ maxHeight: 500, overflow: "scroll" }}>
+                  {leaderboard?.map((row, i) => {
+                    return (
+                      <LeaderBoardTableRow
+                        rank={i + 1}
+                        address={row.feePayer}
+                        key={`leaderboard-${i}`}
+                        isUser={
+                          connected
+                            ? wallet.publicKey.toBase58() === row.feePayer
+                            : false
+                        }
+                      />
+                    );
+                  })}
+                </TableBody>
+              </Table>
+            </>
+          )}
+          {!leaderboardLoaded && (
+            <div className={classes.loading}>
+              <Spin size={50} />
+            </div>
+          )}
         </TableContainer>
       </FloatinCard>
     </div>
