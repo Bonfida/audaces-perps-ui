@@ -40,7 +40,7 @@ const useStyles = makeStyles({
     fontWeight: 600,
   },
   container: {
-    maxHeight: 500,
+    maxHeight: 800,
     width: "100%",
   },
   div: {
