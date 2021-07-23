@@ -10,6 +10,7 @@ import {
   PastTrade,
   FundingPayment,
   Trader,
+  Market,
 } from "./types";
 import { PublicKey } from "@solana/web3.js";
 import { useAsyncData } from "./fetch-loop";
@@ -32,6 +33,18 @@ const URL_LEADERBOARD = "https://serum-api.bonfida.com/perps/leaderboard";
 
 export const MAX_LEVERAGE = 15;
 
+// TODO put this on NPM
+export const MARKETS: Market[] = [
+  {
+    address: "475P8ZX3NrzyEMJSFHt9KCMjPpWBWGa6oNxkWcwww2BR",
+    name: "BTC-PERP",
+  },
+  {
+    address: "3ds9ZtmQfHED17tXShfC1xEsZcfCvmT8huNG79wa4MHg",
+    name: "ETH-PERP",
+  },
+];
+
 const MarketContext: React.Context<null | MarketContextValues> =
   React.createContext<null | MarketContextValues>(null);
 
@@ -42,9 +55,7 @@ export const MarketProvider = ({ children }) => {
     "autoApprove",
     false
   );
-  const [market, setMarket] = useState(
-    "475P8ZX3NrzyEMJSFHt9KCMjPpWBWGa6oNxkWcwww2BR"
-  );
+  const [market, setMarket] = useLocalStorageState("market", MARKETS[0]);
   const [userAccount, setUserAccount] = useState<
     UserAccount | null | undefined
   >(null);
@@ -54,16 +65,22 @@ export const MarketProvider = ({ children }) => {
   );
   const { wallet, connected } = useWallet();
 
-  const marketAddress = useMemo(() => new PublicKey(market), [market]);
+  const marketAddress = useMemo(
+    () => new PublicKey(market.address),
+    [market.address]
+  );
 
   const getMarketState = useCallback(async () => {
-    const marketState = await MarketState.retrieve(connection, marketAddress);
+    const marketState = await MarketState.retrieve(
+      connection,
+      new PublicKey(market.address)
+    );
     return marketState;
-  }, [marketAddress, connection]);
+  }, [market.address, connection]);
 
   const [marketState, marketStateLoaded] = useAsyncData(
     getMarketState,
-    tuple("getMarketState", connection),
+    tuple("getMarketState", connection, market.address),
     { refreshInterval: 1_000 }
   );
   const [refreshUserAccount, setRefreshUserAccount] = useState(false);
@@ -89,12 +106,13 @@ export const MarketProvider = ({ children }) => {
     };
     fn();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [connected, market, refreshUserAccount, marketState]);
+  }, [connected, market.address, refreshUserAccount, marketState]);
 
   return (
     <MarketContext.Provider
       value={{
         marketAddress,
+        marketName: market.name,
         marketState,
         marketStateLoaded,
         slippage,
@@ -122,6 +140,7 @@ export const useMarket = () => {
   }
   return {
     marketAddress: context.marketAddress,
+    marketName: context.marketName,
     marketState: context.marketState,
     marketStateLoaded: context.marketStateLoaded,
     slippage: context.slippage,
@@ -138,14 +157,28 @@ export const useMarket = () => {
   };
 };
 
-export const use24hVolume = () => {
-  const { marketAddress } = useMarket();
+export const useVolume = (
+  marketAddress: string | null | undefined,
+  startTime?: number,
+  endTime?: number
+) => {
+  if (!startTime || !endTime) {
+    endTime = new Date().getTime() / 1_000;
+    endTime = endTime - (endTime % (60 * 60));
+    startTime = endTime - 24 * 60 * 60;
+  }
   const fn = async () => {
-    const result = await apiGet(`${URL_API_VOLUME}${marketAddress.toBase58()}`);
+    if (!marketAddress) return;
+    const result = await apiGet(
+      `${URL_API_VOLUME}${marketAddress}&startTime=${startTime}&endTime=${endTime}`
+    );
     if (!result.success) return 0;
     return roundToDecimal(result?.data?.volume, 2)?.toLocaleString();
   };
-  return useAsyncData(fn, "use24hVolume");
+  return useAsyncData(
+    fn,
+    tuple("useVolume", marketAddress, startTime, endTime)
+  );
 };
 
 export const useLastTrades = () => {};
@@ -227,15 +260,6 @@ export const useUserFunding = () => {
     fn,
     tuple("useUserFunding", userAccount?.address?.toBase58())
   );
-};
-
-export const getMarketNameFromAddress = (name: string) => {
-  switch (name) {
-    case "475P8ZX3NrzyEMJSFHt9KCMjPpWBWGa6oNxkWcwww2BR":
-      return "BTC/USDC";
-    default:
-      return "Unknown";
-  }
 };
 
 export const useFidaAmount = () => {

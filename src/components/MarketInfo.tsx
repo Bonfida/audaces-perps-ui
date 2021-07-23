@@ -1,20 +1,24 @@
 import React, { useState } from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import getIcon from "../utils/icons";
-import { Grid, Typography } from "@material-ui/core";
+import { Grid, Typography, Menu, MenuItem, Fade } from "@material-ui/core";
 import FloatingCard from "./FloatingCard";
 import { useOraclePrice } from "../utils/perpetuals";
 import {
   useMarkPrice,
   useMarket,
-  use24hVolume,
+  useVolume,
   useUserAccount,
   getFundingRate,
+  MARKETS,
 } from "../utils/market";
 import { roundToDecimal, USDC_DECIMALS, useSmallScreen } from "../utils/utils";
 import MouseOverPopOver from "./MouseOverPopOver";
 import Countdown from "react-countdown";
 import useInterval from "../utils/useInterval";
+import ArrowDropDownIcon from "@material-ui/icons/ArrowDropDown";
+import { Market } from "../utils/types";
+import { useHistory } from "react-router-dom";
 
 const useStyles = makeStyles({
   label: {
@@ -58,6 +62,18 @@ const useStyles = makeStyles({
     marginBottom: 10,
     width: "100%",
   },
+  headerContainer: {
+    cursor: "pointer",
+  },
+  arrowDown: {
+    color: "white",
+    fontSize: 20,
+    marginTop: 5,
+  },
+  menuPaper: {
+    background:
+      "linear-gradient(90deg, rgba(18,23,33,1) 0%, rgba(19,30,48,1) 50%, rgba(18,23,33,1) 100%)",
+  },
 });
 
 const InfoColumn = ({ label, value }: { label: string; value: any }) => {
@@ -81,26 +97,110 @@ const InfoColumn = ({ label, value }: { label: string; value: any }) => {
 
 const Header = () => {
   const classes = useStyles();
-  const marketName = "BTC/USDC";
-  const baseCurrency = "BTC";
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const open = Boolean(anchorEl);
+  const { marketName, setMarket } = useMarket();
+  const baseCurrency = marketName.split("-")[0];
+  const history = useHistory();
+
+  const handleClick = (event: React.MouseEvent<HTMLElement>) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleClose = (m: Market) => {
+    const path = m?.name?.split("-")?.join("");
+    if (!path) {
+      return setAnchorEl(null);
+    }
+    history.push(m?.name?.split("-")?.join(""));
+    setMarket(m);
+    setAnchorEl(null);
+  };
 
   return (
-    <Grid
-      container
-      direction="row"
-      justify="center"
-      alignItems="center"
-      spacing={2}
-    >
-      <Grid item>
-        <img src={getIcon(baseCurrency)} className={classes.img} alt="" />
-      </Grid>
-      <Grid item>
-        <Typography className={classes.marketName} align="center">
-          {marketName}
-        </Typography>
-      </Grid>
-    </Grid>
+    <>
+      <div onClick={handleClick} className={classes.headerContainer}>
+        <Grid
+          container
+          direction="row"
+          justify="center"
+          alignItems="center"
+          spacing={2}
+        >
+          <Grid item>
+            <img src={getIcon(baseCurrency)} className={classes.img} alt="" />
+          </Grid>
+          <Grid item>
+            <Typography className={classes.marketName} align="center">
+              {marketName}
+            </Typography>
+          </Grid>
+          <Grid item>
+            <ArrowDropDownIcon className={classes.arrowDown} />
+          </Grid>
+        </Grid>
+      </div>
+      <Menu
+        anchorEl={anchorEl}
+        getContentAnchorEl={null}
+        keepMounted
+        open={open}
+        classes={{ paper: classes.menuPaper }}
+        onClose={handleClose}
+        TransitionComponent={Fade}
+        anchorOrigin={{
+          vertical: "bottom",
+          horizontal: "center",
+        }}
+        transformOrigin={{
+          vertical: "top",
+          horizontal: "center",
+        }}
+      >
+        {MARKETS.map((m, i) => {
+          const _baseCurrency = m.name.split("-")[0];
+          return (
+            <MenuItem
+              key={`market-menu-${i}`}
+              onClick={() => handleClose(m)}
+              style={{
+                background:
+                  marketName === m.name
+                    ? "rgba(211, 211, 211, 0.3)"
+                    : undefined,
+              }}
+            >
+              <Grid
+                container
+                direction="row"
+                justify="center"
+                alignItems="center"
+                spacing={2}
+              >
+                <Grid item>
+                  <img
+                    src={getIcon(_baseCurrency)}
+                    className={classes.img}
+                    alt=""
+                  />
+                </Grid>
+                <Grid item>
+                  <Typography
+                    style={{
+                      fontWeight: 600,
+                    }}
+                    className={classes.marketName}
+                    align="center"
+                  >
+                    {m.name}
+                  </Typography>
+                </Grid>
+              </Grid>
+            </MenuItem>
+          );
+        })}
+      </Menu>
+    </>
   );
 };
 
@@ -108,9 +208,9 @@ const MarketData = () => {
   const classes = useStyles();
   const { marketState } = useMarket();
   const userAccount = useUserAccount();
-  const [indexPrice] = useOraclePrice();
+  const [indexPrice] = useOraclePrice(marketState?.marketAccount);
   const markPrice = useMarkPrice();
-  const [volume] = use24hVolume();
+  const [volume] = useVolume(marketState?.marketAccount?.toBase58());
   const fundingRatios = getFundingRate(marketState);
   const [fundingCountdown, setFundingCountdown] = useState<number>(
     Date.now() + 60 * 60 * 1_000 - (Date.now() % (60 * 60 * 1_000))

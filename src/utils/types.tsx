@@ -1,6 +1,7 @@
 import Wallet from "@project-serum/sol-wallet-adapter";
 import { AccountInfo, Connection, PublicKey } from "@solana/web3.js";
 import { MarketState, UserAccount } from "@audaces/perps";
+import { Mark } from "@material-ui/core";
 
 export interface ConnectionContextValues {
   endpoint: string;
@@ -83,11 +84,12 @@ export interface AvailableCollateral {
 
 export interface MarketContextValues {
   marketAddress: PublicKey;
+  marketName: string;
   marketState: MarketState | null | undefined;
   marketStateLoaded: boolean;
   slippage: number;
   setSlippage: (arg: number) => void;
-  setMarket: (arg: string) => void;
+  setMarket: (arg: Market) => void;
   userAccount: UserAccount | null | undefined;
   setUserAccount: (arg: UserAccount | null | undefined) => void;
   autoApprove: boolean;
@@ -135,4 +137,9 @@ export interface FundingPayment {
 export interface Trader {
   feePayer: string;
   volume: number;
+}
+
+export interface Market {
+  address: string;
+  name: string;
 }

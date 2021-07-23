@@ -3,8 +3,11 @@ import { getProgramAccounts, USDC_MINT, useLocalStorageState } from "./utils";
 import { useAsyncData } from "./fetch-loop";
 import tuple from "immutable-tuple";
 import { useConnection } from "./connection";
-import { findAssociatedTokenAddress } from "@audaces/perps";
-import { getUserAccountsForOwner } from "@audaces/perps";
+import {
+  findAssociatedTokenAddress,
+  getUserAccountsForOwner,
+  MarketState,
+} from "@audaces/perps";
 import { PublicKey } from "@solana/web3.js";
 import { useMarket } from "./market";
 import { getOraclePrice } from "@audaces/perps";
@@ -164,29 +167,20 @@ export const findUserAccountsForMint = (tokenAccounts: any, mint: string) => {
     ?.map((acc) => acc.pubkey);
 };
 
-export const marketNameFromAddress = (address: string) => {
-  switch (address) {
-    case "Bcfk9fHM4X1KpN3yRRajmtf5eR8KQQXH2BouvVoCZn3n":
-      return "BTC/USDC";
-    default:
-      return "BTC/USDC";
-  }
-};
-
-export const useOraclePrice = () => {
-  const { marketState } = useMarket();
+export const useOraclePrice = (marketAddress: PublicKey | undefined | null) => {
   const connection = useConnection();
-  const oracleAddress = marketState?.oracleAddress;
   const get = async () => {
-    if (!oracleAddress) {
+    if (!marketAddress) return;
+    const marketState = await MarketState.retrieve(connection, marketAddress);
+    if (!marketState) {
       return null;
     }
-    const result = await getOraclePrice(connection, oracleAddress);
+    const result = await getOraclePrice(connection, marketState.oracleAddress);
     return result;
   };
   return useAsyncData(
     get,
-    tuple("useOracleAddress", connection, oracleAddress?.toBase58())
+    tuple("useOracleAddress", connection, marketAddress?.toBase58())
   );
 };
 

@@ -7,6 +7,8 @@ import {
 } from "../../charting_library";
 import * as saveLoadAdapter from "./saveLoadAdapter";
 import { flatten } from "../../utils/utils";
+import { useLocalStorageState } from "../../utils/utils";
+import { MARKETS } from "../../utils/market";
 
 export interface ChartContainerProps {
   symbol: ChartingLibraryWidgetOptions["symbol"];
@@ -30,6 +32,7 @@ export interface ChartContainerProps {
 export interface ChartContainerState {}
 
 export const TVChartContainer = () => {
+  const [market] = useLocalStorageState("market", MARKETS[0]);
   // let datafeed = useTvDataFeed();
   const defaultProps: ChartContainerProps = {
     symbol: "BTC-PERP",
@@ -50,9 +53,7 @@ export const TVChartContainer = () => {
   };
 
   const tvWidgetRef = React.useRef<IChartingLibraryWidget | null>(null);
-  const market = "BTC-PERP";
-  const index = "BTC-PERP-INDEX";
-
+  const index = React.useMemo(() => market.name + "-INDEX", [market.name]);
   const chartProperties = JSON.parse(
     localStorage.getItem("chartproperties") || "{}"
   );
@@ -63,7 +64,7 @@ export const TVChartContainer = () => {
     });
 
     const widgetOptions: ChartingLibraryWidgetOptions = {
-      symbol: market,
+      symbol: market.name,
       // BEWARE: no trailing slash is expected in feed URL
       // tslint:disable-next-line:no-any
       // @ts-ignore
@@ -227,8 +228,21 @@ export const TVChartContainer = () => {
       tvWidget.chart().createStudy("Index", false, true);
       tvWidgetRef.current = tvWidget;
     });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [market, tvWidgetRef.current]);
+  }, [
+    market,
+    chartProperties,
+    defaultProps.autosize,
+    defaultProps.clientId,
+    defaultProps.containerId,
+    defaultProps.datafeedUrl,
+    defaultProps.fullscreen,
+    defaultProps.interval,
+    defaultProps.libraryPath,
+    defaultProps.studiesOverrides,
+    defaultProps.theme,
+    defaultProps.userId,
+    index,
+  ]);
 
   return <div id={defaultProps.containerId} className={"TVChartContainer"} />;
 };

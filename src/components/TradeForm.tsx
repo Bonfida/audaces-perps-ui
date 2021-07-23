@@ -133,7 +133,8 @@ const TradeForm = () => {
   const [side, setSide] = useState(0);
   const [baseSize, setBaseSize] = useState("0");
   const [quoteSize, setQuoteSize] = useState("0");
-  const { userAccount, marketState, useIsolatedPositions } = useMarket();
+  const { userAccount, marketState, useIsolatedPositions, marketName } =
+    useMarket();
   const connection = useConnection();
   const { wallet, connected, connect } = useWallet();
   const markPrice = useMarkPrice();
@@ -146,9 +147,9 @@ const TradeForm = () => {
     setSide(newValue);
   };
 
-  const marketName = "BTC-USDC";
-  const baseCurrency = "BTC";
+  const baseCurrency = marketName.split("-")[0];
   const quoteCurrency = "USDC";
+
   const userBalance = useMemo(
     () => userAccount && userAccount.balance / USDC_DECIMALS,
     // eslint-disable-next-line react-hooks/exhaustive-deps

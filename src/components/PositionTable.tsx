@@ -28,8 +28,8 @@ import CreateIcon from "@material-ui/icons/Create";
 import { useSmallScreen } from "../utils/utils";
 import LeverageChip, { LiquidatedChip } from "./Chips";
 import MouseOverPopOver from "./MouseOverPopOver";
-import { useReferrer, marketNameFromAddress } from "../utils/perpetuals";
-import { useMarket } from "../utils/market";
+import { useReferrer } from "../utils/perpetuals";
+import { MARKETS } from "../utils/market";
 
 const useStyles = makeStyles({
   table: {
@@ -150,12 +150,13 @@ const PositionRow = (props: Position) => {
   const connection = useConnection();
   const smallScreen = useSmallScreen("md");
   const referrer = useReferrer();
-  const { marketAddress } = useMarket();
-
+  const market = MARKETS.find(
+    (m) => m.address === props.marketAddress.toBase58()
+  );
   const positivePnl = props.pnl > 0;
   const buySide = props.side === "long";
 
-  const [oraclePrice, oraclePriceLoaded] = useOraclePrice();
+  const [oraclePrice, oraclePriceLoaded] = useOraclePrice(props.marketAddress);
 
   const isLiquidated = useMemo(() => {
     if (!oraclePrice?.price) {
@@ -255,7 +256,7 @@ const PositionRow = (props: Position) => {
     return (
       <TableRow>
         <TableCell className={classes.tableCell}>
-          {marketNameFromAddress(marketAddress.toBase58())}
+          {market ? market.name : "Unknown"}
           <LiquidatedChip />
         </TableCell>
         <TableCell />
@@ -284,7 +285,7 @@ const PositionRow = (props: Position) => {
         <Grid container alignItems="center">
           <Grid item>
             <Typography className={classes.marketName}>
-              {marketNameFromAddress(marketAddress.toBase58())}
+              {market ? market.name : "Unknown"}
             </Typography>
           </Grid>
           {!smallScreen && (

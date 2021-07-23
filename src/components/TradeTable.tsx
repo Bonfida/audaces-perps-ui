@@ -9,11 +9,7 @@ import { PastTrade } from "../utils/types";
 import { useWallet } from "../utils/wallet";
 import { Grid } from "@material-ui/core";
 import WalletConnect from "./WalletConnect";
-import {
-  useMarket,
-  useUserTrades,
-  getMarketNameFromAddress,
-} from "../utils/market";
+import { useMarket, useUserTrades, MARKETS } from "../utils/market";
 import LaunchIcon from "@material-ui/icons/Launch";
 import { ExplorerLink } from "./Link";
 import TableContainer from "@material-ui/core/TableContainer";
@@ -64,10 +60,11 @@ const TradeRow = (props: PastTrade) => {
   const classes = useStyles();
   const { market, side, orderSize, time, markPrice, signature } = props;
   const date = new Date(time * 1000);
+  const marketName = MARKETS.find((m) => m.address === market)?.name;
   return (
     <TableRow>
       <TableCell className={classes.tableCell}>
-        {getMarketNameFromAddress(market)}
+        {marketName ? marketName : "Unknown"}
       </TableCell>
       <TableCell
         className={side === "buy" ? classes.buyCell : classes.sellCell}

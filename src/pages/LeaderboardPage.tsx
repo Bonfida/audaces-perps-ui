@@ -11,11 +11,14 @@ import {
   TableContainer,
   TableHead,
   TableRow,
+  Grid,
 } from "@material-ui/core";
 import LaunchIcon from "@material-ui/icons/Launch";
 import { ExplorerLink } from "../components/Link";
 import { useWallet } from "../utils/wallet";
 import Spin from "../components/Spin";
+import { useVolume } from "../utils/market";
+import ContentLoader from "react-content-loader";
 
 const useStyles = makeStyles({
   tableCell: {
@@ -56,6 +59,16 @@ const useStyles = makeStyles({
     display: "flex",
     justifyContent: "center",
     marginTop: 50,
+  },
+  volumeValue: {
+    fontSize: 50,
+    fontWeight: 600,
+    color: "white",
+  },
+  volumeTitle: {
+    fontSize: 24,
+    color: "white",
+    opacity: 0.8,
   },
 });
 
@@ -108,56 +121,138 @@ const LeaderBoardTableRow = ({
   );
 };
 
+const Loader = () => (
+  <ContentLoader
+    speed={2}
+    width={250}
+    height={75}
+    viewBox="0 0 250 75"
+    backgroundColor="rgba(255, 255, 255, 0.05)"
+    foregroundColor="rgba(236, 235, 235, 0.5)"
+    style={{ borderRadius: 5 }}
+  >
+    <rect x="0" y="0" width="250" height="75" />
+  </ContentLoader>
+);
+
+const Volume = ({
+  title,
+  value,
+  loaded,
+}: {
+  title: string;
+  value: number | undefined | null | string;
+  loaded: boolean;
+}) => {
+  const classes = useStyles();
+  return (
+    <Grid container justify="flex-end" direction="column" alignItems="flex-end">
+      <Grid item>
+        {loaded ? (
+          <Typography className={classes.volumeValue}>${value}</Typography>
+        ) : (
+          <Loader />
+        )}
+      </Grid>
+      <Grid item>
+        <Typography className={classes.volumeTitle}>{title}</Typography>
+      </Grid>
+    </Grid>
+  );
+};
+
 const LeaderboardPage = () => {
   const classes = useStyles();
   const [leaderboard, leaderboardLoaded] = useLeaderBoard();
   const { connected, wallet } = useWallet();
+  const _now = Math.floor(new Date().getTime() / 1_000);
+  const now = React.useMemo(() => _now - (_now % (60 * 60)), [_now]);
+  const [volume24h, volume24hLoaded] = useVolume("all");
+  const [volume7d, volume7dLoaded] = useVolume(
+    "all",
+    now - 7 * 24 * 60 * 60,
+    now
+  );
+  const [volume30d, volume30dLoaded] = useVolume(
+    "all",
+    now - 30 * 24 * 60 * 60,
+    now
+  );
 
   return (
-    <div className={classes.div}>
-      <FloatinCard>
-        <TableContainer className={classes.container}>
-          <Typography className={classes.title} align="center" variant="body1">
-            Top Traders by 24h Volume
-          </Typography>
-          {connected && (
-            <Typography className={classes.text} align="center" variant="body1">
-              My leaderboard name:{" "}
-              {getLeaderBoardName(wallet.publicKey.toBase58())}
+    <>
+      <Grid container justify="center" spacing={5}>
+        <Grid item>
+          <Volume
+            title="24h Volume"
+            value={volume24h}
+            loaded={volume24hLoaded}
+          />
+        </Grid>
+        <Grid item>
+          <Volume title="7D Volume" value={volume7d} loaded={volume7dLoaded} />
+        </Grid>
+        <Grid item>
+          <Volume
+            title="30D Volume"
+            value={volume30d}
+            loaded={volume30dLoaded}
+          />
+        </Grid>
+      </Grid>
+      <div className={classes.div}>
+        <FloatinCard>
+          <TableContainer className={classes.container}>
+            <Typography
+              className={classes.title}
+              align="center"
+              variant="body1"
+            >
+              Top Traders by 24h Volume
             </Typography>
-          )}
+            {connected && (
+              <Typography
+                className={classes.text}
+                align="center"
+                variant="body1"
+              >
+                My leaderboard name:{" "}
+                {getLeaderBoardName(wallet.publicKey.toBase58())}
+              </Typography>
+            )}
 
-          {leaderboardLoaded && (
-            <>
-              <Table>
-                <LeaderBoardTableHead />
-                <TableBody style={{ maxHeight: 500, overflow: "scroll" }}>
-                  {leaderboard?.map((row, i) => {
-                    return (
-                      <LeaderBoardTableRow
-                        rank={i + 1}
-                        address={row.feePayer}
-                        key={`leaderboard-${i}`}
-                        isUser={
-                          connected
-                            ? wallet.publicKey.toBase58() === row.feePayer
-                            : false
-                        }
-                      />
-                    );
-                  })}
-                </TableBody>
-              </Table>
-            </>
-          )}
-          {!leaderboardLoaded && (
-            <div className={classes.loading}>
-              <Spin size={50} />
-            </div>
-          )}
-        </TableContainer>
-      </FloatinCard>
-    </div>
+            {leaderboardLoaded && (
+              <>
+                <Table>
+                  <LeaderBoardTableHead />
+                  <TableBody style={{ maxHeight: 500, overflow: "scroll" }}>
+                    {leaderboard?.map((row, i) => {
+                      return (
+                        <LeaderBoardTableRow
+                          rank={i + 1}
+                          address={row.feePayer}
+                          key={`leaderboard-${i}`}
+                          isUser={
+                            connected
+                              ? wallet.publicKey.toBase58() === row.feePayer
+                              : false
+                          }
+                        />
+                      );
+                    })}
+                  </TableBody>
+                </Table>
+              </>
+            )}
+            {!leaderboardLoaded && (
+              <div className={classes.loading}>
+                <Spin size={50} />
+              </div>
+            )}
+          </TableContainer>
+        </FloatinCard>
+      </div>
+    </>
   );
 };
 

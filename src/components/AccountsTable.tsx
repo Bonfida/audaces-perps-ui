@@ -17,7 +17,7 @@ import {
 } from "@material-ui/core";
 import { useWallet } from "../utils/wallet";
 import WalletConnect from "./WalletConnect";
-import { useUserData, marketNameFromAddress } from "../utils/perpetuals";
+import { useUserData } from "../utils/perpetuals";
 import Spin from "./Spin";
 import { closeAccount, getQuoteAccount, UserAccount } from "@audaces/perps";
 import {
@@ -25,7 +25,7 @@ import {
   fundingExtraction,
   withdrawCollateral,
 } from "@audaces/perps";
-import { useMarket } from "../utils/market";
+import { useMarket, MARKETS } from "../utils/market";
 import { useConnection } from "../utils/connection";
 import {
   checkTextFieldNumberInput,
@@ -43,6 +43,7 @@ import { InformationRow } from "./SummaryPosition";
 import LaunchIcon from "@material-ui/icons/Launch";
 import { ExplorerLink } from "./Link";
 import RefreshIcon from "@material-ui/icons/Refresh";
+import { useHistory } from "react-router-dom";
 
 const useStyles = makeStyles({
   table: {
@@ -491,10 +492,14 @@ const AccountRow = ({ acc }: { acc: UserAccount | undefined | null }) => {
     marketAddress,
     marketState,
     setRefreshUserAccount,
+    setMarket,
   } = useMarket();
   const [openAdd, setOpenAdd] = useState(false);
   const [openWithdraw, setOpenWithdraw] = useState(false);
   const instanceIndex = userAccount?.openPositions[0]?.instanceIndex;
+  const history = useHistory();
+
+  const market = MARKETS.find((m) => m.address === acc?.market.toBase58());
 
   const onClickExtractFunding = async () => {
     if (
@@ -574,11 +579,19 @@ const AccountRow = ({ acc }: { acc: UserAccount | undefined | null }) => {
     }
   };
 
+  const handleChangeUserAccount = (acc: UserAccount) => {
+    setUserAccount(acc);
+    const _market = MARKETS.find((m) => acc.market.toBase58() === m.address);
+    if (!_market) return;
+    setMarket(_market);
+    history.push(_market.name.split("-").join(""));
+  };
+
   return (
     <TableRow>
       <TableCell className={classes.tableCell}>
         <Typography className={classes.marketName}>
-          {marketNameFromAddress(acc.market.toBase58())}
+          {market ? market.name : "Unknown"}
         </Typography>
         <Typography component={"div"} className={classes.userAccountAddress}>
           <Grid container spacing={1} alignItems="center">
@@ -636,7 +649,7 @@ const AccountRow = ({ acc }: { acc: UserAccount | undefined | null }) => {
               ? acc.address.equals(userAccount?.address)
               : false
           }
-          onChange={() => setUserAccount(acc)}
+          onChange={() => handleChangeUserAccount(acc)}
         />
       </TableCell>
       <TableCell className={classes.tableCell}>
@@ -653,16 +666,13 @@ const AccountsTable = () => {
   const classes = useStyles();
   const [userData, userDataLoaded] = useUserData();
   const { connected } = useWallet();
-  const { marketAddress } = useMarket();
 
-  const filteredUserData = userData
-    ?.filter((u) => u?.market.equals(marketAddress))
-    .sort((a, b) => {
-      if (a && b) {
-        return b?.balance - a?.balance;
-      }
-      return 0;
-    });
+  const filteredUserData = userData?.sort((a, b) => {
+    if (a && b) {
+      return b?.balance - a?.balance;
+    }
+    return 0;
+  });
 
   return (
     <>
