@@ -17,7 +17,7 @@ import {
   getHashedName,
   getNameAccountKey,
   NameRegistryState,
-} from "@solana/spl-name-service";
+} from "@bonfida/spl-name-service";
 
 let ALLOW_REF_LINKS = process.env.REACT_APP_ALLOW_REF_LINKS;
 ALLOW_REF_LINKS = ALLOW_REF_LINKS ? JSON.parse(ALLOW_REF_LINKS) : false;
@@ -58,7 +58,10 @@ export const useQuoteAccountFromRefCode = (refCode: string | undefined) => {
           inputDomainKey
         );
       } else {
-        nameRegistryState = await getTwitterRegistry(connection, refCode);
+        nameRegistryState = await getTwitterRegistry(
+          connection,
+          refCode.replace("@", "")
+        );
       }
       usdcAddress = await findAssociatedTokenAddress(
         nameRegistryState.owner,
