@@ -102,6 +102,7 @@ const Header = () => {
   const { marketName, setMarket } = useMarket();
   const baseCurrency = marketName.split("-")[0];
   const history = useHistory();
+  const xsScreen = useSmallScreen("xs");
 
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
@@ -130,11 +131,13 @@ const Header = () => {
           <Grid item>
             <img src={getIcon(baseCurrency)} className={classes.img} alt="" />
           </Grid>
-          <Grid item>
-            <Typography className={classes.marketName} align="center">
-              {marketName}
-            </Typography>
-          </Grid>
+          {!xsScreen && (
+            <Grid item>
+              <Typography className={classes.marketName} align="center">
+                {marketName}
+              </Typography>
+            </Grid>
+          )}
           <Grid item>
             <ArrowDropDownIcon className={classes.arrowDown} />
           </Grid>
@@ -215,7 +218,6 @@ const MarketData = () => {
   const [fundingCountdown, setFundingCountdown] = useState<number>(
     Date.now() + 60 * 60 * 1_000 - (Date.now() % (60 * 60 * 1_000))
   );
-  const smallScreen = useSmallScreen();
 
   useInterval(() => {
     setFundingCountdown(
@@ -233,11 +235,9 @@ const MarketData = () => {
           direction="row"
           spacing={5}
         >
-          {!smallScreen && (
-            <Grid item>
-              <Header />
-            </Grid>
-          )}
+          <Grid item>
+            <Header />
+          </Grid>
           {!!userAccount?.balance && (
             <Grid item>
               <InfoColumn
