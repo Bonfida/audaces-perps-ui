@@ -302,3 +302,10 @@ export const useLeaderBoard = (
     refreshInterval: 60 * 1_000 * 10,
   });
 };
+
+export const findSide = (action: string, side: string) => {
+  if (action === "closePosition") {
+    return side === "buy" ? "sell" : "buy";
+  }
+  return side;
+};

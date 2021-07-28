@@ -9,7 +9,7 @@ import { PastTrade } from "../utils/types";
 import { useWallet } from "../utils/wallet";
 import { Grid } from "@material-ui/core";
 import WalletConnect from "./WalletConnect";
-import { useMarket, useUserTrades, MARKETS } from "../utils/market";
+import { useMarket, useUserTrades, MARKETS, findSide } from "../utils/market";
 import LaunchIcon from "@material-ui/icons/Launch";
 import { ExplorerLink } from "./Link";
 import TableContainer from "@material-ui/core/TableContainer";
@@ -58,7 +58,7 @@ const TradeTableHead = () => {
 
 const TradeRow = (props: PastTrade) => {
   const classes = useStyles();
-  const { market, side, orderSize, time, markPrice, signature } = props;
+  const { market, side, orderSize, time, markPrice, signature, type } = props;
   const date = new Date(time * 1000);
   const marketName = MARKETS.find((m) => m.address === market)?.name;
   return (
@@ -67,9 +67,11 @@ const TradeRow = (props: PastTrade) => {
         {marketName ? marketName : "Unknown"}
       </TableCell>
       <TableCell
-        className={side === "buy" ? classes.buyCell : classes.sellCell}
+        className={
+          findSide(type, side) === "buy" ? classes.buyCell : classes.sellCell
+        }
       >
-        {side}
+        {findSide(type, side)}
       </TableCell>
       <TableCell className={classes.tableCell}>
         {roundToDecimal(orderSize, 10)}

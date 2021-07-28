@@ -97,7 +97,6 @@ const LeaderBoardTableRow = ({
 }) => {
   const classes = useStyles();
   const [domains] = useUserDomains(new PublicKey(address));
-  console.log(domains);
   return (
     <TableRow>
       <TableCell
