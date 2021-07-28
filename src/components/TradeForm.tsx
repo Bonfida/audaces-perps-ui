@@ -288,6 +288,9 @@ const TradeForm = () => {
 
     // Open a new position
     if (canOpenPosition) {
+      if (parseFloat(quoteSize) < 5) {
+        return notify({ message: "Min order size is 5 USDC" });
+      }
       if (parseFloat(quoteSize) > userBalance * leverage) {
         notify({
           message: `Size too big - Max size is ${(
@@ -340,6 +343,9 @@ const TradeForm = () => {
     // Increase current position
     if (canIncrease) {
       try {
+        if (parseFloat(quoteSize) < 5) {
+          return notify({ message: "Min order size is 5 USDC" });
+        }
         setLoading(true);
         const tx = new Transaction();
         const [signers, instructions] = await increasePosition(
