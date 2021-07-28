@@ -279,16 +279,26 @@ export const useFidaAmount = () => {
   return useAsyncData(fn, tuple("useFidaAmount", connection, connected));
 };
 
-export const useLeaderBoard = () => {
+export const useLeaderBoard = (
+  startTime?: number,
+  endTime?: number,
+  limit?: number
+) => {
   const fn = async () => {
-    const result = await apiGet(URL_LEADERBOARD);
+    let url = URL_LEADERBOARD;
+    if (startTime && endTime) {
+      url += `?endTime=${endTime}&startTime=${startTime}`;
+    }
+    const result = await apiGet(url);
     if (!result.success) {
       throw new Error("Error fetching leaderboard");
     }
     const data: Trader[] = result.data;
-    return data.sort((a, b) => b.volume - a.volume);
+    data.sort((a, b) => b.volume - a.volume);
+    if (limit) return data.slice(0, limit);
+    return data;
   };
-  return useAsyncData(fn, "useLeaderBoard", {
+  return useAsyncData(fn, tuple("useLeaderBoard", startTime, endTime), {
     refreshInterval: 60 * 1_000 * 10,
   });
 };

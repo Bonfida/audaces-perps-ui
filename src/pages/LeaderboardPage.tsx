@@ -19,6 +19,8 @@ import { useWallet } from "../utils/wallet";
 import Spin from "../components/Spin";
 import { useVolume } from "../utils/market";
 import ContentLoader from "react-content-loader";
+import { useUserDomains } from "../utils/name-service";
+import { PublicKey } from "@solana/web3.js";
 
 const useStyles = makeStyles({
   tableCell: {
@@ -43,7 +45,6 @@ const useStyles = makeStyles({
     fontWeight: 600,
   },
   container: {
-    maxHeight: 800,
     width: "100%",
   },
   div: {
@@ -95,6 +96,8 @@ const LeaderBoardTableRow = ({
   isUser: boolean;
 }) => {
   const classes = useStyles();
+  const [domains] = useUserDomains(new PublicKey(address));
+  console.log(domains);
   return (
     <TableRow>
       <TableCell
@@ -110,7 +113,9 @@ const LeaderBoardTableRow = ({
           textDecoration: isUser ? "underline" : undefined,
         }}
       >
-        {getLeaderBoardName(address)}
+        {domains && domains.length > 0
+          ? domains[0]
+          : getLeaderBoardName(address)}
       </TableCell>
       <TableCell>
         <ExplorerLink address={address}>
@@ -163,7 +168,21 @@ const Volume = ({
 
 const LeaderboardPage = () => {
   const classes = useStyles();
-  const [leaderboard, leaderboardLoaded] = useLeaderBoard();
+  const [leaderboard24h, leaderboard24hLoaded] = useLeaderBoard(
+    undefined,
+    undefined,
+    10
+  );
+
+  let monthlyEndtime = new Date().getTime() / 1_000;
+  monthlyEndtime = monthlyEndtime - (monthlyEndtime % (60 * 60));
+  const monthlyStartTime = monthlyEndtime - 30 * 24 * 60 * 60;
+  const [leaderboard30d, leaderboard30dLoaded] = useLeaderBoard(
+    monthlyStartTime,
+    monthlyEndtime,
+    50
+  );
+
   const { connected, wallet } = useWallet();
   const _now = Math.floor(new Date().getTime() / 1_000);
   const now = React.useMemo(() => _now - (_now % (60 * 60)), [_now]);
@@ -200,6 +219,16 @@ const LeaderboardPage = () => {
           />
         </Grid>
       </Grid>
+      {connected && (
+        <Typography
+          className={classes.text}
+          align="center"
+          variant="body1"
+          style={{ marginTop: 10, marginBottom: 10 }}
+        >
+          My leaderboard name: {getLeaderBoardName(wallet.publicKey.toBase58())}
+        </Typography>
+      )}
       <div className={classes.div}>
         <FloatinCard>
           <TableContainer className={classes.container}>
@@ -210,28 +239,18 @@ const LeaderboardPage = () => {
             >
               Top Traders by 24h Volume
             </Typography>
-            {connected && (
-              <Typography
-                className={classes.text}
-                align="center"
-                variant="body1"
-              >
-                My leaderboard name:{" "}
-                {getLeaderBoardName(wallet.publicKey.toBase58())}
-              </Typography>
-            )}
 
-            {leaderboardLoaded && (
+            {leaderboard24h && (
               <>
                 <Table>
                   <LeaderBoardTableHead />
                   <TableBody style={{ maxHeight: 500, overflow: "scroll" }}>
-                    {leaderboard?.map((row, i) => {
+                    {leaderboard24h?.map((row, i) => {
                       return (
                         <LeaderBoardTableRow
                           rank={i + 1}
                           address={row.feePayer}
-                          key={`leaderboard-${i}`}
+                          key={`leaderboard-24h-${i}`}
                           isUser={
                             connected
                               ? wallet.publicKey.toBase58() === row.feePayer
@@ -244,7 +263,48 @@ const LeaderboardPage = () => {
                 </Table>
               </>
             )}
-            {!leaderboardLoaded && (
+            {!leaderboard24hLoaded && (
+              <div className={classes.loading}>
+                <Spin size={50} />
+              </div>
+            )}
+          </TableContainer>
+        </FloatinCard>
+      </div>
+      <div className={classes.div}>
+        <FloatinCard>
+          <TableContainer className={classes.container}>
+            <Typography
+              className={classes.title}
+              align="center"
+              variant="body1"
+            >
+              Top Traders by 30D Volume
+            </Typography>
+            {leaderboard30d && (
+              <>
+                <Table>
+                  <LeaderBoardTableHead />
+                  <TableBody style={{ maxHeight: 500, overflow: "scroll" }}>
+                    {leaderboard30d?.map((row, i) => {
+                      return (
+                        <LeaderBoardTableRow
+                          rank={i + 1}
+                          address={row.feePayer}
+                          key={`leaderboard-30d-${i}`}
+                          isUser={
+                            connected
+                              ? wallet.publicKey.toBase58() === row.feePayer
+                              : false
+                          }
+                        />
+                      );
+                    })}
+                  </TableBody>
+                </Table>
+              </>
+            )}
+            {!leaderboard30dLoaded && (
               <div className={classes.loading}>
                 <Spin size={50} />
               </div>
