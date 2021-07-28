@@ -595,7 +595,7 @@ const AccountRow = ({ acc }: { acc: UserAccount | undefined | null }) => {
     setMarket(_market);
     history.push(_market.name.split("-").join(""));
   };
-  console.log("marketState?.quoteDecimals", marketState?.quoteDecimals);
+
   return (
     <TableRow>
       <TableCell className={classes.tableCell}>
