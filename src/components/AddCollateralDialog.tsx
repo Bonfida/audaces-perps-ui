@@ -2,11 +2,7 @@ import React, { useMemo } from "react";
 import { TextField, FormControl, Button, Grid } from "@material-ui/core";
 import { notify } from "../utils/notifications";
 import { makeStyles } from "@material-ui/core/styles";
-import {
-  checkTextFieldNumberInput,
-  USDC_DECIMALS,
-  roundToDecimal,
-} from "../utils/utils";
+import { checkTextFieldNumberInput, roundToDecimal } from "../utils/utils";
 import { useState } from "react";
 import { Transaction } from "@solana/web3.js";
 import { Position, increasePositionCollateral } from "@audaces/perps";
@@ -16,7 +12,7 @@ import { sendTransaction } from "../utils/send";
 import Spin from "./Spin";
 import { refreshAllCaches } from "../utils/fetch-loop";
 import { UpdatedPosition } from "./SummaryPosition";
-import { useMarkPrice } from "../utils/market";
+import { useMarkPrice, useMarket } from "../utils/market";
 
 const useStyles = makeStyles({
   modalTitle: {
@@ -57,23 +53,32 @@ const AddCollateralDialog = ({ position }: { position: Position }) => {
   const [collateral, setCollateral] = useState<number | null>(null);
   const [loading, setLoading] = useState(false);
   const markPrice = useMarkPrice();
+  const { marketState } = useMarket();
 
   const newLeverage = useMemo(() => {
-    if (!markPrice || !collateral) {
+    if (
+      !markPrice ||
+      !collateral ||
+      !marketState?.coinDecimals ||
+      !marketState?.quoteDecimals
+    ) {
       return null;
     }
     return Math.ceil(
-      (markPrice * (position.vCoinAmount / USDC_DECIMALS)) /
-        (position.collateral / USDC_DECIMALS + collateral)
+      (markPrice * (position.vCoinAmount / marketState.coinDecimals)) /
+        (position.collateral / marketState?.quoteDecimals + collateral)
     );
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [collateral]);
 
   const newCollateral = useMemo(() => {
-    if (!collateral) {
+    if (!collateral || !marketState?.quoteDecimals) {
       return null;
     }
-    return roundToDecimal(position.collateral / USDC_DECIMALS + collateral, 3);
+    return roundToDecimal(
+      position.collateral / marketState?.quoteDecimals + collateral,
+      3
+    );
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [collateral]);
 
@@ -87,7 +92,7 @@ const AddCollateralDialog = ({ position }: { position: Position }) => {
   };
 
   const onClick = async () => {
-    if (!wallet || !collateral) {
+    if (!wallet || !collateral || !marketState?.quoteDecimals) {
       return;
     }
     notify({
@@ -99,7 +104,7 @@ const AddCollateralDialog = ({ position }: { position: Position }) => {
         connection,
         position,
         wallet.publicKey,
-        collateral * USDC_DECIMALS
+        collateral * marketState?.quoteDecimals
       );
       await sendTransaction({
         connection: connection,
@@ -154,11 +159,13 @@ const AddCollateralDialog = ({ position }: { position: Position }) => {
           </Button>
         </Grid>
       </Grid>
-      <UpdatedPosition
-        baseSize={position.vCoinAmount / USDC_DECIMALS}
-        leverage={newLeverage}
-        collateral={newCollateral}
-      />
+      {!!marketState?.coinDecimals && (
+        <UpdatedPosition
+          baseSize={position.vCoinAmount / marketState?.coinDecimals}
+          leverage={newLeverage}
+          collateral={newCollateral}
+        />
+      )}
     </>
   );
 };

@@ -75,6 +75,8 @@ export const MarketProvider = ({ children }) => {
       connection,
       new PublicKey(market.address)
     );
+    marketState.quoteDecimals = Math.pow(10, marketState.quoteDecimals);
+    marketState.coinDecimals = Math.pow(10, marketState.coinDecimals);
     return marketState;
   }, [market.address, connection]);
 

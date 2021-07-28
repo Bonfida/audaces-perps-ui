@@ -22,7 +22,6 @@ import {
   reducePositionBaseSize,
 } from "@audaces/perps";
 import {
-  USDC_DECIMALS,
   checkTextFieldNumberInput,
   roundToDecimal,
   BNB_ADDRESS,
@@ -151,7 +150,10 @@ const TradeForm = () => {
   const quoteCurrency = "USDC";
 
   const userBalance = useMemo(
-    () => userAccount && userAccount.balance / USDC_DECIMALS,
+    () =>
+      userAccount &&
+      !!marketState?.quoteDecimals &&
+      userAccount.balance / marketState?.quoteDecimals,
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [userAccount, openDeposit, connected]
   ); // USDC
@@ -163,7 +165,7 @@ const TradeForm = () => {
     setSlippage(
       marketState?.getSlippageEstimation(
         side,
-        parseFloat(quoteSize) * USDC_DECIMALS
+        parseFloat(quoteSize) * marketState.quoteDecimals
       )
     );
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -184,7 +186,7 @@ const TradeForm = () => {
     Math.floor(
       (parseFloat(baseSize) /
         // @ts-ignore (Can't be null)
-        (currentPosition?.vCoinAmount / USDC_DECIMALS)) *
+        (currentPosition?.vCoinAmount / marketState?.coinDecimals)) *
         100
     ) || 0;
 
@@ -197,7 +199,7 @@ const TradeForm = () => {
       });
     }
     const { value, valid } = checkTextFieldNumberInput(e);
-    if (!valid) {
+    if (!valid || !marketState?.quoteDecimals) {
       return setQuoteSize("0");
     }
     if (
@@ -211,8 +213,10 @@ const TradeForm = () => {
         variant: "error",
       });
     }
-    if (canDecrease && value > (currentSize * markPrice) / USDC_DECIMALS) {
-      console.log(value, (currentSize * markPrice) / USDC_DECIMALS);
+    if (
+      canDecrease &&
+      value > (currentSize * markPrice) / marketState?.quoteDecimals
+    ) {
       return notify({
         message: "Amount is too big compared to position size",
         variant: "error",
@@ -233,7 +237,7 @@ const TradeForm = () => {
         message: "Connect your wallet",
       });
     }
-    if (!markPrice) {
+    if (!markPrice || !marketState?.coinDecimals) {
       return;
     }
     const { value, valid } = checkTextFieldNumberInput(e);
@@ -255,7 +259,7 @@ const TradeForm = () => {
         variant: "error",
       });
     }
-    if (canDecrease && value > currentSize / USDC_DECIMALS) {
+    if (canDecrease && value > currentSize / marketState?.coinDecimals) {
       return notify({
         message: "Amount is too big compared to position size",
         variant: "error",
@@ -273,7 +277,12 @@ const TradeForm = () => {
 
   // Create a position
   const onClick = async () => {
-    if (!userBalance || !wallet || !userAccount) {
+    if (
+      !userBalance ||
+      !wallet ||
+      !userAccount ||
+      !marketState?.quoteDecimals
+    ) {
       return;
     }
 
@@ -289,7 +298,7 @@ const TradeForm = () => {
         return;
       }
       try {
-        const parsedSize = parseFloat(quoteSize) * USDC_DECIMALS;
+        const parsedSize = parseFloat(quoteSize) * marketState?.quoteDecimals;
         if (parsedSize <= 0) {
           notify({ message: "Size too small", variant: "error" });
           return;
@@ -336,7 +345,7 @@ const TradeForm = () => {
         const [signers, instructions] = await increasePosition(
           connection,
           currentPosition.marketAddress,
-          (parseFloat(quoteSize) * USDC_DECIMALS) / leverage,
+          (parseFloat(quoteSize) * marketState?.quoteDecimals) / leverage,
           leverage,
           currentPosition.positionIndex,
           userAccount.owner,
@@ -370,7 +379,7 @@ const TradeForm = () => {
     if (canDecrease) {
       try {
         setLoading(true);
-        const _size = parseFloat(baseSize) * USDC_DECIMALS;
+        const _size = parseFloat(baseSize) * marketState?.coinDecimals;
         const tx = new Transaction();
         let signers: Keypair[] = [];
         let instructions: TransactionInstruction[] = [];
@@ -414,8 +423,8 @@ const TradeForm = () => {
   const expectedLiqPrice = roundToDecimal(
     marketState?.getLiquidationIndex(
       side === 0 ? PositionType.Long : PositionType.Short,
-      parseFloat(baseSize) * USDC_DECIMALS,
-      (parseFloat(quoteSize) * USDC_DECIMALS) / leverage
+      parseFloat(baseSize) * marketState.coinDecimals,
+      (parseFloat(quoteSize) * marketState.quoteDecimals) / leverage
     ),
     2
   )?.toLocaleString();
@@ -522,10 +531,11 @@ const TradeForm = () => {
           <LeverageSlider
             value={positionPercentage}
             onChange={(e, v) => {
-              if (markPrice && currentPosition) {
+              if (markPrice && currentPosition && !!marketState?.coinDecimals) {
                 const baseSize =
                   ((v as number) *
-                    (currentPosition?.vCoinAmount / USDC_DECIMALS)) /
+                    (currentPosition?.vCoinAmount /
+                      marketState?.coinDecimals)) /
                   100;
                 setBaseSize(baseSize.toString());
                 setQuoteSize((baseSize * markPrice).toString());

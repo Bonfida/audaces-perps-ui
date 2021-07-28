@@ -10,10 +10,9 @@ import { Grid } from "@material-ui/core";
 import { FundingPayment } from "../utils/types";
 import LaunchIcon from "@material-ui/icons/Launch";
 import { ExplorerLink } from "./Link";
-import { useUserFunding, MARKETS } from "../utils/market";
+import { useUserFunding, MARKETS, useMarket } from "../utils/market";
 import { useWallet } from "../utils/wallet";
 import WalletConnect from "./WalletConnect";
-import { USDC_DECIMALS } from "../utils/utils";
 
 const useStyles = makeStyles({
   tableCell: {
@@ -48,13 +47,16 @@ const FundingTableRow = (props: FundingPayment) => {
   const classes = useStyles();
   const date = new Date(props.time);
   const marketName = MARKETS.find((m) => m.address === props.market)?.name;
+  const { marketState } = useMarket();
   return (
     <TableRow>
       <TableCell className={classes.tableCell}>
         {marketName ? marketName : "Unknown"}
       </TableCell>
       <TableCell className={classes.tableCell}>
-        {props.amount / USDC_DECIMALS}
+        {!!marketState?.quoteDecimals && (
+          <>{props.amount / marketState?.quoteDecimals}</>
+        )}
       </TableCell>
       <TableCell
         className={classes.tableCell}

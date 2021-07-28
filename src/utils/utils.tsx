@@ -9,8 +9,6 @@ import words from "fun-word-list";
 
 export const BONFIDA_API_URL = "https://serum-api.bonfida.com/";
 
-export const USDC_DECIMALS = Math.pow(10, 6);
-
 export const USDC_MINT = new PublicKey(
   "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"
 );

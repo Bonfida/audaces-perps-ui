@@ -12,7 +12,7 @@ import {
   getFundingRate,
   MARKETS,
 } from "../utils/market";
-import { roundToDecimal, USDC_DECIMALS, useSmallScreen } from "../utils/utils";
+import { roundToDecimal, useSmallScreen } from "../utils/utils";
 import MouseOverPopOver from "./MouseOverPopOver";
 import Countdown from "react-countdown";
 import useInterval from "../utils/useInterval";
@@ -238,14 +238,14 @@ const MarketData = () => {
           <Grid item>
             <Header />
           </Grid>
-          {!!userAccount?.balance && (
+          {!!userAccount?.balance && !!marketState?.quoteDecimals && (
             <Grid item>
               <InfoColumn
                 label="Available Collateral"
                 value={
                   <>
                     {roundToDecimal(
-                      userAccount?.balance / USDC_DECIMALS,
+                      userAccount?.balance / marketState?.quoteDecimals,
                       3
                     )?.toLocaleString()}{" "}
                     <strong>USDC</strong>

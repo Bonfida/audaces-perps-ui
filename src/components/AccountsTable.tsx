@@ -30,7 +30,6 @@ import { useConnection } from "../utils/connection";
 import {
   checkTextFieldNumberInput,
   roundToDecimal,
-  USDC_DECIMALS,
   sleep,
 } from "../utils/utils";
 import { useAvailableCollateral } from "../utils/perpetuals";
@@ -227,7 +226,7 @@ export const ModalAdd = ({
   const classes = useStyles();
   const connection = useConnection();
   const { wallet, connected } = useWallet();
-  const { marketAddress, setRefreshUserAccount } = useMarket();
+  const { marketAddress, setRefreshUserAccount, marketState } = useMarket();
   const [collateral] = useAvailableCollateral();
   const [amount, setAmount] = useState<number | null>(null);
   const [loading, setLoading] = useState(false);
@@ -258,7 +257,11 @@ export const ModalAdd = ({
   const onClick = async () => {
     try {
       setLoading(true);
-      if (!amount || !collateral?.collateralAddress) {
+      if (
+        !amount ||
+        !collateral?.collateralAddress ||
+        !marketState?.quoteDecimals
+      ) {
         return;
       }
       notify({
@@ -267,7 +270,7 @@ export const ModalAdd = ({
       const [signers, instructions] = await depositCollateral(
         connection,
         marketAddress,
-        amount * USDC_DECIMALS,
+        amount * marketState?.quoteDecimals,
         wallet.publicKey,
         acc
       );
@@ -376,7 +379,8 @@ const ModalWithdraw = ({
   const classes = useStyles();
   const connection = useConnection();
   const { wallet } = useWallet();
-  const { marketAddress, userAccount, setRefreshUserAccount } = useMarket();
+  const { marketAddress, userAccount, setRefreshUserAccount, marketState } =
+    useMarket();
   const [collateral] = useAvailableCollateral();
   const [amount, setAmount] = useState<number | null>(null);
   const [loading, setLoading] = useState(false);
@@ -391,16 +395,21 @@ const ModalWithdraw = ({
   };
 
   const onClickMax = () => {
-    if (!acc?.balance) {
+    if (!acc?.balance || !marketState?.quoteDecimals) {
       return;
     }
-    setAmount(acc?.balance / USDC_DECIMALS);
+    setAmount(acc?.balance / marketState?.quoteDecimals);
   };
 
   const onClick = async () => {
     try {
       setLoading(true);
-      if (!amount || !collateral?.collateralAddress || !userAccount?.address) {
+      if (
+        !amount ||
+        !collateral?.collateralAddress ||
+        !userAccount?.address ||
+        !marketState?.quoteDecimals
+      ) {
         return;
       }
       notify({
@@ -410,7 +419,7 @@ const ModalWithdraw = ({
       const [signers, instructions] = await withdrawCollateral(
         connection,
         marketAddress,
-        amount * USDC_DECIMALS,
+        amount * marketState?.quoteDecimals,
         wallet.publicKey,
         acc?.address
       );
@@ -586,7 +595,7 @@ const AccountRow = ({ acc }: { acc: UserAccount | undefined | null }) => {
     setMarket(_market);
     history.push(_market.name.split("-").join(""));
   };
-
+  console.log("marketState?.quoteDecimals", marketState?.quoteDecimals);
   return (
     <TableRow>
       <TableCell className={classes.tableCell}>
@@ -605,7 +614,11 @@ const AccountRow = ({ acc }: { acc: UserAccount | undefined | null }) => {
         </Typography>
       </TableCell>
       <TableCell className={classes.tableCell}>
-        {roundToDecimal(acc.balance / USDC_DECIMALS, 4)?.toLocaleString()}{" "}
+        {!!marketState?.quoteDecimals &&
+          roundToDecimal(
+            acc.balance / marketState?.quoteDecimals,
+            4
+          )?.toLocaleString()}{" "}
         <strong>USDC</strong>
       </TableCell>
       <TableCell className={classes.tableCell}>

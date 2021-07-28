@@ -2,11 +2,7 @@ import React, { useMemo } from "react";
 import { TextField, FormControl, Button, Grid } from "@material-ui/core";
 import { notify } from "../utils/notifications";
 import { makeStyles } from "@material-ui/core/styles";
-import {
-  checkTextFieldNumberInput,
-  roundToDecimal,
-  USDC_DECIMALS,
-} from "../utils/utils";
+import { checkTextFieldNumberInput, roundToDecimal } from "../utils/utils";
 import { useState } from "react";
 import {
   Position,
@@ -152,34 +148,46 @@ export const PartialCloseDialog = ({ position }: { position: Position }) => {
   const { marketState } = useMarket();
 
   const newBaseSize = useMemo(() => {
-    if (!parseFloat(size) && parseFloat(size) <= 0) {
+    if (
+      (!parseFloat(size) && parseFloat(size) <= 0) ||
+      !marketState?.coinDecimals
+    ) {
       return null;
     }
     return roundToDecimal(
-      -parseFloat(size) + position.vCoinAmount / USDC_DECIMALS,
+      -parseFloat(size) + position.vCoinAmount / marketState?.coinDecimals,
       5
     );
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [size]);
   const newLeverage = useMemo(() => {
-    if (!newBaseSize || !markPrice) {
+    if (
+      !newBaseSize ||
+      !markPrice ||
+      !marketState?.coinDecimals ||
+      !marketState?.quoteDecimals
+    ) {
       return null;
     }
     return Math.ceil(
-      (markPrice * (-parseFloat(size) + position.vCoinAmount / USDC_DECIMALS)) /
-        (position.collateral / USDC_DECIMALS)
+      (markPrice *
+        (-parseFloat(size) +
+          position.vCoinAmount / marketState?.coinDecimals)) /
+        (position.collateral / marketState?.quoteDecimals)
     );
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [markPrice, newBaseSize]);
 
   const onChangeSize = (e) => {
     const { value, valid } = checkTextFieldNumberInput(e);
-    if (!valid) {
+    if (!valid || !marketState?.coinDecimals || !marketState?.coinDecimals) {
       return;
     }
-    if (parseFloat(value) > position.vCoinAmount / USDC_DECIMALS) {
+    if (parseFloat(value) > position.vCoinAmount / marketState?.coinDecimals) {
       notify({
-        message: `Size too large - max ${position.vCoinAmount / USDC_DECIMALS}`,
+        message: `Size too large - max ${
+          position.vCoinAmount / marketState?.coinDecimals
+        }`,
       });
       return;
     }
@@ -192,10 +200,10 @@ export const PartialCloseDialog = ({ position }: { position: Position }) => {
       message: "Closing position...",
     });
     try {
-      if (!wallet.publicKey || !size) {
+      if (!wallet.publicKey || !size || !marketState?.coinDecimals) {
         return;
       }
-      let parsedSize = parseFloat(size) * USDC_DECIMALS;
+      let parsedSize = parseFloat(size) * marketState?.coinDecimals;
       if (isNaN(parsedSize) || !isFinite(parsedSize) || parsedSize <= 0) {
         return notify({ message: "Invalid size" });
       }
@@ -278,21 +286,23 @@ export const PartialCloseDialog = ({ position }: { position: Position }) => {
           </Button>
         </Grid>
       </Grid>
-      <UpdatedPosition
-        baseSize={newBaseSize}
-        leverage={newLeverage}
-        collateral={position.collateral / USDC_DECIMALS}
-        slippage={
-          !!markPrice
-            ? marketState?.getSlippageEstimation(
-                position.side === "short"
-                  ? PositionType.Short
-                  : PositionType.Long,
-                parseFloat(size) * markPrice * USDC_DECIMALS
-              )
-            : undefined
-        }
-      />
+      {!!marketState?.quoteDecimals && (
+        <UpdatedPosition
+          baseSize={newBaseSize}
+          leverage={newLeverage}
+          collateral={position.collateral / marketState?.quoteDecimals}
+          slippage={
+            !!markPrice
+              ? marketState?.getSlippageEstimation(
+                  position.side === "short"
+                    ? PositionType.Short
+                    : PositionType.Long,
+                  parseFloat(size) * markPrice * marketState.quoteDecimals
+                )
+              : undefined
+          }
+        />
+      )}
     </>
   );
 };

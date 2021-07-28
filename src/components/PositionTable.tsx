@@ -2,7 +2,7 @@ import React, { useState, useMemo } from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import { Position, completeClosePosition } from "@audaces/perps";
 import Grid from "@material-ui/core/Grid";
-import { roundToDecimal, USDC_DECIMALS } from "../utils/utils";
+import { roundToDecimal } from "../utils/utils";
 import { useOpenPositions, useOraclePrice } from "../utils/perpetuals";
 import WalletConnect from "./WalletConnect";
 import Spin from "./Spin";
@@ -29,7 +29,7 @@ import { useSmallScreen } from "../utils/utils";
 import LeverageChip, { LiquidatedChip } from "./Chips";
 import MouseOverPopOver from "./MouseOverPopOver";
 import { useReferrer } from "../utils/perpetuals";
-import { MARKETS } from "../utils/market";
+import { MARKETS, useMarket } from "../utils/market";
 
 const useStyles = makeStyles({
   table: {
@@ -157,6 +157,7 @@ const PositionRow = (props: Position) => {
   const buySide = props.side === "long";
 
   const [oraclePrice, oraclePriceLoaded] = useOraclePrice(props.marketAddress);
+  const { marketState } = useMarket();
 
   const isLiquidated = useMemo(() => {
     if (!oraclePrice?.price) {
@@ -306,7 +307,11 @@ const PositionRow = (props: Position) => {
       </TableCell>
       <TableCell className={buySide ? classes.buyCell : classes.sellCell}>
         <Grid container alignItems="center">
-          <Grid item>{props.size / USDC_DECIMALS}</Grid>
+          <Grid item>
+            {!!marketState?.coinDecimals
+              ? props.size / marketState?.coinDecimals
+              : null}
+          </Grid>
           <Grid item>
             <PenButton
               onClick={() => {
@@ -318,7 +323,14 @@ const PositionRow = (props: Position) => {
         </Grid>
       </TableCell>
       <TableCell className={positivePnl ? classes.buyCell : classes.sellCell}>
-        {roundToDecimal(props.pnl / USDC_DECIMALS, 4)?.toLocaleString()}
+        {!!marketState?.quoteDecimals && (
+          <>
+            {roundToDecimal(
+              props.pnl / marketState?.quoteDecimals,
+              4
+            )?.toLocaleString()}
+          </>
+        )}
       </TableCell>
       <TableCell className={classes.tableCell}>
         {props.liqPrice.toLocaleString()}
@@ -326,7 +338,13 @@ const PositionRow = (props: Position) => {
       <TableCell className={classes.tableCell}>
         <Grid container alignItems="center">
           <Grid item>
-            {(props.collateral / USDC_DECIMALS).toLocaleString()}
+            {!!marketState?.quoteDecimals && (
+              <>
+                {(
+                  props.collateral / marketState?.quoteDecimals
+                ).toLocaleString()}
+              </>
+            )}
           </Grid>
           <Grid item>
             <PenButton

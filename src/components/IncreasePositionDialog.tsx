@@ -2,11 +2,7 @@ import React, { useMemo } from "react";
 import { TextField, FormControl, Button, Grid } from "@material-ui/core";
 import { notify } from "../utils/notifications";
 import { makeStyles } from "@material-ui/core/styles";
-import {
-  checkTextFieldNumberInput,
-  USDC_DECIMALS,
-  roundToDecimal,
-} from "../utils/utils";
+import { checkTextFieldNumberInput, roundToDecimal } from "../utils/utils";
 import { useState } from "react";
 import {
   Position,
@@ -80,22 +76,31 @@ const IncreasePositionDialog = ({ position }: { position: Position }) => {
   const referrer = useReferrer();
 
   const newBaseSize = useMemo(() => {
-    if (!parseFloat(size) && parseFloat(size) <= 0) {
+    if (
+      (!parseFloat(size) && parseFloat(size) <= 0) ||
+      !marketState?.coinDecimals
+    ) {
       return null;
     }
     return roundToDecimal(
-      parseFloat(size) + position.vCoinAmount / USDC_DECIMALS,
+      parseFloat(size) + position.vCoinAmount / marketState?.coinDecimals,
       5
     );
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [size]);
   const newLeverage = useMemo(() => {
-    if (!newBaseSize || !markPrice) {
+    if (
+      !newBaseSize ||
+      !markPrice ||
+      !marketState?.coinDecimals ||
+      !marketState?.quoteDecimals
+    ) {
       return null;
     }
     return Math.ceil(
-      (markPrice * (parseFloat(size) + position.vCoinAmount / USDC_DECIMALS)) /
-        (position.collateral / USDC_DECIMALS)
+      (markPrice *
+        (parseFloat(size) + position.vCoinAmount / marketState?.coinDecimals)) /
+        (position.collateral / marketState?.quoteDecimals)
     );
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [markPrice, newBaseSize]);
@@ -114,11 +119,16 @@ const IncreasePositionDialog = ({ position }: { position: Position }) => {
       message: "Increasing position...",
     });
     try {
-      if (!wallet.publicKey || !size || !markPrice) {
+      if (
+        !wallet.publicKey ||
+        !size ||
+        !markPrice ||
+        !marketState?.coinDecimals
+      ) {
         return;
       }
 
-      const parsedSize = parseFloat(size) * USDC_DECIMALS;
+      const parsedSize = parseFloat(size) * marketState?.coinDecimals;
 
       const [, instructions] = await increasePositionBaseSize(
         connection,
@@ -176,21 +186,23 @@ const IncreasePositionDialog = ({ position }: { position: Position }) => {
           </Button>
         </Grid>
       </Grid>
-      <UpdatedPosition
-        baseSize={newBaseSize}
-        leverage={newLeverage}
-        collateral={position.collateral / USDC_DECIMALS}
-        slippage={
-          !!markPrice
-            ? marketState?.getSlippageEstimation(
-                position.side === "short"
-                  ? PositionType.Short
-                  : PositionType.Long,
-                parseFloat(size) * markPrice * USDC_DECIMALS
-              )
-            : undefined
-        }
-      />
+      {!!marketState?.quoteDecimals && (
+        <UpdatedPosition
+          baseSize={newBaseSize}
+          leverage={newLeverage}
+          collateral={position.collateral / marketState?.quoteDecimals}
+          slippage={
+            !!markPrice
+              ? marketState?.getSlippageEstimation(
+                  position.side === "short"
+                    ? PositionType.Short
+                    : PositionType.Long,
+                  parseFloat(size) * markPrice * marketState.quoteDecimals
+                )
+              : undefined
+          }
+        />
+      )}
     </>
   );
 };
