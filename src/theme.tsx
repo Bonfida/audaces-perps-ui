@@ -13,8 +13,10 @@ export const theme = createMuiTheme({
     MuiCssBaseline: {
       "@global": {
         body: {
+          backgroundColor: "#121838",
           background:
-            "linear-gradient(90deg, rgba(18,23,33,1) 0%, rgba(19,30,48,1) 50%, rgba(18,23,33,1) 100%)",
+            "linear-gradient(135deg, rgba(19, 30, 48, 0.5) 0%, #0F0F11 61.99%)",
+          transform: "transform: matrix(-1, 0, 0, 1, 0, 0)",
           backgroundRepeat: "no-repeat",
           backgroundAttachment: "fixed",
         },
@@ -62,7 +64,8 @@ export const theme = createMuiTheme({
         backgroundColor: "#141721",
       },
       root: {
-        borderBottom: "1px solid rgba(224, 224, 224, 0.5)",
+        // borderBottom: "1px solid rgba(224, 224, 224, 0.5)",
+        borderBottom: "0px",
       },
     },
     MuiTableRow: {

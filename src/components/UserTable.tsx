@@ -18,7 +18,7 @@ const useStyles = makeStyles({
     minWidth: 650,
   },
   indicator: {
-    backgroundColor: "#00ADB5",
+    backgroundColor: "#77E3EF",
   },
   container: {
     background: "#141721",
@@ -26,19 +26,30 @@ const useStyles = makeStyles({
     width: "100%",
   },
   text: {
-    fontSize: 14,
-    fontWeight: 600,
+    fontSize: 18,
+    fontWeight: 800,
     textTransform: "capitalize",
+    color: "#C8CCD6",
   },
   scrollButton: {
     color: "white",
   },
 });
 
-const Label = ({ children }: { children: React.ReactNode }) => {
+const Label = ({
+  selected,
+  children,
+}: {
+  selected?: boolean;
+  children: React.ReactNode;
+}) => {
   const classes = useStyles();
   return (
-    <Typography variant="body1" className={classes.text}>
+    <Typography
+      variant="body1"
+      className={classes.text}
+      style={{ color: selected ? "#77E3EF" : undefined }}
+    >
       {children}
     </Typography>
   );
@@ -72,12 +83,25 @@ const UserTable = () => {
         variant="scrollable"
         scrollButtons={smallScreen ? "on" : "auto"}
         TabScrollButtonProps={{ className: classes.scrollButton }}
+        style={{ borderBottom: "1px solid rgba(57, 60, 69, 0.5)" }}
       >
-        <Tab disableRipple label={<Label>Positions</Label>} />
-        <Tab disableRipple label={<Label>Accounts</Label>} />
-        <Tab disableRipple label={<Label>Trade History</Label>} />
-        <Tab disableRipple label={<Label>Funding Payments</Label>} />
-        <Tab disableRipple label={<Label>Fees</Label>} />
+        <Tab
+          disableRipple
+          label={<Label selected={tab === 0}>Positions</Label>}
+        />
+        <Tab
+          disableRipple
+          label={<Label selected={tab === 1}>Accounts</Label>}
+        />
+        <Tab
+          disableRipple
+          label={<Label selected={tab === 2}>Trade History</Label>}
+        />
+        <Tab
+          disableRipple
+          label={<Label selected={tab === 3}>Funding Payments</Label>}
+        />
+        <Tab disableRipple label={<Label selected={tab === 4}>Fees</Label>} />
       </Tabs>
       <TabPanel value={tab} index={0}>
         <PositionTable />

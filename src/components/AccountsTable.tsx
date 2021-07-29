@@ -43,6 +43,7 @@ import LaunchIcon from "@material-ui/icons/Launch";
 import { ExplorerLink } from "./Link";
 import RefreshIcon from "@material-ui/icons/Refresh";
 import { useHistory } from "react-router-dom";
+import refresh from "../assets/tables/refresh.svg";
 
 const useStyles = makeStyles({
   table: {
@@ -185,6 +186,9 @@ const useStyles = makeStyles({
     fontSize: 18,
     cursor: "pointer",
   },
+  refreshDiv: {
+    cursor: "pointer",
+  },
 });
 
 const AccountTableHead = () => {
@@ -204,10 +208,12 @@ const AccountTableHead = () => {
         <TableCell className={classes.tableCell}>Selected Acc.</TableCell>
         <TableCell>
           {/* Refresh column */}
-          <RefreshIcon
+          <div
+            className={classes.refreshDiv}
             onClick={() => setRefreshUserAccount((prev) => !prev)}
-            className={classes.refreshIcon}
-          />
+          >
+            <img src={refresh} />
+          </div>
         </TableCell>
       </TableRow>
     </TableHead>

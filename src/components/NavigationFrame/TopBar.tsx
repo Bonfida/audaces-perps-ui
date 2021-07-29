@@ -1,233 +1,157 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { makeStyles, Theme, createStyles } from "@material-ui/core/styles";
-import AppBar from "@material-ui/core/AppBar";
 import { useHistory, useLocation } from "react-router-dom";
-import Grid from "@material-ui/core/Grid";
-import Typography from "@material-ui/core/Typography";
+import fida from "../../assets/homepage/fida.png";
+import { Typography, Grid, Divider } from "@material-ui/core";
 import WalletConnect from "../WalletConnect";
-import Settings from "../Settings";
-import { useSmallScreen } from "../../utils/utils";
-import Drawer from "@material-ui/core/Drawer";
-import List from "@material-ui/core/List";
-import Divider from "@material-ui/core/Divider";
-import IconButton from "@material-ui/core/IconButton";
-import MenuIcon from "@material-ui/icons/MenuOpen";
-import ChevronLeftIcon from "@material-ui/icons/ChevronLeft";
-import ListItem from "@material-ui/core/ListItem";
-import ListItemText from "@material-ui/core/ListItemText";
-import ListItemIcon from "@material-ui/core/ListItemIcon";
-import clsx from "clsx";
-import { useLocalStorageState } from "../../utils/utils";
-import HomeIcon from "@material-ui/icons/Home";
-import BarChartIcon from "@material-ui/icons/BarChart";
-import AllInclusiveIcon from "@material-ui/icons/AllInclusive";
-import AssessmentIcon from "@material-ui/icons/Assessment";
-
-const drawerWidth = 280;
+import gear from "../../assets/components/topbar/gear.svg";
+import MarketInfo from "../MarketInfo";
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
-    root: {
-      flexGrow: 1,
+    connectButton: {
+      background:
+        "linear-gradient(135deg, rgba(19, 30, 48, 0.5) 0%, #0F0F11 0%)",
+      margin: 1,
+      borderRadius: 20,
+      width: 148,
+      "&:hover": {
+        background:
+          "linear-gradient(135deg, rgba(19, 30, 48, 0.5) 0%, #0F0F11 0%)",
+      },
     },
-    AppBar: {
-      marginTop: "40px",
-      background: "transparent",
+    text: {
+      fontSize: 18,
+      fontWeight: 600,
     },
-    logo: {
-      color: "black",
-    },
-    audacesPerpetual: {
-      fontSize: 20,
-      fontWeight: 500,
-      color: "black",
-    },
-    indicator: {
-      backgroundColor: "#00ADB5",
-    },
-    hide: {
-      display: "none",
-    },
-    drawer: {
-      width: drawerWidth,
-      flexShrink: 0,
-    },
-    drawerPaper: {
-      width: drawerWidth,
-    },
-    drawerHeader: {
+    sectionsContainer: {
       display: "flex",
-      alignItems: "center",
-      padding: theme.spacing(0, 1),
-      // necessary for content to be below app bar
-      ...theme.mixins.toolbar,
-      justifyContent: "flex-end",
+      justifyContent: "space-around",
     },
-    inputRoot: {
-      padding: "2px 4px",
-      display: "flex",
-      alignItems: "center",
-      width: "100%",
+    sectionItem: {
+      marginRight: 10,
+      marginLeft: 10,
     },
-    input: {
-      marginLeft: theme.spacing(1),
-      flex: 1,
+    sectionName: {
+      color: "#FFFFFF",
+      fontSize: 18,
+      textTransform: "capitalize",
     },
-    iconButton: {
-      padding: 10,
+    fida: {
+      height: 38,
     },
     divider: {
-      height: 28,
-      margin: 4,
+      background: "#9BA3B5",
+      width: 1,
+      height: 24,
+      marginLeft: 20,
+      marginRight: 20,
     },
-    walletConnect: { position: "absolute", right: 85, zIndex: 1 },
-    settingsButton: { position: "absolute", right: 10, zIndex: 1 },
+    settingsContainer: {
+      display: "flex",
+      justifyContent: "center",
+      alignItems: "center",
+    },
   })
 );
 
-const topBarElement = [
+const topBarElements = [
   {
     name: "home",
     href: "/",
-    icon: <HomeIcon />,
   },
   {
     name: "trade",
     href: "/trade/BTCUSDC",
-    icon: <BarChartIcon />,
   },
   {
     name: "nodes",
     href: "/nodes",
-    icon: <AllInclusiveIcon />,
   },
   {
     name: "leaderboard",
     href: "/leaderboard",
-    icon: <AssessmentIcon />,
   },
 ];
 
-//  For white label UIs change this
-export const Logo = () => {
+const Sections = () => {
   const classes = useStyles();
   return (
-    <>
-      <Grid
-        container
-        direction="row"
-        justify="center"
-        alignItems="center"
-        // spacing={5}
-      >
-        {/* <Grid item>Put Logo here</Grid> */}
+    <Grid container justify="flex-start" alignItems="center" spacing={5}>
+      <Grid item>
+        <img src={fida} className={classes.fida} alt="" />
+      </Grid>
+      {topBarElements.map((e) => {
+        return (
+          <Grid item key={`section-top-bar-${e.name}`}>
+            <Typography className={classes.sectionName}>{e.name}</Typography>
+          </Grid>
+        );
+      })}
+    </Grid>
+  );
+};
+
+const TopBarHomePage = () => {
+  const classes = useStyles();
+  return (
+    <div style={{ marginLeft: "10%", marginRight: "10%", marginTop: 30 }}>
+      <div className={classes.sectionsContainer}>
+        <div>
+          <Sections />
+        </div>
+        <div>
+          <WalletConnect />
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const TopBarMarketPage = () => {
+  const classes = useStyles();
+  return (
+    <div
+      style={{
+        marginTop: 20,
+        background: "#141722",
+        paddingTop: 15,
+        paddingBottom: 10,
+        paddingLeft: 20,
+        paddingRight: 20,
+      }}
+    >
+      <Grid container justify="space-between">
         <Grid item>
-          <Typography align="center" className={classes.audacesPerpetual}>
-            Audaces Perpetuals
-          </Typography>
+          <div className={classes.settingsContainer}>
+            <img
+              src={fida}
+              className={classes.fida}
+              alt=""
+              style={{ marginRight: 40 }}
+            />
+            <MarketInfo />
+          </div>
+        </Grid>
+        <Grid item>
+          <div className={classes.settingsContainer}>
+            <WalletConnect />
+            <Divider orientation="vertical" className={classes.divider} />
+            <img src={gear} style={{ height: 21 }} />
+          </div>
         </Grid>
       </Grid>
-    </>
+    </div>
   );
 };
 
 const TopBar = () => {
   const location = useLocation();
-  const history = useHistory();
-  const classes = useStyles();
-  const [tab, setTab] = useState(0);
-  const smallScreen = useSmallScreen();
-  const [open, setOpen] = useLocalStorageState("showDrawer", true);
-
-  useEffect(() => {
-    if (location.pathname.includes("trade")) {
-      setTab(1);
-    } else if (location.pathname.includes("nodes")) {
-      setTab(2);
-    } else if (location.pathname.includes("leaderboard")) {
-      setTab(3);
-    } else {
-      setTab(0);
-    }
-  }, [location.pathname]);
-
-  return (
-    <div className={classes.root}>
-      <AppBar
-        className={classes.AppBar}
-        position="static"
-        elevation={0}
-        style={{ marginTop: 20 }}
-      >
-        <div style={{ position: "static", zIndex: 1 }}>
-          <IconButton
-            color="inherit"
-            aria-label="open drawer"
-            edge="end"
-            onClick={() => {
-              setOpen(true);
-            }}
-            style={{ color: "black" }}
-            className={clsx(open && classes.hide)}
-          >
-            <MenuIcon style={{ color: "white", fontSize: 35 }} />
-          </IconButton>
-        </div>
-        {!smallScreen && (
-          <div className={classes.walletConnect}>
-            <WalletConnect />
-          </div>
-        )}
-        <div className={classes.settingsButton}>
-          <Settings />
-        </div>
-      </AppBar>
-      {open && <div style={{ marginTop: "59px" }} />}
-      <Drawer
-        className={classes.drawer}
-        anchor="left"
-        open={open}
-        classes={{
-          paper: classes.drawerPaper,
-        }}
-        onClose={() => setOpen(false)}
-      >
-        <div className={classes.drawerHeader}>
-          <IconButton onClick={() => setOpen(false)}>
-            <ChevronLeftIcon />
-          </IconButton>
-        </div>
-        <div
-          style={{
-            marginLeft: "auto",
-            marginRight: "auto",
-            marginBottom: "5%",
-          }}
-        >
-          <WalletConnect />
-        </div>
-        <Divider />
-        <List>
-          {topBarElement.map((e, i) => {
-            return (
-              <ListItem
-                button
-                key={e.name}
-                onClick={() => history.push(e.href)}
-                selected={i === tab}
-              >
-                <ListItemIcon>{e.icon}</ListItemIcon>
-                <ListItemText
-                  primary={e.name}
-                  style={{ textTransform: "capitalize" }}
-                />
-              </ListItem>
-            );
-          })}
-        </List>
-      </Drawer>
-    </div>
-  );
+  const isHomagePage = location.pathname === "/";
+  if (isHomagePage) {
+    return <TopBarHomePage />;
+  }
+  return <TopBarMarketPage />;
 };
 
 export default TopBar;
