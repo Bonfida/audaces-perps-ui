@@ -2,7 +2,6 @@ import React from "react";
 import TradeForm from "../components/TradeForm";
 import UserTable from "../components/UserTable";
 import { TVChartContainer } from "../components/TVChartContainer";
-import MarketInfo from "../components/MarketInfo";
 import TradePanel from "../components/TradePanel";
 import { useLayout } from "../utils/layout";
 import { Responsive, WidthProvider } from "react-grid-layout";

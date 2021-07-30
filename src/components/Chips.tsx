@@ -17,6 +17,27 @@ const useStyles = makeStyles({
   leverageRisk: {
     marginTop: 10,
   },
+  leverageValue: {
+    background: "#0F0F11",
+    borderRadius: 10,
+    color: "#FFFFFF",
+    fontSize: 14,
+    fontWeight: 800,
+    height: 19,
+    width: "100%",
+    margin: 1,
+    textAlign: "center",
+    alignItems: "center",
+    paddingBottom: 5,
+  },
+  leverageValueContainer: {
+    background: "linear-gradient(135deg, #37BCBD 0%, #B846B2 61.99%)",
+    borderRadius: 10,
+    height: 21,
+    width: 50,
+    justifyContent: "center",
+    display: "flex",
+  },
 });
 
 // Leverage chips
@@ -156,5 +177,14 @@ export const LiquidatedChip = () => {
         </Grid>
       }
     />
+  );
+};
+
+export const LeverageValueChip = ({ value }: { value: number }) => {
+  const classes = useStyles();
+  return (
+    <div className={classes.leverageValueContainer}>
+      <div className={classes.leverageValue}>{value}x</div>
+    </div>
   );
 };

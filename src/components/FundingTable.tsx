@@ -18,6 +18,7 @@ const useStyles = makeStyles({
     textTransform: "capitalize",
     fontSize: 14,
     color: "white",
+    fontWeight: 800,
   },
   container: {
     maxHeight: 250,
@@ -74,7 +75,7 @@ const FundingTableRow = ({
       >{`${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`}</TableCell>
       <TableCell>
         <ExplorerLink tx={signature}>
-          <img src={ExplorerIcon} />
+          <img src={ExplorerIcon} alt="" />
         </ExplorerLink>
       </TableCell>
     </TableRow>

@@ -103,7 +103,7 @@ const TradeRow = ({
       >{`${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`}</TableCell>
       <TableCell>
         <ExplorerLink tx={signature}>
-          <img src={ExplorerIcon} />
+          <img src={ExplorerIcon} alt="" />
         </ExplorerLink>
       </TableCell>
     </TableRow>

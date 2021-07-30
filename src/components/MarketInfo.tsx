@@ -145,7 +145,7 @@ const Header = () => {
             </Grid>
           )}
           <Grid item>
-            <img src={ArrowDropDownIcon} className={classes.arrowDown} />
+            <img src={ArrowDropDownIcon} className={classes.arrowDown} alt="" />
           </Grid>
         </Grid>
       </div>
@@ -225,6 +225,8 @@ const MarketData = () => {
     Date.now() + 60 * 60 * 1_000 - (Date.now() % (60 * 60 * 1_000))
   );
 
+  const smallScreen = useSmallScreen();
+
   useInterval(() => {
     setFundingCountdown(
       Date.now() + 60 * 60 * 1_000 - (Date.now() % (60 * 60 * 1_000))
@@ -244,22 +246,24 @@ const MarketData = () => {
           <Grid item>
             <Header />
           </Grid>
-          {!!userAccount?.balance && !!marketState?.quoteDecimals && (
-            <Grid item>
-              <InfoColumn
-                label="Available Collateral"
-                value={
-                  <>
-                    {roundToDecimal(
-                      userAccount?.balance / marketState?.quoteDecimals,
-                      3
-                    )?.toLocaleString()}{" "}
-                    <strong>USDC</strong>
-                  </>
-                }
-              />
-            </Grid>
-          )}
+          {!!userAccount?.balance &&
+            !!marketState?.quoteDecimals &&
+            !smallScreen && (
+              <Grid item>
+                <InfoColumn
+                  label="Available Collateral"
+                  value={
+                    <>
+                      {roundToDecimal(
+                        userAccount?.balance / marketState?.quoteDecimals,
+                        3
+                      )?.toLocaleString()}{" "}
+                      <strong>USDC</strong>
+                    </>
+                  }
+                />
+              </Grid>
+            )}
           {!!markPrice && (
             <Grid item>
               <InfoColumn
@@ -283,7 +287,8 @@ const MarketData = () => {
             !!fundingRatios.fundingRatioLongs &&
             !isNaN(fundingRatios.fundingRatioLongs) &&
             !!fundingRatios.fundingRatioShorts &&
-            !isNaN(fundingRatios.fundingRatioShorts) && (
+            !isNaN(fundingRatios.fundingRatioShorts) &&
+            !smallScreen && (
               <Grid item>
                 <MouseOverPopOver
                   popOverText={<>Long funding rate/ Short funding rate</>}
@@ -302,15 +307,19 @@ const MarketData = () => {
                 </MouseOverPopOver>
               </Grid>
             )}
-          <Grid item>
-            <InfoColumn
-              label="Next Funding"
-              value={<Countdown date={fundingCountdown} />}
-            />
-          </Grid>
-          <Grid item>
-            <InfoColumn label="24h Volume" value={"$" + (volume || 0)} />
-          </Grid>
+          {!smallScreen && (
+            <Grid item>
+              <InfoColumn
+                label="Next Funding"
+                value={<Countdown date={fundingCountdown} />}
+              />
+            </Grid>
+          )}
+          {!smallScreen && (
+            <Grid item>
+              <InfoColumn label="24h Volume" value={"$" + (volume || 0)} />
+            </Grid>
+          )}
         </Grid>
       </div>
     </>

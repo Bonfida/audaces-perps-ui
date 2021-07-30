@@ -23,19 +23,20 @@ import { makeStyles } from "@material-ui/core/styles";
 import blockto from "../assets/wallets/blocto.png";
 
 const useStyles = makeStyles({
-  button: {
-    color: "white",
-    background: "transparent",
-    borderRadius: 10,
-    height: "50px",
-    border: "2px solid",
-    borderColor: "#8BC6EC",
-    "&:hover": {
-      backgroundColor: "#8BC6EC",
-      backgroundImage: "linear-gradient(135deg, #8BC6EC 0%, #9599E2 100%)",
-    },
+  buttonContainer: {
+    background: "linear-gradient(135deg, #60C0CB 18.23%, #6868FC 100%)",
+    borderRadius: 25,
     width: 250,
-    padding: 4,
+  },
+  button: {
+    background: "linear-gradient(135deg, rgba(19, 30, 48, 0.5) 0%, #0F0F11 0%)",
+    margin: 1,
+    borderRadius: 25,
+    width: 248,
+    "&:hover": {
+      background:
+        "linear-gradient(135deg, rgba(19, 30, 48, 0.5) 0%, #0F0F11 0%)",
+    },
   },
   modalTitle: {
     color: "white",
@@ -46,6 +47,17 @@ const useStyles = makeStyles({
   img: {
     height: 30,
     marginTop: 4,
+  },
+  coloredText: {
+    textTransform: "capitalize",
+    fontWeight: 400,
+    backgroundImage: "linear-gradient(135deg, #60C0CB 18.23%, #6868FC 100%)",
+    backgroundClip: "text",
+    color: "#60C0CB",
+    "-webkit-background-clip": "text",
+    "-moz-background-clip": "text",
+    "-webkit-text-fill-color": "transparent",
+    "-moz-text-fill-color": "transparent",
   },
 });
 
@@ -212,14 +224,24 @@ export function WalletProvider({ children = null as any }) {
 
             return (
               <Grid item key={`wallet-provider-${provider.name}`}>
-                <Button className={classes.button} onClick={onClick}>
-                  <Grid container justify="space-around" alignItems="center">
-                    <Grid item>{provider.name}</Grid>
-                    <Grid item>
-                      <img src={provider.icon} className={classes.img} alt="" />
+                <div className={classes.buttonContainer}>
+                  <Button className={classes.button} onClick={onClick}>
+                    <Grid container justify="space-around" alignItems="center">
+                      <Grid item>
+                        <Typography className={classes.coloredText}>
+                          {provider.name}
+                        </Typography>
+                      </Grid>
+                      <Grid item>
+                        <img
+                          src={provider.icon}
+                          className={classes.img}
+                          alt=""
+                        />
+                      </Grid>
                     </Grid>
-                  </Grid>
-                </Button>
+                  </Button>
+                </div>
               </Grid>
             );
           })}

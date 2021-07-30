@@ -32,17 +32,21 @@ const useStyles = makeStyles({
   },
 });
 
-export default function WalletConnect() {
+export default function WalletConnect({ width }: { width?: number }) {
   const classes = useStyles();
   const { connected, disconnect, select } = useWallet();
 
   return (
     <>
-      <div className={classes.buttonContainer}>
+      <div
+        className={classes.buttonContainer}
+        style={{ width: width ? width : undefined }}
+      >
         <Button
           disableRipple
           onClick={connected ? disconnect : select}
           className={classes.button}
+          style={{ width: width ? width - 2 : undefined }}
         >
           {!connected ? (
             <Typography className={classes.coloredText}>

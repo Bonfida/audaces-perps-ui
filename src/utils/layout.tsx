@@ -63,7 +63,7 @@ export const LayoutProvider = ({ children }) => {
 
   // TradingView
   let tradingViewWidth = isLg ? 10 : isMd ? 9 : isSm ? 12 : 12;
-  let tradingViewHeight = isLg ? 40 : isMd ? 22 : isSm ? 20 : 20;
+  let tradingViewHeight = isLg ? 43 : isMd ? 25 : isSm ? 20 : 20;
   // UserTable
   let userTableWidth = isLg ? 12 : isMd ? 9 : isSm ? 12 : 12;
   let userTableHeight = isLg ? 15 : isMd ? 15 : isSm ? 15 : 15;
@@ -106,14 +106,6 @@ export const LayoutProvider = ({ children }) => {
     : isSm
     ? [0, tradingViewHeight]
     : [0, tradingViewHeight];
-
-  let marketInfoPosition = isLg
-    ? [0, 0]
-    : isMd
-    ? [0, 0]
-    : isSm
-    ? [0, 0]
-    : [0, 0];
 
   // Layout configs
   let tradingViewConfig = {

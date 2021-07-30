@@ -12,8 +12,8 @@ const useStyles = makeStyles((theme: Theme) =>
       justifyContent: "center",
     },
     paper: {
-      borderRadius: 10,
-      backgroundColor: "#252930",
+      borderRadius: 4,
+      backgroundColor: "#202430",
       boxShadow: theme.shadows[5],
       padding: theme.spacing(2, 4, 3),
     },
@@ -25,14 +25,16 @@ const CustomModal = ({
   setOpen,
   children,
   disableBackdropClick,
+  noPadding,
 }: {
   openModal: boolean;
   setOpen: (args: boolean) => void;
   children: React.ReactNode;
+  noPadding?: boolean;
   disableBackdropClick?;
 }) => {
   const classes = useStyles();
-
+  console.log();
   const handleClose = () => {
     setOpen(false);
   };
@@ -51,7 +53,12 @@ const CustomModal = ({
         disableBackdropClick={!!disableBackdropClick}
       >
         <Fade in={openModal}>
-          <div className={classes.paper}>{children}</div>
+          <div
+            className={classes.paper}
+            style={{ padding: noPadding ? 0 : undefined }}
+          >
+            {children}
+          </div>
         </Fade>
       </Modal>
     </div>

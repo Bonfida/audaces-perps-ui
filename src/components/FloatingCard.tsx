@@ -11,11 +11,22 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
 }));
 
-const FloatingCard = ({ children }) => {
+const FloatingCard = ({
+  children,
+  padding,
+}: {
+  children: React.ReactNode;
+  padding?: string;
+}) => {
   const classes = useStyles();
   return (
     <Box height="100%">
-      <div className={classes.root}>{children}</div>
+      <div
+        className={classes.root}
+        style={{ padding: padding ? padding : "undefined" }}
+      >
+        {children}
+      </div>
     </Box>
   );
 };

@@ -19,6 +19,7 @@ const useStyles = makeStyles({
     textTransform: "capitalize",
     fontSize: 14,
     color: "white",
+    fontWeight: 800,
   },
   sellCell: {
     textTransform: "capitalize",
@@ -137,12 +138,26 @@ const FeesTableHead = () => {
   );
 };
 
-const FeeTableRow = (props: FeesRowProps) => {
+const FeeTableRow = ({
+  feeTier,
+  fee,
+  feeHighLeverage,
+  requirements,
+  index,
+  isUserFeeTier,
+}: {
+  feeTier: number;
+  fee: string;
+  feeHighLeverage: string;
+  requirements: string;
+  index: number;
+  isUserFeeTier: boolean;
+}) => {
   const classes = useStyles();
-  const { feeTier, fee, feeHighLeverage, requirements, isUserFeeTier } = props;
+
   const { connected } = useWallet();
   return (
-    <TableRow>
+    <TableRow style={{ background: index % 2 === 0 ? "#141722" : undefined }}>
       <TableCell className={classes.tableCell}>{feeTier}</TableCell>
       <TableCell className={classes.tableCell}>{fee}</TableCell>
       <TableCell className={classes.tableCell}>{feeHighLeverage}</TableCell>
@@ -168,6 +183,7 @@ const FeeTable = () => {
             return (
               <FeeTableRow
                 {...row}
+                index={i}
                 isUserFeeTier={row.min < fidaAmount && fidaAmount < row.max}
                 key={`fee-tier-${i}`}
               />

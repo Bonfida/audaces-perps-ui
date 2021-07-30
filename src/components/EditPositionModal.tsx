@@ -1,6 +1,6 @@
 import React from "react";
 import Modal from "./Modal";
-import { Typography, Grid, Button, Tabs, Tab } from "@material-ui/core";
+import { Typography, Grid, Tabs, Tab, AppBar } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
 import { CompleteCloseDialog, PartialCloseDialog } from "./CloseDialog";
 import AddCollateralDialog from "./AddCollateralDialog";
@@ -12,8 +12,11 @@ import { Divider } from "@material-ui/core";
 import TabPanel from "./TabPanel";
 
 const useStyles = makeStyles({
-  indicator: {
+  indicatorAddRemove: {
     backgroundColor: "#8BC6EC",
+  },
+  indicator: {
+    backgroundColor: "transparent",
   },
   modalTitle: {
     color: "white",
@@ -50,13 +53,26 @@ const useStyles = makeStyles({
     height: "30vh",
     minHeight: 550,
     minWidth: 500,
-    margin: 10,
+    // margin: 10,
   },
   divider: {
     background: "#8BC6EC",
     marginTop: 10,
     marginBottom: 10,
     width: "100%",
+  },
+  AppBar: {
+    background: "transparent",
+    paddingTop: 0,
+  },
+  flexContainer: {
+    justifyContent: "space-between",
+  },
+  tab: {
+    color: "#77E3EF",
+    fontSize: 14,
+    fontWeight: 800,
+    textTransform: "capitalize",
   },
 });
 
@@ -79,55 +95,48 @@ const EditPositionModal = ({
     setTab(newValue);
   };
   return (
-    <Modal openModal={openModal} setOpen={setOpen}>
+    <Modal openModal={openModal} setOpen={setOpen} noPadding={true}>
       <div className={classes.modalContainer}>
-        <Grid container justify="center">
-          {tab === 0 && (
-            <>
-              <DecreaseLeverageChip />
-            </>
-          )}
-          {tab === 1 && (
-            <>
-              <IncreaseLeverageChip />
-            </>
-          )}
-        </Grid>
-
-        <Grid container justify="center">
-          <div className={classes.selectButtonContainer}>
-            <Button
-              disableRipple
-              className={
-                selectedButton === "size"
-                  ? classes.selectButtonActive
-                  : classes.selectButton
-              }
-              onClick={() =>
-                selectedButton === "size"
-                  ? setSelectedButton("collateral")
-                  : setSelectedButton("size")
-              }
-            >
-              Size
-            </Button>
-            <Button
-              disableRipple
-              className={
-                selectedButton === "collateral"
-                  ? classes.selectButtonActive
-                  : classes.selectButton
-              }
-              onClick={() =>
-                selectedButton === "collateral"
-                  ? setSelectedButton("size")
-                  : setSelectedButton("collateral")
-              }
-            >
-              Collateral
-            </Button>
-          </div>
-        </Grid>
+        <AppBar className={classes.AppBar} position="static" elevation={0}>
+          <Tabs
+            variant="standard"
+            value={selectedButton}
+            onChange={() => {
+              selectedButton === "collateral"
+                ? setSelectedButton("size")
+                : setSelectedButton("collateral");
+            }}
+            classes={{
+              flexContainer: classes.flexContainer,
+              indicator: classes.indicator,
+            }}
+          >
+            <Tab
+              label="Size"
+              className={classes.tab}
+              style={{
+                background:
+                  selectedButton === "collateral" ? "#141722" : "transparent",
+                width: "50%",
+                borderRadius:
+                  selectedButton === "size" ? "4px 4px 0px 0px" : "undefined",
+              }}
+            />
+            <Tab
+              label="Collateral"
+              className={classes.tab}
+              style={{
+                background:
+                  selectedButton === "size" ? "#141722" : "transparent",
+                width: "50%",
+                borderRadius:
+                  selectedButton === "collateral"
+                    ? "4px 4px 0px 0px"
+                    : "undefined",
+              }}
+            />
+          </Tabs>
+        </AppBar>
         {selectedButton === "size" && (
           <>
             <Tabs
@@ -136,7 +145,7 @@ const EditPositionModal = ({
               textColor="primary"
               onChange={handleTabChange}
               centered
-              classes={{ indicator: classes.indicator }}
+              classes={{ indicator: classes.indicatorAddRemove }}
             >
               <Tab disableRipple label="Decrease" />
               <Tab disableRipple label="Increase" />
@@ -164,7 +173,7 @@ const EditPositionModal = ({
               textColor="primary"
               onChange={handleTabChange}
               centered
-              classes={{ indicator: classes.indicator }}
+              classes={{ indicator: classes.indicatorAddRemove }}
             >
               <Tab disableRipple label="Add" />
               <Tab disableRipple label="Remove" />
@@ -179,6 +188,19 @@ const EditPositionModal = ({
             </TabPanel>
           </>
         )}
+
+        <Grid container justify="center">
+          {tab === 0 && (
+            <>
+              <DecreaseLeverageChip />
+            </>
+          )}
+          {tab === 1 && (
+            <>
+              <IncreaseLeverageChip />
+            </>
+          )}
+        </Grid>
       </div>
     </Modal>
   );

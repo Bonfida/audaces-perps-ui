@@ -3,6 +3,7 @@ import { makeStyles } from "@material-ui/core/styles";
 import bonfidaLogo from "../../assets/homepage/fida.png";
 import { Grid, Typography } from "@material-ui/core";
 import { useSmallScreen } from "../../utils/utils";
+import { useHistory } from "react-router";
 
 const useStyles = makeStyles({
   root: {
@@ -43,12 +44,7 @@ const INTERNAL_LINKS = [
   { name: "Leaderboard", url: "/leaderboard" },
 ];
 
-const EXTERNAL_LINKS_C1 = [
-  { name: "Twitter", url: "https://twitter.com/bonfida" },
-  { name: "Telegram", url: "https://t.me/bonfidatg" },
-];
-
-const EXTERNAL_LINKS_C2 = [
+const EXTERNAL_LINKS = [
   { name: "Help", url: "https://docs.bonfida.org" },
   { name: "Twitter", url: "https://twitter.com/bonfida" },
   { name: "Telegram", url: "https://t.me/bonfidatg" },
@@ -68,6 +64,7 @@ const Brand = () => {
 
 const InternalLinks = () => {
   const classes = useStyles();
+  const history = useHistory();
   return (
     <Grid
       container
@@ -78,14 +75,12 @@ const InternalLinks = () => {
       {INTERNAL_LINKS.map((l) => (
         <Grid item key={l.name}>
           <Typography className={classes.text} variant="body1">
-            <a
-              href={l.url}
-              className={classes.a}
-              target="_blank"
-              rel="noopener noreferrer"
+            <div
+              onClick={() => history.push(l.url)}
+              style={{ cursor: "pointer" }}
             >
               {l.name}
-            </a>
+            </div>
           </Typography>
         </Grid>
       ))}
@@ -137,10 +132,7 @@ const Footer = () => {
             <InternalLinks />
           </Grid>
           <Grid item>
-            <ExternalLinks list={EXTERNAL_LINKS_C1} />
-          </Grid>
-          <Grid item>
-            <ExternalLinks list={EXTERNAL_LINKS_C2} />
+            <ExternalLinks list={EXTERNAL_LINKS} />
           </Grid>
         </Grid>
       </div>
@@ -163,10 +155,7 @@ const Footer = () => {
               <InternalLinks />
             </Grid>
             <Grid item>
-              <ExternalLinks list={EXTERNAL_LINKS_C1} />
-            </Grid>
-            <Grid item>
-              <ExternalLinks list={EXTERNAL_LINKS_C2} />
+              <ExternalLinks list={EXTERNAL_LINKS} />
             </Grid>
           </Grid>
           <Typography className={classes.disclaimer}>

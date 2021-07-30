@@ -45,6 +45,10 @@ export const theme = createMuiTheme({
       },
     },
     MuiOutlinedInput: {
+      notchedOutline: {
+        borderWidth: "1px",
+        borderColor: "#9BA3B5 !important",
+      },
       input: {
         height: 20,
       },
@@ -55,16 +59,13 @@ export const theme = createMuiTheme({
       },
     },
     MuiInput: {
-      underline: {
-        borderBottom: "2px solid #00ADB5",
-      },
+      underline: {},
     },
     MuiTableCell: {
       stickyHeader: {
         backgroundColor: "#141721",
       },
       root: {
-        // borderBottom: "1px solid rgba(224, 224, 224, 0.5)",
         borderBottom: "0px",
       },
     },
