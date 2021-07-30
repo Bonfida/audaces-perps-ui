@@ -149,6 +149,7 @@ const RemoveCollateralDialog = ({ position }: { position: Position }) => {
         <Grid item>
           <FormControl>
             <TextField
+              variant="outlined"
               value={collateral}
               onChange={onChangeCollateral}
               inputProps={{

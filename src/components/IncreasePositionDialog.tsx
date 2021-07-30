@@ -166,6 +166,7 @@ const IncreasePositionDialog = ({ position }: { position: Position }) => {
         <Grid item>
           <FormControl>
             <TextField
+              variant="outlined"
               value={size}
               onChange={onChangeSize}
               inputProps={{

@@ -270,6 +270,7 @@ export const PartialCloseDialog = ({ position }: { position: Position }) => {
         <Grid item>
           <FormControl>
             <TextField
+              variant="outlined"
               value={size}
               onChange={onChangeSize}
               inputProps={{

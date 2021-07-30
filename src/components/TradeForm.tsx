@@ -112,7 +112,6 @@ const useStyles = makeStyles({
     background: "#EB5252",
     maxWidth: 300,
     width: "100%",
-    border: "1px solid",
     color: "#141722",
     fontSize: 14,
     fontWeight: 800,

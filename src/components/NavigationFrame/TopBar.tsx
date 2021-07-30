@@ -151,17 +151,19 @@ const Sections = () => {
 const TopBarHomePage = () => {
   const classes = useStyles();
   const smallScreen = useSmallScreen();
+  if (smallScreen) {
+    return null;
+  }
   return (
     <div style={{ marginLeft: "auto", marginRight: "auto", marginTop: 30 }}>
       <div className={classes.sectionsContainer}>
         <div>
           <Sections />
         </div>
-        {!smallScreen && (
-          <div>
-            <WalletConnect />
-          </div>
-        )}
+
+        <div>
+          <WalletConnect />
+        </div>
       </div>
     </div>
   );

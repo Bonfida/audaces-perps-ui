@@ -749,7 +749,8 @@ const VolumeSection = () => {
             alt=""
             src={cubes}
             style={{
-              width: "90%",
+              width: "70%",
+              marginLeft: "10%",
             }}
           />
         </Grid>
