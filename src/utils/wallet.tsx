@@ -13,6 +13,7 @@ import {
   LedgerWalletAdapter,
   SolongWalletAdapter,
   PhantomWalletAdapter,
+  SolflareExtensionWalletAdapter,
   BloctoWalletAdapter,
   MathWalletAdapter,
 } from "../wallet-adapters";
@@ -21,6 +22,7 @@ import { useLocalStorageState } from "../utils/utils";
 import { notify } from "../utils/notifications";
 import { makeStyles } from "@material-ui/core/styles";
 import blockto from "../assets/wallets/blocto.png";
+import solflare from "../assets/wallets/solflare.svg";
 
 const useStyles = makeStyles({
   button: {
@@ -72,7 +74,13 @@ export const WALLET_PROVIDERS = [
   {
     name: "Solflare",
     url: "https://solflare.com/access-wallet",
-    icon: `${ASSET_URL}/solflare.svg`,
+    icon: solflare,
+  },
+  {
+    name: "Solflare Extension",
+    url: "https://www.solflare.com",
+    icon: solflare,
+    adapter: SolflareExtensionWalletAdapter,
   },
   {
     name: "Ledger",

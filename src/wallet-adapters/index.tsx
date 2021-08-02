@@ -4,3 +4,4 @@ export * from "./phantom";
 export * from "./blocto";
 export * from "./math";
 export * from "./types";
+export * from "./solflare-extension";
