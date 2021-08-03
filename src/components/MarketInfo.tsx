@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import getIcon from "../utils/icons";
 import { Grid, Typography, Menu, MenuItem, Fade } from "@material-ui/core";
-import FloatingCard from "./FloatingCard";
 import { useOraclePrice } from "../utils/perpetuals";
 import {
   useMarkPrice,
@@ -16,19 +15,20 @@ import { roundToDecimal, useSmallScreen } from "../utils/utils";
 import MouseOverPopOver from "./MouseOverPopOver";
 import Countdown from "react-countdown";
 import useInterval from "../utils/useInterval";
-import ArrowDropDownIcon from "@material-ui/icons/ArrowDropDown";
+import ArrowDropDownIcon from "../assets/components/topbar/arrow-down.svg";
 import { Market } from "../utils/types";
 import { useHistory } from "react-router-dom";
 
 const useStyles = makeStyles({
   label: {
     fontSize: 14,
-    color: "white",
-    fontWeight: 600,
+    color: "#77E3EF",
+    fontWeight: 400,
   },
   value: {
     fontSize: 14,
-    color: "white",
+    color: "#FFFFFF",
+    fontWeight: 800,
   },
   img: {
     height: 35,
@@ -36,8 +36,8 @@ const useStyles = makeStyles({
   },
   marketName: {
     fontSize: 20,
-    opacity: 0.9,
     color: "white",
+    fontWeight: 700,
   },
   marketDataContainer: {},
   addButton: {
@@ -76,14 +76,20 @@ const useStyles = makeStyles({
   },
 });
 
-const InfoColumn = ({ label, value }: { label: string; value: any }) => {
+const InfoColumn = ({
+  label,
+  value,
+}: {
+  label: React.ReactNode;
+  value: React.ReactNode;
+}) => {
   const classes = useStyles();
   return (
     <Grid
       container
       direction="column"
       justify="space-between"
-      alignItems="center"
+      alignItems="flex-start"
     >
       <Grid item>
         <Typography className={classes.label}>{label}</Typography>
@@ -139,7 +145,7 @@ const Header = () => {
             </Grid>
           )}
           <Grid item>
-            <ArrowDropDownIcon className={classes.arrowDown} />
+            <img src={ArrowDropDownIcon} className={classes.arrowDown} alt="" />
           </Grid>
         </Grid>
       </div>
@@ -219,6 +225,8 @@ const MarketData = () => {
     Date.now() + 60 * 60 * 1_000 - (Date.now() % (60 * 60 * 1_000))
   );
 
+  const smallScreen = useSmallScreen();
+
   useInterval(() => {
     setFundingCountdown(
       Date.now() + 60 * 60 * 1_000 - (Date.now() % (60 * 60 * 1_000))
@@ -238,22 +246,24 @@ const MarketData = () => {
           <Grid item>
             <Header />
           </Grid>
-          {!!userAccount?.balance && !!marketState?.quoteDecimals && (
-            <Grid item>
-              <InfoColumn
-                label="Available Collateral"
-                value={
-                  <>
-                    {roundToDecimal(
-                      userAccount?.balance / marketState?.quoteDecimals,
-                      3
-                    )?.toLocaleString()}{" "}
-                    <strong>USDC</strong>
-                  </>
-                }
-              />
-            </Grid>
-          )}
+          {!!userAccount?.balance &&
+            !!marketState?.quoteDecimals &&
+            !smallScreen && (
+              <Grid item>
+                <InfoColumn
+                  label="Available Collateral"
+                  value={
+                    <>
+                      {roundToDecimal(
+                        userAccount?.balance / marketState?.quoteDecimals,
+                        3
+                      )?.toLocaleString()}{" "}
+                      <strong>USDC</strong>
+                    </>
+                  }
+                />
+              </Grid>
+            )}
           {!!markPrice && (
             <Grid item>
               <InfoColumn
@@ -277,7 +287,8 @@ const MarketData = () => {
             !!fundingRatios.fundingRatioLongs &&
             !isNaN(fundingRatios.fundingRatioLongs) &&
             !!fundingRatios.fundingRatioShorts &&
-            !isNaN(fundingRatios.fundingRatioShorts) && (
+            !isNaN(fundingRatios.fundingRatioShorts) &&
+            !smallScreen && (
               <Grid item>
                 <MouseOverPopOver
                   popOverText={<>Long funding rate/ Short funding rate</>}
@@ -296,15 +307,19 @@ const MarketData = () => {
                 </MouseOverPopOver>
               </Grid>
             )}
-          <Grid item>
-            <InfoColumn
-              label="Next Funding"
-              value={<Countdown date={fundingCountdown} />}
-            />
-          </Grid>
-          <Grid item>
-            <InfoColumn label="24h Volume" value={"$" + (volume || 0)} />
-          </Grid>
+          {!smallScreen && (
+            <Grid item>
+              <InfoColumn
+                label="Next Funding"
+                value={<Countdown date={fundingCountdown} />}
+              />
+            </Grid>
+          )}
+          {!smallScreen && (
+            <Grid item>
+              <InfoColumn label="24h Volume" value={"$" + (volume || 0)} />
+            </Grid>
+          )}
         </Grid>
       </div>
     </>
@@ -312,11 +327,7 @@ const MarketData = () => {
 };
 
 const MarketInfo = () => {
-  return (
-    <FloatingCard>
-      <MarketData />
-    </FloatingCard>
-  );
+  return <MarketData />;
 };
 
 export default MarketInfo;

@@ -8,33 +8,41 @@ import TableContainer from "@material-ui/core/TableContainer";
 import TableHead from "@material-ui/core/TableHead";
 import TableRow from "@material-ui/core/TableRow";
 import { PastTrade } from "../utils/types";
-import { Typography } from "@material-ui/core";
+import { Typography, Grid } from "@material-ui/core";
 import { useMarket, useMarketTrades } from "../utils/market";
 import { roundToDecimal } from "../utils/utils";
-import LaunchIcon from "@material-ui/icons/Launch";
+import LaunchIcon from "../assets/Link/explorer.svg";
 import { ExplorerLink } from "./Link";
 
 const useStyles = makeStyles({
   tableCell: {
     textTransform: "capitalize",
-    fontSize: 12,
+    fontSize: 14,
     color: "white",
+    fontWeight: 400,
+  },
+  tableCellHead: {
+    textTransform: "capitalize",
+    fontSize: 14,
+    color: "white",
+    fontWeight: 800,
   },
   sellCell: {
     textTransform: "capitalize",
     fontSize: 12,
-    color: "#FF3B69",
+    color: "#EB5252",
   },
   buyCell: {
     textTransform: "capitalize",
     fontSize: 12,
-    color: "#02C77A",
+    color: "#4EDC76",
   },
   title: {
-    fontSize: 14,
+    fontSize: 18,
     color: "white",
     margin: "unset",
-    fontWeight: 600,
+    fontWeight: 700,
+    marginLeft: 15,
   },
   container: {
     maxHeight: 350,
@@ -47,10 +55,9 @@ const TradeTableHead = () => {
   return (
     <TableHead>
       <TableRow>
-        <TableCell className={classes.tableCell}>Size</TableCell>
-        <TableCell className={classes.tableCell}>Price</TableCell>
-        <TableCell className={classes.tableCell}>Time</TableCell>
-        <TableCell className={classes.tableCell} />
+        <TableCell className={classes.tableCellHead}>Size</TableCell>
+        <TableCell className={classes.tableCellHead}>Price</TableCell>
+        <TableCell className={classes.tableCellHead}>Time</TableCell>
       </TableRow>
     </TableHead>
   );
@@ -69,13 +76,17 @@ const TradeTableRow = (props: PastTrade) => {
       <TableCell className={classes.tableCell}>
         {roundToDecimal(markPrice, 3)}
       </TableCell>
-      <TableCell
-        className={classes.tableCell}
-      >{`${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`}</TableCell>
-      <TableCell>
-        <ExplorerLink tx={signature}>
-          <LaunchIcon style={{ color: "white", fontSize: 14 }} />
-        </ExplorerLink>
+      <TableCell className={classes.tableCell}>
+        <Grid container justify="flex-start" spacing={2}>
+          <Grid item>
+            {`${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`}
+          </Grid>
+          <Grid item>
+            <ExplorerLink tx={signature}>
+              <img src={LaunchIcon} alt="" />
+            </ExplorerLink>
+          </Grid>
+        </Grid>
       </TableCell>
     </TableRow>
   );
@@ -89,7 +100,7 @@ const TradePanel = () => {
   return (
     <FloatinCard>
       <TableContainer className={classes.container}>
-        <Typography className={classes.title} align="center" variant="body1">
+        <Typography className={classes.title} align="left" variant="body1">
           Market Trades
         </Typography>
         <Table>

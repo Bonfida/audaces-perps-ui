@@ -7,8 +7,7 @@ import TableHead from "@material-ui/core/TableHead";
 import TableRow from "@material-ui/core/TableRow";
 import { makeStyles } from "@material-ui/core/styles";
 import { Grid } from "@material-ui/core";
-import { FundingPayment } from "../utils/types";
-import LaunchIcon from "@material-ui/icons/Launch";
+import ExplorerIcon from "../assets/Link/explorer.svg";
 import { ExplorerLink } from "./Link";
 import { useUserFunding, MARKETS, useMarket } from "../utils/market";
 import { useWallet } from "../utils/wallet";
@@ -19,6 +18,7 @@ const useStyles = makeStyles({
     textTransform: "capitalize",
     fontSize: 14,
     color: "white",
+    fontWeight: 800,
   },
   container: {
     maxHeight: 250,
@@ -43,27 +43,39 @@ const FundingTableHead = () => {
   );
 };
 
-const FundingTableRow = (props: FundingPayment) => {
+const FundingTableRow = ({
+  time,
+  market,
+  amount,
+  signature,
+  index,
+}: {
+  time: number;
+  market: string;
+  amount: number;
+  signature: string;
+  index: number;
+}) => {
   const classes = useStyles();
-  const date = new Date(props.time);
-  const marketName = MARKETS.find((m) => m.address === props.market)?.name;
+  const date = new Date(time);
+  const marketName = MARKETS.find((m) => m.address === market)?.name;
   const { marketState } = useMarket();
   return (
-    <TableRow>
+    <TableRow style={{ background: index % 2 === 0 ? "#141722" : undefined }}>
       <TableCell className={classes.tableCell}>
         {marketName ? marketName : "Unknown"}
       </TableCell>
       <TableCell className={classes.tableCell}>
         {!!marketState?.quoteDecimals && (
-          <>{props.amount / marketState?.quoteDecimals}</>
+          <>{amount / marketState?.quoteDecimals}</>
         )}
       </TableCell>
       <TableCell
         className={classes.tableCell}
       >{`${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`}</TableCell>
       <TableCell>
-        <ExplorerLink tx={props.signature}>
-          <LaunchIcon style={{ color: "white", fontSize: 14 }} />
+        <ExplorerLink tx={signature}>
+          <img src={ExplorerIcon} alt="" />
         </ExplorerLink>
       </TableCell>
     </TableRow>
@@ -93,7 +105,9 @@ const FundingPaymentTable = () => {
         <FundingTableHead />
         <TableBody>
           {fundingPayments?.map((row, i) => {
-            return <FundingTableRow {...row} key={`funding-table-${i}`} />;
+            return (
+              <FundingTableRow {...row} index={i} key={`funding-table-${i}`} />
+            );
           })}
         </TableBody>
       </Table>

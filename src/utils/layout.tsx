@@ -63,7 +63,7 @@ export const LayoutProvider = ({ children }) => {
 
   // TradingView
   let tradingViewWidth = isLg ? 10 : isMd ? 9 : isSm ? 12 : 12;
-  let tradingViewHeight = isLg ? 40 : isMd ? 22 : isSm ? 20 : 20;
+  let tradingViewHeight = isLg ? 43 : isMd ? 25 : isSm ? 20 : 20;
   // UserTable
   let userTableWidth = isLg ? 12 : isMd ? 9 : isSm ? 12 : 12;
   let userTableHeight = isLg ? 15 : isMd ? 15 : isSm ? 15 : 15;
@@ -73,9 +73,6 @@ export const LayoutProvider = ({ children }) => {
   // Trade Form
   let tradeFormWidth = isLg ? 2 : isMd ? 3 : isSm ? 12 : 12;
   let tradeFormHeight = isLg ? 25 : isMd ? 25 : isSm ? 25 : 25;
-  // MarketInfo
-  let marketInfoWidth = isLg ? 10 : isMd ? 9 : isSm ? 12 : 12;
-  let marketInfoHeight = isLg ? 3 : isMd ? 3 : isSm ? 3 : 3;
 
   // Layout Positions
   let tradingViewPosition = isLg
@@ -84,45 +81,31 @@ export const LayoutProvider = ({ children }) => {
     ? [0, 0]
     : isSm
     ? [0, 0]
-    : [0, marketInfoHeight];
+    : [0, 0];
 
   let userTablePosition = isLg
-    ? [0, tradingViewHeight + marketInfoHeight]
+    ? [0, tradingViewHeight]
     : isMd
-    ? [0, tradingViewHeight + marketInfoHeight]
+    ? [0, tradingViewHeight]
     : isSm
-    ? [0, tradingViewHeight + marketInfoHeight]
-    : [0, tradingViewHeight + marketInfoHeight + tradeFormHeight];
+    ? [0, tradingViewHeight]
+    : [0, tradingViewHeight + tradeFormHeight];
 
   let tradePanelPosition = isLg
     ? [tradingViewWidth, tradeFormHeight]
     : isMd
     ? [tradingViewWidth, tradeFormHeight]
     : isSm
-    ? [0, tradingViewHeight + marketInfoHeight + userTableHeight]
-    : [
-        0,
-        tradingViewHeight +
-          marketInfoHeight +
-          userTableHeight +
-          tradeFormHeight,
-      ];
+    ? [0, tradingViewHeight + userTableHeight]
+    : [0, tradingViewHeight + userTableHeight + tradeFormHeight];
 
   let tradeFormPosition = isLg
     ? [tradingViewWidth + tradePanelWidth, 0]
     : isMd
     ? [tradingViewWidth + tradePanelWidth, 0]
     : isSm
-    ? [marketInfoWidth, tradingViewHeight]
-    : [marketInfoWidth, tradingViewHeight];
-
-  let marketInfoPosition = isLg
-    ? [0, 0]
-    : isMd
-    ? [0, 0]
-    : isSm
-    ? [0, 0]
-    : [0, 0];
+    ? [0, tradingViewHeight]
+    : [0, tradingViewHeight];
 
   // Layout configs
   let tradingViewConfig = {
@@ -159,22 +142,12 @@ export const LayoutProvider = ({ children }) => {
     minH: 20,
     i: "tradeForm",
   };
-  let marketInfoConfig = {
-    x: marketInfoPosition[0],
-    y: marketInfoPosition[1],
-    w: marketInfoWidth,
-    h: marketInfoHeight,
-    minH: 3,
-    minW: 2,
-    i: "marketInfo",
-  };
 
   let defaultLayouts = [
     tradingViewConfig,
     userTableConfig,
     tradePanelConfig,
     tradeFormConfig,
-    marketInfoConfig,
   ];
 
   const [layouts, setLayouts] = useLocalStorageState("layouts", defaultLayouts);

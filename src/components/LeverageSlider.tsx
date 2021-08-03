@@ -1,10 +1,11 @@
 import React from "react";
 import { withStyles } from "@material-ui/core/styles";
 import Slider from "@material-ui/core/Slider";
+import Tooltip from "@material-ui/core/Tooltip";
+import { makeStyles } from "@material-ui/core/styles";
 
 const StyledLeverage = withStyles({
   root: {
-    color: "#00ADB5",
     height: 8,
   },
   thumb: {
@@ -23,14 +24,55 @@ const StyledLeverage = withStyles({
     left: "calc(-50% + 4px)",
   },
   track: {
-    height: 8,
+    height: 4,
     borderRadius: 4,
+    backgroundImage: "linear-gradient(135deg, #60C0CB 18.23%, #6868FC 100%)",
   },
   rail: {
-    height: 8,
+    height: 4,
     borderRadius: 4,
+    backgroundImage: "linear-gradient(135deg, #60C0CB 18.23%, #6868FC 100%)",
+  },
+  mark: {
+    backgroundColor: "transparent",
+  },
+  markLabel: {
+    color: "#C8CCD6",
+    fontSize: 12,
+    margin: 10,
   },
 })(Slider);
+
+const useStyles = makeStyles({
+  toolTip: {
+    backgroundColor: "#7C7CFF",
+    borderRadius: 2,
+  },
+});
+
+interface Props {
+  children: React.ReactElement;
+  open: boolean;
+  value: number;
+}
+
+const ValueLabelComponent = (props: Props) => {
+  const { children, open, value } = props;
+  const classes = useStyles();
+  return (
+    <Tooltip
+      open={open}
+      enterTouchDelay={0}
+      placement="top"
+      title={value}
+      classes={{
+        tooltip: classes.toolTip,
+      }}
+    >
+      {children}
+    </Tooltip>
+  );
+};
 
 const LeverageSlider = ({
   value,
@@ -38,14 +80,17 @@ const LeverageSlider = ({
   valueLabelDisplay,
   max = 100,
   min = 1,
+  marks,
 }) => {
   return (
     <StyledLeverage
+      ValueLabelComponent={ValueLabelComponent}
       value={value}
       onChange={onChange}
       valueLabelDisplay={valueLabelDisplay}
       max={max}
       min={min}
+      marks={marks}
     />
   );
 };

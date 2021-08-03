@@ -26,17 +26,20 @@ const useStyles = makeStyles({
     fontSize: 20,
   },
   addButton: {
-    marginTop: 20,
-    background: "#02C77A",
+    background: "#4EDC76",
     maxWidth: 300,
     width: "100%",
-    border: "1px solid",
-    color: "white",
-    borderColor: "transparent",
+    color: "#141722",
+    fontSize: 14,
+    fontWeight: 800,
     "&:hover": {
-      color: "#02C77A",
-      borderColor: "#02C77A",
       cursor: "pointer",
+      background: "#4EDC76",
+      maxWidth: 300,
+      width: "100%",
+      color: "#141722",
+      fontSize: 14,
+      fontWeight: 800,
     },
   },
   newSizeText: {
@@ -139,6 +142,7 @@ const AddCollateralDialog = ({ position }: { position: Position }) => {
         <Grid item>
           <FormControl>
             <TextField
+              variant="outlined"
               value={collateral}
               onChange={onChangeCollateral}
               inputProps={{

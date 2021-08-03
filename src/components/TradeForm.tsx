@@ -33,7 +33,7 @@ import { useWallet } from "../utils/wallet";
 import { sendTransaction } from "../utils/send";
 import Spin from "./Spin";
 import { refreshAllCaches } from "../utils/fetch-loop";
-import { IsolatedPositionChip } from "./Chips";
+import { IsolatedPositionChip, LeverageValueChip } from "./Chips";
 import MouseOverPopOver from "./MouseOverPopOver";
 import { useReferrer, useOpenPositions } from "../utils/perpetuals";
 import Emoji from "./Emoji";
@@ -45,8 +45,8 @@ const useStyles = makeStyles({
     flexGrow: 1,
   },
   AppBar: {
-    marginTop: "40px",
     background: "transparent",
+    paddingTop: 0,
   },
   sellIndicator: {
     backgroundColor: "#FF3B69",
@@ -54,13 +54,20 @@ const useStyles = makeStyles({
   buyIndicator: {
     backgroundColor: "#02C77A",
   },
+  indicator: {
+    backgroundColor: "transparent",
+  },
   buyTab: {
-    color: "#02C77A",
+    color: "#4EDC76",
     fontSize: 14,
+    fontWeight: 800,
+    textTransform: "capitalize",
   },
   sellTab: {
-    color: "#FF3B69",
+    color: "#EB5252",
     fontSize: 14,
+    fontWeight: 800,
+    textTransform: "capitalize",
   },
   inputProps: {
     color: "white",
@@ -82,37 +89,47 @@ const useStyles = makeStyles({
   leverageContainer: {
     paddingRight: "11%",
     paddingLeft: 10,
+    marginLeft: 10,
   },
   buyButton: {
-    background: "#02C77A",
+    background: "#4EDC76",
     maxWidth: 300,
     width: "100%",
-    border: "1px solid",
-    color: "white",
-    borderColor: "transparent",
+    color: "#141722",
+    fontSize: 14,
+    fontWeight: 800,
     "&:hover": {
-      color: "#02C77A",
-      borderColor: "#02C77A",
       cursor: "pointer",
+      background: "#4EDC76",
+      maxWidth: 300,
+      width: "100%",
+      color: "#141722",
+      fontSize: 14,
+      fontWeight: 800,
     },
   },
   sellButton: {
-    background: "#FF3B69",
+    background: "#EB5252",
     maxWidth: 300,
     width: "100%",
-    border: "1px solid",
-    color: "white",
+    color: "#141722",
+    fontSize: 14,
+    fontWeight: 800,
     borderColor: "transparent",
     "&:hover": {
-      color: "#FF3B69",
-      borderColor: "#FF3B69",
       cursor: "pointer",
+      background: "#EB5252",
+      maxWidth: 300,
+      width: "100%",
+      color: "#141722",
+      fontSize: 14,
+      fontWeight: 800,
     },
   },
   buttonText: {
     fontSize: 14,
-    color: "white",
-    fontWeight: 400,
+    color: "#141722",
+    fontWeight: 800,
   },
   maxPositionContainer: {
     marginLeft: 5,
@@ -123,7 +140,34 @@ const useStyles = makeStyles({
     fontWeight: 600,
     textAlign: "center",
   },
+  leverage: {
+    color: "#FFFFFF",
+    fontSize: 19,
+    fontWeight: 700,
+  },
+  flexContainer: {
+    justifyContent: "space-between",
+  },
 });
+
+const leverageMarks = [
+  {
+    value: 1,
+    label: "1x",
+  },
+  {
+    value: 5,
+    label: "5x",
+  },
+  {
+    value: 10,
+    label: "10x",
+  },
+  {
+    value: 15,
+    label: "15x",
+  },
+];
 
 const TradeForm = () => {
   const classes = useStyles();
@@ -436,7 +480,7 @@ const TradeForm = () => {
   )?.toLocaleString();
 
   return (
-    <FloatingCard>
+    <FloatingCard padding="0 0 0 0">
       {/* Select Side */}
       {useIsolatedPositions && (
         <Grid container justify="center">
@@ -456,23 +500,31 @@ const TradeForm = () => {
       )}
       <AppBar className={classes.AppBar} position="static" elevation={0}>
         <Tabs
+          variant="standard"
           value={side}
           onChange={handleSetSide}
-          centered
           classes={{
-            indicator:
-              side === 0 ? classes.buyIndicator : classes.sellIndicator,
+            flexContainer: classes.flexContainer,
+            indicator: classes.indicator,
           }}
         >
           <Tab
-            label={`Buy ${marketName}`}
+            label="Buy"
             className={classes.buyTab}
-            style={{ marginRight: "3%" }}
+            style={{
+              background: side === 1 ? "#141722" : "transparent",
+              width: "50%",
+              borderRadius: side === 0 ? "4px 4px 0px 0px" : "undefined",
+            }}
           />
           <Tab
-            label={`Sell ${marketName}`}
+            label="Sell"
             className={classes.sellTab}
-            style={{ marginLeft: "3%" }}
+            style={{
+              background: side === 0 ? "#141722" : "transparent",
+              width: "50%",
+              borderRadius: side === 1 ? "4px 4px 0px 0px" : "undefined",
+            }}
           />
         </Tabs>
       </AppBar>
@@ -486,7 +538,7 @@ const TradeForm = () => {
         <Grid item style={{ padding: 10, width: "90%" }}>
           <FormControl style={{ width: "100%" }}>
             <TextField
-              style={{ width: "100%" }}
+              variant="outlined"
               value={baseSize}
               onChange={handleChangeBaseSize}
               inputProps={{
@@ -501,6 +553,7 @@ const TradeForm = () => {
         <Grid item style={{ padding: 10, marginTop: 20, width: "90%" }}>
           <FormControl style={{ width: "100%" }}>
             <TextField
+              variant="outlined"
               value={quoteSize}
               onChange={handleChangeQuoteSize}
               inputProps={{
@@ -517,14 +570,22 @@ const TradeForm = () => {
       {/* Set leverage */}
       {(canIncrease || canOpenPosition) && (
         <div className={classes.leverageContainer}>
-          <Typography variant="body1" className={classes.whiteText}>
-            Leverage: {leverage}x
-          </Typography>
+          <Grid container justify="space-between" alignItems="center">
+            <Grid item>
+              <Typography variant="body1" className={classes.leverage}>
+                Leverage:
+              </Typography>
+            </Grid>
+            <Grid item>
+              <LeverageValueChip value={leverage} />
+            </Grid>
+          </Grid>
           <LeverageSlider
             value={leverage}
             onChange={(e, v) => handleChangeLeverage(v as number)}
             valueLabelDisplay="auto"
             max={MAX_LEVERAGE}
+            marks={leverageMarks}
           />
         </div>
       )}
@@ -535,6 +596,7 @@ const TradeForm = () => {
             Position Size: {positionPercentage}%
           </Typography>
           <LeverageSlider
+            marks={undefined}
             value={positionPercentage}
             onChange={(e, v) => {
               if (markPrice && currentPosition && !!marketState?.coinDecimals) {
@@ -557,10 +619,13 @@ const TradeForm = () => {
           <Typography
             variant="body1"
             className={classes.whiteText}
-            style={{ opacity: 0.6, cursor: "pointer" }}
+            style={{ opacity: 0.6, cursor: "pointer", marginLeft: 10 }}
             onClick={() => {
               if (markPrice) {
-                const value = Math.floor(leverage * userBalance);
+                // Apply 5% haircut to prevent users to have 0 in their user account (for funding extraction)
+                const value = Math.floor(
+                  leverage * userBalance * (1 - 5 / 100)
+                );
                 const valueString = value.toString();
                 setQuoteSize(valueString);
                 const newBaseSize = (value / markPrice).toString();
@@ -568,7 +633,9 @@ const TradeForm = () => {
               }
             }}
           >
-            Max position: {(leverage * userBalance).toLocaleString()}
+            Max position:{" "}
+            {/*  Apply 5% haircut to prevent users to have 0 in their user account (for funding extraction) */}
+            {(leverage * userBalance * (1 - 5 / 100)).toLocaleString()}
           </Typography>
         </div>
       )}
@@ -577,7 +644,7 @@ const TradeForm = () => {
           <Typography
             variant="body1"
             className={classes.whiteText}
-            style={{ opacity: 0.6 }}
+            style={{ opacity: 0.6, marginLeft: 10 }}
           >
             Expected slippage: {`${roundToDecimal(slippage * 100, 3)}%`}
           </Typography>
@@ -588,7 +655,7 @@ const TradeForm = () => {
           <Typography
             variant="body1"
             className={classes.whiteText}
-            style={{ opacity: 0.6 }}
+            style={{ opacity: 0.6, marginLeft: 10 }}
           >
             Expected entry price:{" "}
             {`${roundToDecimal(
@@ -606,7 +673,7 @@ const TradeForm = () => {
                 <Typography
                   variant="body1"
                   className={classes.whiteText}
-                  style={{ opacity: 0.6 }}
+                  style={{ opacity: 0.6, marginLeft: 10 }}
                 >
                   Expected liq. price: {expectedLiqPrice}
                 </Typography>

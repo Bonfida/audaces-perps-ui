@@ -26,18 +26,23 @@ const useStyles = makeStyles({
     color: "white",
     fontSize: 20,
   },
-  addButton: {
-    marginTop: 20,
-    background: "#02C77A",
+  removeButton: {
+    background: "#EB5252",
     maxWidth: 300,
     width: "100%",
     border: "1px solid",
-    color: "white",
+    color: "#141722",
+    fontSize: 14,
+    fontWeight: 800,
     borderColor: "transparent",
     "&:hover": {
-      color: "#02C77A",
-      borderColor: "#02C77A",
       cursor: "pointer",
+      background: "#EB5252",
+      maxWidth: 300,
+      width: "100%",
+      color: "#141722",
+      fontSize: 14,
+      fontWeight: 800,
     },
   },
 });
@@ -144,6 +149,7 @@ const RemoveCollateralDialog = ({ position }: { position: Position }) => {
         <Grid item>
           <FormControl>
             <TextField
+              variant="outlined"
               value={collateral}
               onChange={onChangeCollateral}
               inputProps={{
@@ -158,9 +164,9 @@ const RemoveCollateralDialog = ({ position }: { position: Position }) => {
           <Button
             disabled={loading || !wallet || !collateral}
             onClick={onClick}
-            className={classes.addButton}
+            className={classes.removeButton}
           >
-            {loading ? <Spin size={20} /> : "Add"}
+            {loading ? <Spin size={20} /> : "Remove"}
           </Button>
         </Grid>
       </Grid>

@@ -39,6 +39,7 @@ const useStyles = makeStyles({
     textTransform: "capitalize",
     fontSize: 14,
     color: "white",
+    fontWeight: 800,
   },
   sellCell: {
     textTransform: "capitalize",
@@ -54,30 +55,20 @@ const useStyles = makeStyles({
     backgroundColor: "#5C1864",
   },
   button: {
-    color: "white",
+    color: "#77E3EF",
     background: "transparent",
     width: "auto",
-    borderRadius: 2,
-    border: "2px solid",
-    borderColor: "#00ADB5",
     fontSize: 14,
+    fontWeight: 800,
   },
   loading: {
     color: "white",
     fontSize: 18,
   },
   closeButton: {
-    background: "#FF3B69",
     minWidth: 80,
-    border: "1px solid",
-    color: "white",
-    borderColor: "transparent",
-    borderRadius: 2,
-    "&:hover": {
-      color: "#FF3B69",
-      borderColor: "#FF3B69",
-      cursor: "pointer",
-    },
+    color: "#EB5252",
+    fontWeight: 800,
     fontSize: 14,
   },
   createIcon: {
@@ -141,7 +132,7 @@ const PositionTableHead = () => {
   );
 };
 
-const PositionRow = (props: Position) => {
+const PositionRow = ({ props, index }: { props: Position; index: number }) => {
   const classes = useStyles();
   const [openEditPosition, setOpenEditPosition] = useState(false);
   const [selectedButton, setSelectedButton] = useState("size");
@@ -255,7 +246,7 @@ const PositionRow = (props: Position) => {
 
   if (isLiquidated) {
     return (
-      <TableRow>
+      <TableRow style={{ background: index % 2 === 0 ? "#141722" : undefined }}>
         <TableCell className={classes.tableCell}>
           {market ? market.name : "Unknown"}
           <LiquidatedChip />
@@ -281,7 +272,7 @@ const PositionRow = (props: Position) => {
   }
 
   return (
-    <TableRow>
+    <TableRow style={{ background: index % 2 === 0 ? "#141722" : undefined }}>
       <TableCell className={classes.tableCell}>
         <Grid container alignItems="center">
           <Grid item>
@@ -437,7 +428,8 @@ const PositionTable = () => {
           {positions?.map((row, i) => {
             return (
               <PositionRow
-                {...row}
+                index={i}
+                props={row}
                 key={`position-${i}-${row.positionIndex}`}
               />
             );

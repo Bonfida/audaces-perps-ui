@@ -2,7 +2,7 @@ import React from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import FloatinCard from "../components/FloatingCard";
 import { useLeaderBoard } from "../utils/market";
-import { getLeaderBoardName } from "../utils/utils";
+import { getLeaderBoardName, roundToDecimal } from "../utils/utils";
 import {
   Typography,
   Table,
@@ -13,7 +13,7 @@ import {
   TableRow,
   Grid,
 } from "@material-ui/core";
-import LaunchIcon from "@material-ui/icons/Launch";
+import LaunchIcon from "../assets/Link/explorer.svg";
 import { ExplorerLink } from "../components/Link";
 import { useWallet } from "../utils/wallet";
 import Spin from "../components/Spin";
@@ -80,6 +80,7 @@ const LeaderBoardTableHead = () => {
       <TableRow>
         <TableCell className={classes.tableCell}>Rank</TableCell>
         <TableCell className={classes.tableCell}>Name</TableCell>
+        <TableCell className={classes.tableCell}>Volume</TableCell>
         <TableCell className={classes.tableCell} />
       </TableRow>
     </TableHead>
@@ -90,15 +91,25 @@ const LeaderBoardTableRow = ({
   address,
   rank,
   isUser,
+  index,
+  volume,
 }: {
   address: string;
   rank: number;
   isUser: boolean;
+  index: number;
+  volume: number;
 }) => {
   const classes = useStyles();
   const [domains] = useUserDomains(new PublicKey(address));
+  console.log(volume);
   return (
-    <TableRow>
+    <TableRow
+      style={{
+        background:
+          index % 2 === 0 ? "transparent" : "rgba(255, 255, 255, 0.03)",
+      }}
+    >
       <TableCell
         className={classes.tableCell}
         style={{ fontWeight: isUser ? 600 : undefined }}
@@ -116,9 +127,12 @@ const LeaderBoardTableRow = ({
           ? domains[0]
           : getLeaderBoardName(address)}
       </TableCell>
+      <TableCell className={classes.tableCell}>
+        ${roundToDecimal(volume, 2)?.toLocaleString()}
+      </TableCell>
       <TableCell>
         <ExplorerLink address={address}>
-          <LaunchIcon style={{ color: "white", fontSize: 14 }} />
+          <img src={LaunchIcon} alt="" />
         </ExplorerLink>
       </TableCell>
     </TableRow>
@@ -247,6 +261,7 @@ const LeaderboardPage = () => {
                     {leaderboard24h?.map((row, i) => {
                       return (
                         <LeaderBoardTableRow
+                          index={i}
                           rank={i + 1}
                           address={row.feePayer}
                           key={`leaderboard-24h-${i}`}
@@ -255,6 +270,7 @@ const LeaderboardPage = () => {
                               ? wallet.publicKey.toBase58() === row.feePayer
                               : false
                           }
+                          volume={row.volume}
                         />
                       );
                     })}
@@ -289,6 +305,7 @@ const LeaderboardPage = () => {
                       return (
                         <LeaderBoardTableRow
                           rank={i + 1}
+                          index={i}
                           address={row.feePayer}
                           key={`leaderboard-30d-${i}`}
                           isUser={
@@ -296,6 +313,7 @@ const LeaderboardPage = () => {
                               ? wallet.publicKey.toBase58() === row.feePayer
                               : false
                           }
+                          volume={row.volume}
                         />
                       );
                     })}

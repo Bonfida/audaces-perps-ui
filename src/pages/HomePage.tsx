@@ -1,377 +1,876 @@
-import React from "react";
-import staking from "../assets/homepage/staking.svg";
-import node from "../assets/homepage/node.svg";
+import React, { useState, useEffect } from "react";
 import Grid from "@material-ui/core/Grid";
 import Button from "@material-ui/core/Button";
 import Typography from "@material-ui/core/Typography";
 import { makeStyles } from "@material-ui/core/styles";
+import { Fade } from "@material-ui/core";
 import HelpUrls from "../utils/HelpUrls";
 import solana from "../assets/homepage/solana.png";
-import builtOnSolana from "../assets/homepage/built_on_solana.svg";
 import ipfs from "../assets/homepage/ipfs.png";
-import fida from "../assets/homepage/fida.png";
 import github from "../assets/homepage/github.png";
 import Link from "../components/Link";
 import { useParams } from "react-router-dom";
 import { useLocalStorageState } from "../utils/utils";
 import { notify } from "../utils/notifications";
+import community from "../assets/homepage/community.svg";
+import fast from "../assets/homepage/fast.svg";
+import liquidity from "../assets/homepage/liquidity.svg";
+import safe from "../assets/homepage/safe.svg";
+import safeBlack from "../assets/homepage/safeBlack.svg";
+import whitepaper from "../assets/homepage/whitepaper.svg";
+import cubes from "../assets/homepage/cubes.png";
+import illusion from "../assets/homepage/illusion.svg";
+import burn from "../assets/homepage/burn.svg";
+import reward from "../assets/homepage/reward.svg";
+import back from "../assets/homepage/back.svg";
+import { useHistory } from "react-router";
+import cubeBottom from "../assets/homepage/cube-bottom.svg";
+import { useVolume, useLeaderBoard, MARKETS } from "../utils/market";
+import LeaderboardTable from "../components/LeaderBoardTable";
+import { Trader } from "../utils/types";
+import { useSmallScreen, useWindowSize } from "../utils/utils";
+import { useWallet } from "../utils/wallet";
+import { useConnection } from "../utils/connection";
+import { crankLiquidation, crankFunding } from "@audaces/perps";
+import { sendSignedTransaction, signTransactions } from "../utils/send";
+import { PublicKey, Transaction } from "@solana/web3.js";
+import Spin from "../components/Spin";
 
 const useStyles = makeStyles({
-  imgStaking: {
-    height: 300,
+  h1: {
+    color: "#FFFFFF",
+    textShadow:
+      "0px 2px 13px rgba(119, 227, 239, 0.28), 0px 4px 26px rgba(119, 227, 239, 0.34)",
+    fontSize: 68,
+    margin: 10,
+    fontWeight: 800,
+    lineHeight: "1.0em",
   },
   h2: {
-    fontSize: "max(4vw, 40px)",
+    color: "#FFFFFF",
+    textShadow:
+      "0px 2px 13px rgba(119, 227, 239, 0.28), 0px 4px 26px rgba(119, 227, 239, 0.34)",
+    fontSize: 42,
+    margin: 10,
+    fontWeight: 800,
+    lineHeight: "1.0em",
+  },
+  builtOnSolana: {
+    fontSize: 26,
+    marginLeft: 15,
     fontWeight: 400,
-    color: "white",
-    marginTop: "2%",
-    marginBottom: "2%",
+    textTransform: "uppercase",
+    color: "#FFFFFF",
   },
-  subTitle: {
-    fontSize: 20,
-    color: "white",
-    fontWeight: 600,
-  },
-  text: {
-    fontSize: 18,
-    color: "white",
-  },
-  imgNode: {
-    height: 250,
-  },
-  button: {
-    color: "white",
-    background: "transparent",
-    width: "auto",
-    borderRadius: 5,
-    height: "50px",
-    border: "2px solid",
-    borderColor: "#00ADB5",
-    fontSize: 20,
-    padding: 20,
-  },
-  h1: {
-    fontSize: "max(5vw, 60px)",
-    fontWeight: 400,
-    color: "white",
-    marginTop: "5%",
-  },
-  sectionContainer: {
-    margin: "3%",
-  },
-  imgBuiltOnSolana: {
-    width: "min(400px, 90%)",
-  },
-  clickableImg: {
-    cursor: "pointer",
-    transition: "transform .2s",
+  startTradingButton: {
+    background: "linear-gradient(135deg, rgba(19, 30, 48, 0.5) 0%, #0F0F11 0%)",
+    borderRadius: 20,
+    margin: 1,
+    textTransform: "capitalize",
+    width: 200,
+    color: "#77E3EF",
+    fontWeight: 700,
     "&:hover": {
-      transform: "scale(1.04)",
+      background:
+        "linear-gradient(135deg, rgba(19, 30, 48, 0.5) 0%, #0F0F11 0%)",
     },
   },
-  launchAppButton: {
-    color: "white",
+  startTradingButtonContainer: {
+    background: "linear-gradient(135deg, #37BCBD 0%, #B846B2 61.99%)",
+    borderRadius: 25,
+    width: 202,
+    marginTop: 20,
+    marginLeft: 10,
+  },
+  imgFeelSection: {
+    height: 35,
+  },
+  titleFeelSection: {
+    color: "rgba(119, 227, 239, 1)",
+  },
+  descriptionFeelSection: {
+    color: "#FFFFFF",
+    maxWidth: 171,
+  },
+  illusion: {
+    zIndex: -1,
+    position: "absolute",
+    overflow: "hidden",
+  },
+  cardContainer: {
+    background: "linear-gradient(135deg, #37BCBD 0%, #B846B2 61.99%)",
+    borderRadius: 16,
+    display: "flex",
+    justifyContent: "center",
+    width: 600,
+    height: 540,
+    "&:hover": {
+      background: "linear-gradient(135deg, #37BCBD 0%, #B846B2 100%)",
+    },
+  },
+  card: {
+    padding: 25,
+    borderRadius: 16,
+    height: "538px",
+    width: "100%",
+    margin: 1,
+    background:
+      "linear-gradient(135deg, rgba(19, 30, 48, 0.5) 0%, #0F0F11 61.99%)",
+    "&:hover": {
+      boxShadow:
+        "0px 4px 36px -7px rgba(255, 255, 255, 0.03), 0px -1px 81px 17px rgba(255, 255, 255, 0.05)",
+    },
+  },
+  cardTitle: {
+    color: "#FFFFFF",
+    textShadow:
+      "0px 2px 13px rgba(119, 227, 239, 0.28), 0px 4px 26px rgba(119, 227, 239, 0.34)",
+    fontSize: 68,
+    margin: 10,
+    fontWeight: 800,
+    lineHeight: "1.0em",
+  },
+  cardSubtitle: {
+    color: "rgba(192, 169, 199, 1)",
+    fontSize: 42,
     fontWeight: 600,
-    background: "linear-gradient(213.67deg, #DC1FFF -3.51%, #00ADB5 99.6%)",
-    borderRadius: 5,
-    height: "50px",
-    fontSize: 30,
-    padding: 30,
   },
-  blackSection: {
-    background: "rgb(9,11,15)",
-    paddingBottom: 10,
-    paddingTop: 10,
+  cardDescription: {
+    color: "#FFFFFF",
+    fontSize: 18,
+    maxWidth: 450,
   },
-  bannerContainer: {
-    height: "25%",
-    marginBottom: "3%",
+  cardIcon: {
+    height: 40,
+    marginTop: 15,
+    marginLeft: 15,
+  },
+  buttonContainer: {
+    background: "linear-gradient(135deg, #60C0CB 18.23%, #6868FC 100%)",
+    borderRadius: 25,
+    width: 200,
+  },
+  button: {
+    background: "linear-gradient(135deg, rgba(19, 30, 48, 0.5) 0%, #0F0F11 0%)",
+    margin: 1,
+    borderRadius: 20,
+    width: 198,
+    "&:hover": {
+      background:
+        "linear-gradient(135deg, rgba(19, 30, 48, 0.5) 0%, #0F0F11 0%)",
+    },
+  },
+  coloredText: {
+    textTransform: "capitalize",
+    fontWeight: 400,
+    backgroundImage: "linear-gradient(135deg, #60C0CB 18.23%, #6868FC 100%)",
+    backgroundClip: "text",
+    color: "#60C0CB",
+    "-webkit-background-clip": "text",
+    "-moz-background-clip": "text",
+    "-webkit-text-fill-color": "transparent",
+    "-moz-text-fill-color": "transparent",
+  },
+  nodeColoredText: {
+    textTransform: "capitalize",
+    fontWeight: 400,
+    fontSize: 42,
+    backgroundImage: "linear-gradient(135deg, #60C0CB 18.23%, #6868FC 100%)",
+    backgroundClip: "text",
+    color: "#60C0CB",
+    "-webkit-background-clip": "text",
+    "-moz-background-clip": "text",
+    "-webkit-text-fill-color": "transparent",
+    "-moz-text-fill-color": "transparent",
+  },
+  backIcon: {
+    marginRight: 10,
+  },
+  imgDecentralizedSection: {
+    height: 100,
+  },
+  link: {
+    textDecoration: "none",
+  },
+  cubeBottom: {
+    position: "absolute",
+    bottom: -10,
+    right: -50,
+    zIndex: -1,
+  },
+  volumeColoredText: {
+    textTransform: "capitalize",
+    fontWeight: 800,
+    fontSize: 110,
+    backgroundImage: "linear-gradient(135deg, #60C0CB 18.23%, #6868FC 100%)",
+    backgroundClip: "text",
+    textShadow:
+      "0px 2px 13px rgba(119, 227, 239, 0.28), 0px 4px 26px rgba(119, 227, 239, 0.34)",
+    color: "rgba(119, 227, 239, 0.28)",
+    "-webkit-background-clip": "text",
+    "-moz-background-clip": "text",
+    "-webkit-text-fill-color": "transparent",
+    "-moz-text-fill-color": "transparent",
+  },
+  volumeCaption: {
+    marginTop: 0,
+    color: "#CDCDC1",
+    fontSize: 16,
+    fontWeight: 400,
+    textTransform: "uppercase",
+  },
+  secondaryVolume: {
+    fontWeight: 600,
+    fontSize: 42,
+    color: "#FFFFFF",
+  },
+  wolveCardSelected: {
+    justifyContent: "center",
+    display: "flex",
+    borderRadius: 16,
+    height: 101,
+    width: 196,
+    margin: 1,
+    background:
+      "linear-gradient(135deg, rgba(19, 30, 48, 0.5) 0%, #0F0F11 61.99%)",
+    "&:hover": {
+      cursor: "pointer",
+      boxShadow:
+        "0px 4px 36px -7px rgba(255, 255, 255, 0.03), 0px -1px 81px 17px rgba(255, 255, 255, 0.05)",
+    },
+  },
+  wolveCard: {
+    justifyContent: "center",
+    display: "flex",
+    borderRadius: 16,
+    height: 101,
+    width: 196,
+    margin: 1,
+    background:
+      "linear-gradient(135deg, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 0.1125) 9.37%, rgba(255, 255, 255, 0.0375) 54.69%, rgba(255, 255, 255, 0.0394911) 66.15%, rgba(255, 255, 255, 0.15) 100%)",
+    "&:hover": {
+      cursor: "pointer",
+      boxShadow:
+        "0px 4px 36px -7px rgba(255, 255, 255, 0.03), 0px -1px 81px 17px rgba(255, 255, 255, 0.05)",
+    },
+  },
+
+  wolveCardContainer: {
+    background: "linear-gradient(135deg, #37BCBD 0%, #B846B2 61.99%)",
+    borderRadius: 16,
+    display: "flex",
+    justifyContent: "center",
+    width: 198,
+    height: 103,
+    "&:hover": {
+      cursor: "pointer",
+      background: "linear-gradient(135deg, #37BCBD 0%, #B846B2 100%)",
+    },
+  },
+  wolveCardTextSelected: {
+    textTransform: "capitalize",
+    fontWeight: 600,
+    fontSize: 42,
+    backgroundImage: "linear-gradient(135deg, #60C0CB 18.23%, #6868FC 100%)",
+    backgroundClip: "text",
+    textShadow:
+      "0px 2px 13px rgba(119, 227, 239, 0.28), 0px 4px 26px rgba(119, 227, 239, 0.34)",
+    color: "rgba(119, 227, 239, 0.28)",
+    "-webkit-background-clip": "text",
+    "-moz-background-clip": "text",
+    "-webkit-text-fill-color": "transparent",
+    "-moz-text-fill-color": "transparent",
+  },
+  wolveCardText: {
+    textTransform: "capitalize",
+    fontWeight: 600,
+    fontSize: 42,
+    color: "#FFFFFF",
+    textShadow:
+      "0px 2px 13px rgba(119, 227, 239, 0.28), 0px 4px 26px rgba(119, 227, 239, 0.34)",
+  },
+  wolveCardSubtitle: {
+    textTransform: "capitalize",
+    fontWeight: 400,
+    fontSize: 18,
+    color: "#FFFFFF",
   },
 });
 
-const Staking = () => {
-  const classes = useStyles();
-  const Text = () => {
-    return (
-      <>
-        <Grid
-          container
-          justify="flex-start"
-          alignItems="flex-start"
-          direction="column"
-          style={{ maxWidth: 500 }}
-          spacing={5}
-        >
-          <Grid item>
-            <Typography variant="body1" className={classes.subTitle}>
-              Buy and Burn
-            </Typography>
-            <Typography variant="body1" className={classes.text}>
-              30% of all fees generated go to FIDA buy and burns
-            </Typography>
-          </Grid>
-          <Grid item>
-            <Typography variant="body1" className={classes.subTitle}>
-              Staking Reward
-            </Typography>
-            <Typography variant="body1" className={classes.text}>
-              10% of the monthly buy and burn will be airdropped on FIDA stakers
-            </Typography>
-          </Grid>
-          <Grid item>
-            <Button
-              href={HelpUrls.stake}
-              disableRipple
-              className={classes.button}
-            >
-              Stake
-            </Button>
-          </Grid>
-        </Grid>
-      </>
-    );
-  };
-  return (
-    <div className={classes.sectionContainer}>
-      <Typography variant="h2" className={classes.h2} align="center">
-        Staking
-      </Typography>
-      <Grid
-        container
-        justify="center"
-        alignItems="center"
-        direction="row"
-        spacing={10}
-      >
-        <Grid item>
-          <Text />
-        </Grid>
-        <Grid item>
-          <img src={staking} className={classes.imgStaking} alt="" />
-        </Grid>
-      </Grid>
-    </div>
-  );
-};
-
-const Node = () => {
-  const classes = useStyles();
-  const Text = () => {
-    return (
-      <>
-        <Grid
-          container
-          justify="flex-start"
-          alignItems="flex-start"
-          direction="column"
-          style={{ maxWidth: 500 }}
-          spacing={5}
-        >
-          <Grid item>
-            <Typography variant="body1" className={classes.subTitle}>
-              Secure the network
-            </Typography>
-            <Typography variant="body1" className={classes.text}>
-              Perpetual nodes secure the protocol by cranking liquidations and
-              updating funding rates. Anyone can run a node and help secure the
-              protocol
-            </Typography>
-          </Grid>
-          <Grid item>
-            <Typography variant="body1" className={classes.subTitle}>
-              Earn a reward
-            </Typography>
-            <Typography variant="body1" className={classes.text}>
-              Nodes get rewarded with a flat fee for each transaction they crank
-            </Typography>
-          </Grid>
-          <Grid item>
-            <Button disableRipple className={classes.button}>
-              Get Started
-            </Button>
-          </Grid>
-        </Grid>
-      </>
-    );
-  };
-  return (
-    <div className={classes.sectionContainer}>
-      <Typography variant="h2" className={classes.h2} align="center">
-        Perpetual Nodes
-      </Typography>
-      <Grid
-        container
-        justify="center"
-        alignItems="center"
-        direction="row"
-        spacing={10}
-      >
-        <Grid item>
-          <img src={node} className={classes.imgNode} alt="" />
-        </Grid>
-        <Grid item>
-          <Text />
-        </Grid>
-      </Grid>
-    </div>
-  );
-};
-
 const Banner = () => {
+  const classes = useStyles();
+  const history = useHistory();
+  return (
+    <>
+      <Typography className={classes.builtOnSolana}>Built on Solana</Typography>
+      <Typography className={classes.h1}>
+        On-chain <br />
+        Perpetual swaps
+      </Typography>
+      <div className={classes.startTradingButtonContainer}>
+        <Button
+          className={classes.startTradingButton}
+          onClick={() => history.push("/trade/BTCPERP")}
+        >
+          Start trading
+        </Button>
+      </div>
+    </>
+  );
+};
+
+const feelSections = [
+  {
+    title: "Fast and cheap",
+    description: <>Trade up to 15x leverage with near zero network fees.</>,
+    icon: fast,
+  },
+  {
+    title: "High liquidity",
+    description: <>Virtual AMMs provide deep liquidity from the start</>,
+    icon: liquidity,
+  },
+  {
+    title: "Safety first",
+    description: <>The protocol is backed by an insurance fund</>,
+    icon: safe,
+  },
+  {
+    title: "Community",
+    description: <>Host a UI or refer your friends and get 10% the fees!</>,
+    icon: community,
+  },
+  {
+    title: "Whitepaper",
+    description: (
+      <>
+        Read the white paper on{" "}
+        <Link
+          external
+          to={HelpUrls.whitePaper}
+          style={{ color: "white", textDecoration: "none", fontWeight: 800 }}
+        >
+          Arweave
+        </Link>
+      </>
+    ),
+    icon: whitepaper,
+  },
+];
+
+const FeelTheDifference = () => {
   const classes = useStyles();
   return (
     <>
-      <Typography align="center" className={classes.h1}>
-        On-chain Perpetuals
-      </Typography>
-      <Grid container justify="center" style={{ marginTop: "5%" }}>
-        <img src={builtOnSolana} className={classes.imgBuiltOnSolana} alt="" />
-      </Grid>
-      <Grid container justify="center" style={{ marginTop: "5%" }}>
-        <Button
-          href="/#/trade/BTCUSDC"
-          disableRipple
-          className={classes.launchAppButton}
-        >
-          Launch App
-        </Button>
+      <Typography className={classes.h2}>Feel the difference</Typography>
+      <Grid
+        container
+        justify="flex-start"
+        alignItems="center"
+        spacing={5}
+        style={{ marginTop: 30 }}
+      >
+        {feelSections.map((s, i) => {
+          return (
+            <Grid item key={`feel-difference-section-${i}`}>
+              <img src={s.icon} className={classes.imgFeelSection} alt="" />
+              <Typography className={classes.titleFeelSection}>
+                {s.title}
+              </Typography>
+              <Typography className={classes.descriptionFeelSection}>
+                {s.description}
+              </Typography>
+            </Grid>
+          );
+        })}
       </Grid>
     </>
   );
 };
 
-const Introduction = () => {
+const StakingCard = () => {
   const classes = useStyles();
-  const Text = () => {
-    return (
-      <>
-        <Grid
-          container
-          justify="flex-start"
-          alignItems="flex-start"
-          direction="column"
-          style={{ maxWidth: 600 }}
-          spacing={5}
-        >
-          <Grid item>
-            <Typography variant="body1" className={classes.subTitle}>
-              Fast and cheap
-            </Typography>
-            <Typography variant="body1" className={classes.text}>
-              Trade up to 15x leverage with near 0 network fees
-            </Typography>
-          </Grid>
-          <Grid item>
-            <Typography variant="body1" className={classes.subTitle}>
-              High liquidity
-            </Typography>
-            <Typography variant="body1" className={classes.text}>
-              Virtual AMMs provide deep liquidity from the start
-            </Typography>
-          </Grid>
-          <Grid item>
-            <Typography variant="body1" className={classes.subTitle}>
-              Safety First
-            </Typography>
-            <Typography variant="body1" className={classes.text}>
-              The protocol is backed by an insurance fund
-            </Typography>
-          </Grid>
-          <Grid item>
-            <Typography variant="body1" className={classes.subTitle}>
-              Community
-            </Typography>
-            <Typography variant="body1" className={classes.text}>
-              Host a UI or refer your friends and get 10% of the fees!
-            </Typography>
-          </Grid>
-          <Grid item>
-            <Typography variant="body1" className={classes.subTitle}>
-              White Paper
-            </Typography>
-            <Typography variant="body1" className={classes.text}>
-              Read the white paper{" "}
-              <Link
-                style={{ color: "white" }}
-                external
-                to={HelpUrls.whitePaper}
-              >
-                on Arweave
-              </Link>
-            </Typography>
-          </Grid>
-        </Grid>
-      </>
-    );
-  };
+  const smallScreen = useSmallScreen();
   return (
-    <div className={classes.sectionContainer}>
-      <Typography variant="h2" className={classes.h2} align="center">
-        Feel the Difference
+    <div
+      className={classes.cardContainer}
+      style={{
+        width: smallScreen ? "auto" : "undefined",
+        height: smallScreen ? "auto" : "undefined",
+        margin: smallScreen ? 15 : "undefined",
+      }}
+    >
+      <div
+        className={classes.card}
+        style={{
+          width: smallScreen ? "auto" : "undefined",
+          height: smallScreen ? "auto" : "undefined",
+        }}
+      >
+        <Typography className={classes.cardTitle}>Staking</Typography>
+        <img src={burn} className={classes.cardIcon} alt="" />
+        <Typography className={classes.cardSubtitle}>Buy and burn</Typography>
+        <Typography className={classes.cardDescription}>
+          30% of all fees generated go to FIDA buy and burns.
+        </Typography>
+        <img src={reward} className={classes.cardIcon} alt="" />
+        <Typography className={classes.cardSubtitle}>Staking reward</Typography>
+        <Typography className={classes.cardDescription}>
+          10% of the monthly buy and burn will be airdropped on FIDA stakers.
+        </Typography>
+        <div
+          className={classes.buttonContainer}
+          style={{ marginTop: "min(10%, 40px)" }}
+        >
+          <Link external to={HelpUrls.stake} className={classes.link}>
+            <Button className={classes.button}>
+              <Typography className={classes.coloredText}>
+                Start staking
+              </Typography>
+            </Button>
+          </Link>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const NodeCard = () => {
+  const classes = useStyles();
+  const [front, setFront] = useState(true);
+  const smallScreen = useSmallScreen();
+  const { wallet, connected } = useWallet();
+  const [loading, setLoading] = useState(false);
+  const connection = useConnection();
+
+  const onClick = () => {
+    setFront((prev) => !prev);
+  };
+
+  const onClickLiquidation = async () => {
+    if (!connected || !wallet?.publicKey) {
+      notify({
+        message: "Connect your wallet",
+      });
+      return;
+    }
+
+    try {
+      setLoading(true);
+      const [, instructions] = await crankLiquidation(
+        connection,
+        wallet?.publicKey,
+        new PublicKey(MARKETS[0].address)
+      );
+      const signed = await signTransactions({
+        transactionsAndSigners: instructions.map((i) => {
+          return { transaction: new Transaction().add(i) };
+        }),
+        connection: connection,
+        wallet: wallet,
+      });
+
+      for (let signedTransaction of signed) {
+        await sendSignedTransaction({ signedTransaction, connection });
+      }
+    } catch (err) {
+      if (err.message.includes("no-op")) {
+        return notify({
+          message: `No liquidation to crank`,
+          variant: "success",
+        });
+      }
+      console.warn(`Error - ${err}`);
+      notify({
+        message: `Error cranking transaction - ${err}`,
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const onClickFunding = async () => {
+    if (!connected) {
+      notify({
+        message: "Connect your wallet",
+      });
+      return;
+    }
+    try {
+      setLoading(true);
+      const [, instructions] = await crankFunding(
+        connection,
+        new PublicKey(MARKETS[0].address)
+      );
+      const signed = await signTransactions({
+        transactionsAndSigners: instructions.map((i) => {
+          return { transaction: new Transaction().add(i) };
+        }),
+        connection: connection,
+        wallet: wallet,
+      });
+
+      for (let signedTransaction of signed) {
+        await sendSignedTransaction({ signedTransaction, connection });
+      }
+    } catch (err) {
+      if (err.message.includes("no-op")) {
+        return notify({ message: `No funding to crank`, variant: "success" });
+      }
+      console.warn(`Error - ${err}`);
+      notify({
+        message: `Error cranking transaction - ${err}`,
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div
+      className={classes.cardContainer}
+      style={{
+        width: smallScreen ? "auto" : undefined,
+        margin: smallScreen ? 5 : undefined,
+        height: smallScreen ? "auto" : undefined,
+      }}
+    >
+      <div
+        className={classes.card}
+        style={{
+          width: smallScreen ? "auto" : undefined,
+          height: smallScreen ? "auto" : undefined,
+        }}
+      >
+        {front && (
+          <>
+            <Typography className={classes.cardTitle}>Nodes</Typography>
+            <img src={safeBlack} className={classes.cardIcon} alt="" />
+            <Typography className={classes.cardSubtitle}>
+              Secure the network
+            </Typography>
+            <img src={reward} className={classes.cardIcon} alt="" />
+            <Typography className={classes.cardSubtitle}>
+              Earn a reward
+            </Typography>
+            <Typography className={classes.cardDescription}>
+              Nodes get rewarded for each transaction they crank.
+            </Typography>
+            <div
+              className={classes.buttonContainer}
+              style={{ marginTop: "min(10%, 40px)" }}
+            >
+              <Button className={classes.button} onClick={onClick}>
+                <Typography className={classes.coloredText}>
+                  Learn how
+                </Typography>
+              </Button>
+            </div>
+          </>
+        )}
+        {!front && (
+          <Fade in={true} timeout={500}>
+            <div>
+              <div onClick={onClick} style={{ cursor: "pointer" }}>
+                <Typography className={classes.cardDescription}>
+                  <img src={back} className={classes.backIcon} alt="" />
+                  Back
+                </Typography>
+              </div>
+              <Typography className={classes.nodeColoredText}>
+                What are nodes?
+              </Typography>
+              <Typography className={classes.cardDescription}>
+                Perpetual nodes secure the protocol by cranking liquidations and
+                updating funding rates. Anyone can run a node and help secure
+                the protocol
+              </Typography>
+              <Typography className={classes.nodeColoredText}>
+                Set up your node
+              </Typography>
+              <Typography className={classes.cardDescription}>
+                Anyone can set up a node and start cranking! Cranking can be
+                done using the JavaScript SDK available on NPM or a Rust
+                executable available on Github.
+              </Typography>
+              <Typography className={classes.nodeColoredText}>
+                Crank manually
+              </Typography>
+              <Typography className={classes.cardDescription}>
+                You can crank liquidations and funding rates manually and try
+                earning a rewards!
+              </Typography>
+              <Grid
+                container
+                justify="flex-start"
+                alignItems="center"
+                spacing={5}
+                style={{ marginTop: 10 }}
+              >
+                <Grid item>
+                  <div className={classes.buttonContainer}>
+                    <Button
+                      className={classes.button}
+                      onClick={onClickLiquidation}
+                    >
+                      <Typography className={classes.coloredText}>
+                        {loading ? <Spin size={10} /> : <>Crank Liquidation</>}
+                      </Typography>
+                    </Button>
+                  </div>
+                </Grid>
+                <Grid item>
+                  <div className={classes.buttonContainer}>
+                    <Button className={classes.button} onClick={onClickFunding}>
+                      <Typography className={classes.coloredText}>
+                        {loading ? <Spin size={10} /> : <>Crank Funding</>}
+                      </Typography>
+                    </Button>
+                  </div>
+                </Grid>
+              </Grid>
+            </div>
+          </Fade>
+        )}
+      </div>
+    </div>
+  );
+};
+
+const DecentralizedSection = () => {
+  const classes = useStyles();
+  return (
+    <>
+      <Typography align="center" className={classes.h2}>
+        Decentralized and opensource
       </Typography>
       <Grid
         container
         justify="center"
         alignItems="center"
-        direction="row"
-        spacing={10}
+        spacing={5}
+        style={{ marginTop: 30 }}
       >
         <Grid item>
-          <Text />
+          <Link external to={HelpUrls.solana}>
+            <img
+              src={solana}
+              className={classes.imgDecentralizedSection}
+              alt=""
+            />
+          </Link>
         </Grid>
         <Grid item>
-          <img src={fida} className={classes.imgNode} alt="" />
+          <Link external to={HelpUrls.ipfs}>
+            <img
+              src={ipfs}
+              className={classes.imgDecentralizedSection}
+              alt=""
+            />
+          </Link>
+        </Grid>
+        <Grid item>
+          <Link external to={HelpUrls.github}>
+            <img
+              src={github}
+              className={classes.imgDecentralizedSection}
+              alt=""
+            />
+          </Link>
+        </Grid>
+      </Grid>
+    </>
+  );
+};
+
+const VolumeDetails = () => {
+  const classes = useStyles();
+  const _now = Math.floor(new Date().getTime() / 1_000);
+  const now = React.useMemo(() => _now - (_now % (60 * 60)), [_now]);
+  const [volume24h] = useVolume("all");
+  const [volume7d] = useVolume("all", now - 7 * 24 * 60 * 60, now);
+  const [volume30d] = useVolume("all", now - 30 * 24 * 60 * 60, now);
+  const smallScreen = useSmallScreen();
+  return (
+    <>
+      <Typography className={classes.h2} align="right">
+        Our trading volumes
+      </Typography>
+      <Typography
+        className={classes.volumeColoredText}
+        style={{ fontSize: smallScreen ? "4rem" : undefined }}
+        align="right"
+      >
+        ${volume24h}
+      </Typography>
+      <Typography className={classes.volumeCaption} align="right">
+        24h Volume
+      </Typography>
+      <Grid
+        container
+        justify="flex-end"
+        alignItems={smallScreen ? "flex-end" : "center"}
+        spacing={5}
+        direction={smallScreen ? "column" : "row"}
+      >
+        <Grid item>
+          <Typography className={classes.secondaryVolume} align="right">
+            ${volume7d}
+          </Typography>
+          <Typography className={classes.volumeCaption} align="right">
+            7D Volume
+          </Typography>
+        </Grid>
+        <Grid item>
+          <Typography className={classes.secondaryVolume} align="right">
+            ${volume30d}
+          </Typography>
+          <Typography className={classes.volumeCaption} align="right">
+            30D Volume
+          </Typography>
+        </Grid>
+      </Grid>
+    </>
+  );
+};
+
+const VolumeSection = () => {
+  const { width } = useWindowSize();
+  if (width < 650) {
+    return <VolumeDetails />;
+  }
+  if (width < 1420) {
+    return (
+      <Grid
+        container
+        justify="center"
+        style={{ marginTop: 40, marginBottom: 40 }}
+      >
+        <Grid item>
+          <VolumeDetails />
+        </Grid>
+      </Grid>
+    );
+  }
+  return (
+    <div style={{ position: "relative" }}>
+      <Grid container justify="space-evenly" alignItems="center">
+        <Grid item>
+          <img
+            alt=""
+            src={cubes}
+            style={{
+              width: "70%",
+              marginLeft: "10%",
+            }}
+          />
+        </Grid>
+        <Grid item>
+          <VolumeDetails />
         </Grid>
       </Grid>
     </div>
   );
 };
 
-const Values = () => {
+const WolveCard = ({
+  time,
+
+  selected,
+}: {
+  time: string;
+
+  selected: boolean;
+}) => {
   const classes = useStyles();
+  if (!selected) {
+    return (
+      <div className={classes.wolveCard}>
+        <div>
+          <Typography className={classes.wolveCardText}>{time}</Typography>
+          <Typography className={classes.wolveCardSubtitle}>Leaders</Typography>
+        </div>
+      </div>
+    );
+  }
+  return (
+    <div className={classes.wolveCardContainer}>
+      <div className={classes.wolveCardSelected}>
+        <div>
+          <Typography className={classes.wolveCardTextSelected}>
+            {time}
+          </Typography>
+          <Typography className={classes.wolveCardSubtitle}>Leaders</Typography>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const Leaderboardsection = () => {
+  const classes = useStyles();
+  const [leaderboard, setLeaderBoard] = useState<null | undefined | Trader[]>(
+    null
+  );
+  const [card, setCard] = useState(0);
+  const [leaderboard24h, leaderboard24hLoaded] = useLeaderBoard(
+    undefined,
+    undefined,
+    10
+  );
+
+  let monthlyEndtime = new Date().getTime() / 1_000;
+  monthlyEndtime = monthlyEndtime - (monthlyEndtime % (60 * 60));
+  const monthlyStartTime = monthlyEndtime - 30 * 24 * 60 * 60;
+  const [leaderboard30d] = useLeaderBoard(monthlyStartTime, monthlyEndtime, 10);
+
+  useEffect(() => {
+    if (!leaderboard && !!leaderboard24h) {
+      setLeaderBoard(leaderboard24h);
+    }
+    // eslint-disable-next-line
+  }, [leaderboard24hLoaded, leaderboard24h]);
+
   return (
     <>
-      <Typography align="center" className={classes.h2}>
-        Decentralized {"&"} Open Source
-      </Typography>
-      <Grid
-        container
-        justify="center"
-        alignItems="center"
-        direction="row"
-        spacing={10}
-      >
+      <Grid container justify="center" alignItems="center" spacing={5}>
         <Grid item>
-          <Link external to="https://solana.com">
-            <img
-              src={solana}
-              height="100px"
-              alt=""
-              className={classes.clickableImg}
-            />
-          </Link>
+          <Typography className={classes.h2}>Bonfida wolves</Typography>
+          <Typography
+            className={classes.wolveCardSubtitle}
+            style={{ marginLeft: 10, marginBottom: 20 }}
+          >
+            Can you make it to the top 10?
+          </Typography>
+
+          <div style={{ display: "flex", justifyContent: "space-around" }}>
+            <div
+              style={{ marginRight: 30 }}
+              onClick={() => {
+                setLeaderBoard(leaderboard24h);
+                setCard(0);
+              }}
+            >
+              <WolveCard time="7D" selected={card === 0} />
+            </div>
+
+            <div
+              onClick={() => {
+                setLeaderBoard(leaderboard30d);
+                setCard(1);
+              }}
+            >
+              <WolveCard time="30D" selected={card === 1} />
+            </div>
+          </div>
         </Grid>
         <Grid item>
-          <Link external to="https://ipfs.com">
-            <img
-              src={ipfs}
-              height="110px"
-              alt=""
-              style={{ marginBottom: 20 }}
-              className={classes.clickableImg}
+          <div style={{ maxWidth: 500 }}>
+            <LeaderboardTable
+              leaderboard={leaderboard}
+              leaderboardLoaded={!!leaderboard}
             />
-          </Link>
-        </Grid>
-        <Grid item>
-          <Link external to="https://github.com/AudacesFoundation">
-            <img
-              src={github}
-              height="110px"
-              alt=""
-              style={{ marginBottom: 20 }}
-              className={classes.clickableImg}
-            />
-          </Link>
+          </div>
         </Grid>
       </Grid>
     </>
@@ -395,17 +894,41 @@ const HomePage = () => {
   }
   return (
     <>
-      <div className={classes.bannerContainer}>
-        <Banner />
+      <div style={{ position: "relative", overflow: "hidden" }}>
+        <img src={illusion} className={classes.illusion} alt="" />
+        <div style={{ marginTop: "5%", marginLeft: "21vw" }}>
+          <Banner />
+        </div>
+        <div
+          style={{
+            marginTop: "5%",
+            marginBottom: "5%",
+            marginLeft: "21vw",
+          }}
+        >
+          <FeelTheDifference />
+        </div>
+        <div style={{ marginRight: "6%" }}>
+          <VolumeSection />
+        </div>
+        <div id="nodes">
+          <Grid container justify="center" alignItems="center" spacing={5}>
+            <Grid item>
+              <StakingCard />
+            </Grid>
+            <Grid item>
+              <NodeCard />
+            </Grid>
+          </Grid>
+        </div>
+        <div style={{ marginTop: "5%" }} id="leaderboard">
+          <Leaderboardsection />
+        </div>
+        <div style={{ marginTop: "5%", marginBottom: "5%" }}>
+          <DecentralizedSection />
+        </div>
+        <img src={cubeBottom} className={classes.cubeBottom} alt="" />
       </div>
-      <div className={classes.blackSection}>
-        <Introduction />
-      </div>
-      <Node />
-      <div className={classes.blackSection}>
-        <Staking />
-      </div>
-      <Values />
     </>
   );
 };

@@ -36,13 +36,13 @@ import { useAvailableCollateral } from "../utils/perpetuals";
 import { notify } from "../utils/notifications";
 import { PublicKey, Transaction } from "@solana/web3.js";
 import { sendTransaction } from "../utils/send";
-import DeleteForeverIcon from "@material-ui/icons/DeleteForever";
 import CreateUserAccountButton from "./CreateUserAccountButton";
 import { InformationRow } from "./SummaryPosition";
 import LaunchIcon from "@material-ui/icons/Launch";
 import { ExplorerLink } from "./Link";
-import RefreshIcon from "@material-ui/icons/Refresh";
 import { useHistory } from "react-router-dom";
+import refresh from "../assets/tables/refresh.svg";
+import deleteIcon from "../assets/tables/delete.svg";
 
 const useStyles = makeStyles({
   table: {
@@ -54,51 +54,37 @@ const useStyles = makeStyles({
     color: "white",
   },
   buyButton: {
-    background: "#02C77A",
+    background: "#4EDC76",
     fontSize: 14,
+    fontWeight: 600,
     maxWidth: 200,
     width: "100%",
-    border: "1px solid",
-    color: "white",
-    borderColor: "transparent",
+    color: "#141722",
     "&:hover": {
-      color: "#02C77A",
-      borderColor: "#02C77A",
-      cursor: "pointer",
+      background: "#4EDC76",
+      color: "#141722",
     },
   },
   maxButton: {
     marginLeft: 10,
-    background: "#02C77A",
     fontSize: 14,
-    maxWidth: 30,
-    width: "100%",
-    border: "1px solid",
-    color: "white",
-    borderColor: "transparent",
-    "&:hover": {
-      color: "#02C77A",
-      borderColor: "#02C77A",
-      cursor: "pointer",
-    },
+    color: "#4EDC76",
+    fontWeight: 800,
   },
   sellButton: {
-    background: "#FF3B69",
+    background: "#EB5252",
     maxWidth: 200,
     width: "100%",
-    border: "1px solid",
-    color: "white",
-    borderColor: "transparent",
+    color: "#141722",
     "&:hover": {
-      color: "#FF3B69",
-      borderColor: "#FF3B69",
-      cursor: "pointer",
+      background: "#EB5252",
+      color: "#141722",
     },
   },
   radio: {
-    color: "#00ADB5",
+    color: "#C8CCD6",
     "&$checked": {
-      color: "#00ADB5",
+      color: "#77E3EF",
     },
   },
   checked: {},
@@ -122,9 +108,9 @@ const useStyles = makeStyles({
   },
   modalTitle: {
     color: "white",
-    opacity: 0.8,
     fontSize: 20,
     marginBottom: 10,
+    fontWeight: 700,
   },
   fundingButton: {
     background: "#1e8bf0",
@@ -140,11 +126,7 @@ const useStyles = makeStyles({
     },
   },
   maxWithdrawButton: {
-    width: 100,
-    background: "transaparent",
-    border: "1px solid",
-    color: "#FF3B69",
-    borderColor: "#FF3B69",
+    color: "#EB5252",
   },
   withdrawButtonContainer: {
     marginTop: 50,
@@ -166,7 +148,6 @@ const useStyles = makeStyles({
     fontSize: 18,
     color: "white",
     fontWeight: 400,
-    opacity: 0.8,
   },
   marketName: {
     fontWeight: 600,
@@ -185,6 +166,35 @@ const useStyles = makeStyles({
     fontSize: 18,
     cursor: "pointer",
   },
+  refreshDiv: {
+    cursor: "pointer",
+  },
+  tableCellHead: {
+    color: "#FFFFFF",
+    fontSize: 14,
+    fontWeight: 800,
+  },
+  extract: {
+    color: "#77E3EF",
+    fontSize: 14,
+    fontWeight: 800,
+    textTransform: "capitalize",
+  },
+  withdraw: {
+    color: "#EB5252",
+    fontSize: 14,
+    fontWeight: 800,
+    textTransform: "capitalize",
+  },
+  deposit: {
+    color: "#4EDC76",
+    fontSize: 14,
+    fontWeight: 800,
+    textTransform: "capitalize",
+  },
+  delete: {
+    cursor: "pointer",
+  },
 });
 
 const AccountTableHead = () => {
@@ -193,21 +203,36 @@ const AccountTableHead = () => {
   return (
     <TableHead>
       <TableRow>
-        <TableCell className={classes.tableCell}>User Account</TableCell>
-        <TableCell className={classes.tableCell}>
+        <TableCell className={classes.tableCellHead} align="left">
+          Selected Acc.
+        </TableCell>
+        <TableCell className={classes.tableCellHead} align="left">
+          User Account
+        </TableCell>
+        <TableCell className={classes.tableCellHead} align="left">
           Collateral Available
         </TableCell>
-        <TableCell className={classes.tableCell}>Nb Open Position</TableCell>
-        <TableCell className={classes.tableCell}>Deposit</TableCell>
-        <TableCell className={classes.tableCell}>Withdraw</TableCell>
-        <TableCell className={classes.tableCell}>Funding</TableCell>
-        <TableCell className={classes.tableCell}>Selected Acc.</TableCell>
+        <TableCell className={classes.tableCellHead} align="left">
+          Nb Open Position
+        </TableCell>
+        <TableCell className={classes.tableCellHead} align="left">
+          Deposit
+        </TableCell>
+        <TableCell className={classes.tableCellHead} align="left">
+          Withdraw
+        </TableCell>
+        <TableCell className={classes.tableCellHead} align="left">
+          Funding
+        </TableCell>
+
         <TableCell>
           {/* Refresh column */}
-          <RefreshIcon
+          <div
+            className={classes.refreshDiv}
             onClick={() => setRefreshUserAccount((prev) => !prev)}
-            className={classes.refreshIcon}
-          />
+          >
+            <img src={refresh} alt="" />
+          </div>
         </TableCell>
       </TableRow>
     </TableHead>
@@ -490,7 +515,13 @@ const ModalWithdraw = ({
   );
 };
 
-const AccountRow = ({ acc }: { acc: UserAccount | undefined | null }) => {
+const AccountRow = ({
+  acc,
+  index,
+}: {
+  acc: UserAccount | undefined | null;
+  index: number;
+}) => {
   const classes = useStyles();
   const connection = useConnection();
   const { wallet } = useWallet();
@@ -597,8 +628,22 @@ const AccountRow = ({ acc }: { acc: UserAccount | undefined | null }) => {
   };
 
   return (
-    <TableRow>
-      <TableCell className={classes.tableCell}>
+    <TableRow style={{ background: index % 2 === 0 ? "#141722" : undefined }}>
+      <TableCell align="left">
+        <Checkbox
+          classes={{
+            root: classes.radio,
+            checked: classes.checked,
+          }}
+          checked={
+            userAccount?.address
+              ? acc.address.equals(userAccount?.address)
+              : false
+          }
+          onChange={() => handleChangeUserAccount(acc)}
+        />
+      </TableCell>
+      <TableCell className={classes.tableCell} align="left">
         <Typography className={classes.marketName}>
           {market ? market.name : "Unknown"}
         </Typography>
@@ -613,19 +658,20 @@ const AccountRow = ({ acc }: { acc: UserAccount | undefined | null }) => {
           </Grid>
         </Typography>
       </TableCell>
-      <TableCell className={classes.tableCell}>
-        {!!marketState?.quoteDecimals &&
+      <TableCell className={classes.tableCell} align="right">
+        <strong>$</strong>
+        {(!!marketState?.quoteDecimals &&
           roundToDecimal(
             acc.balance / marketState?.quoteDecimals,
             4
-          )?.toLocaleString()}{" "}
-        <strong>USDC</strong>
+          )?.toLocaleString()) ||
+          0}
       </TableCell>
-      <TableCell className={classes.tableCell}>
+      <TableCell className={classes.tableCell} align="right">
         {acc.openPositions?.length}
       </TableCell>
       <TableCell className={classes.tableCell}>
-        <Button onClick={() => setOpenAdd(true)} className={classes.buyButton}>
+        <Button onClick={() => setOpenAdd(true)} className={classes.deposit}>
           Deposit
         </Button>
         <ModalAdd setOpen={setOpenAdd} open={openAdd} acc={acc.address} />
@@ -633,7 +679,7 @@ const AccountRow = ({ acc }: { acc: UserAccount | undefined | null }) => {
       <TableCell className={classes.tableCell}>
         <Button
           onClick={() => setOpenWithdraw(true)}
-          className={classes.sellButton}
+          className={classes.withdraw}
         >
           Withdraw
         </Button>
@@ -644,32 +690,14 @@ const AccountRow = ({ acc }: { acc: UserAccount | undefined | null }) => {
         />
       </TableCell>
       <TableCell className={classes.tableCell}>
-        <Button
-          onClick={onClickExtractFunding}
-          className={classes.fundingButton}
-        >
+        <Button onClick={onClickExtractFunding} className={classes.extract}>
           {loading ? <Spin size={20} /> : "Extract"}
         </Button>
       </TableCell>
-      <TableCell>
-        <Checkbox
-          classes={{
-            root: classes.radio,
-            checked: classes.checked,
-          }}
-          checked={
-            userAccount?.address
-              ? acc.address.equals(userAccount?.address)
-              : false
-          }
-          onChange={() => handleChangeUserAccount(acc)}
-        />
-      </TableCell>
       <TableCell className={classes.tableCell}>
-        <DeleteForeverIcon
-          className={classes.deleteIcon}
-          onClick={onClickDelete}
-        />
+        <div onClick={onClickDelete} className={classes.delete}>
+          <img src={deleteIcon} alt="" />
+        </div>
       </TableCell>
     </TableRow>
   );
@@ -694,7 +722,13 @@ const AccountsTable = () => {
           <AccountTableHead />
           <TableBody className={classes.tableBody}>
             {filteredUserData?.map((row, i) => {
-              return <AccountRow acc={row} key={`${i}-account-table-row`} />;
+              return (
+                <AccountRow
+                  acc={row}
+                  key={`${i}-account-table-row`}
+                  index={i}
+                />
+              );
             })}
           </TableBody>
         </Table>
