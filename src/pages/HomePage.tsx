@@ -28,7 +28,7 @@ import cubeBottom from "../assets/homepage/cube-bottom.svg";
 import { useVolume, useLeaderBoard, MARKETS } from "../utils/market";
 import LeaderboardTable from "../components/LeaderBoardTable";
 import { Trader } from "../utils/types";
-import { useSmallScreen } from "../utils/utils";
+import { useSmallScreen, useWindowSize } from "../utils/utils";
 import { useWallet } from "../utils/wallet";
 import { useConnection } from "../utils/connection";
 import { crankLiquidation, crankFunding } from "@audaces/perps";
@@ -337,9 +337,7 @@ const feelSections = [
   },
   {
     title: "Community",
-    description: (
-      <>Host a UI or refer your friends and get 10% free of the fees!</>
-    ),
+    description: <>Host a UI or refer your friends and get 10% the fees!</>,
     icon: community,
   },
   {
@@ -737,9 +735,22 @@ const VolumeDetails = () => {
 };
 
 const VolumeSection = () => {
-  const smallScreen = useSmallScreen("md");
-  if (smallScreen) {
+  const { width } = useWindowSize();
+  if (width < 650) {
     return <VolumeDetails />;
+  }
+  if (width < 1420) {
+    return (
+      <Grid
+        container
+        justify="center"
+        style={{ marginTop: 40, marginBottom: 40 }}
+      >
+        <Grid item>
+          <VolumeDetails />
+        </Grid>
+      </Grid>
+    );
   }
   return (
     <div style={{ position: "relative" }}>
