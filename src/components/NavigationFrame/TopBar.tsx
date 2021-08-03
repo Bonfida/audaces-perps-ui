@@ -15,7 +15,7 @@ import { useWallet } from "../../utils/wallet";
 import { useMarket } from "../../utils/market";
 import { useLayout } from "../../utils/layout";
 import { useHistory } from "react-router";
-import { useSmallScreen } from "../../utils/utils";
+import { useSmallScreen, useWindowSize } from "../../utils/utils";
 
 const drawerWidth = 300;
 
@@ -177,8 +177,8 @@ const TopBarMarketPage = () => {
   const { useIsolatedPositions, setUseIsolatedPositions, userAccount } =
     useMarket();
   const history = useHistory();
-  const smallScreen = useSmallScreen();
-
+  const { width } = useWindowSize();
+  const smallScreen = width < 1125;
   const handleChangeIsolatedPositions = () => {
     // If no userAccount
     if (!userAccount?.openPositions) {
