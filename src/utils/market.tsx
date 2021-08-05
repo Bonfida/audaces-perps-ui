@@ -315,3 +315,14 @@ export const findSide = (action: string, side: string) => {
   }
   return side;
 };
+
+export const useMarketState = (marketAddress: PublicKey) => {
+  const connection = useConnection();
+  const fn = async () => {
+    const marketState = await MarketState.retrieve(connection, marketAddress);
+    marketState.quoteDecimals = Math.pow(10, marketState.quoteDecimals);
+    marketState.coinDecimals = Math.pow(10, marketState.coinDecimals);
+    return marketState;
+  };
+  return useAsyncData(fn, tuple("useMarketState", marketAddress.toBase58()));
+};

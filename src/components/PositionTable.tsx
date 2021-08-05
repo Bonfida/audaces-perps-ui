@@ -29,7 +29,7 @@ import { useSmallScreen } from "../utils/utils";
 import LeverageChip, { LiquidatedChip } from "./Chips";
 import MouseOverPopOver from "./MouseOverPopOver";
 import { useReferrer } from "../utils/perpetuals";
-import { MARKETS, useMarket } from "../utils/market";
+import { MARKETS, useMarketState } from "../utils/market";
 
 const useStyles = makeStyles({
   table: {
@@ -144,11 +144,11 @@ const PositionRow = ({ props, index }: { props: Position; index: number }) => {
   const market = MARKETS.find(
     (m) => m.address === props.marketAddress.toBase58()
   );
-  const positivePnl = props.pnl > 0;
-  const buySide = props.side === "long";
 
+  const buySide = props.side === "long";
   const [oraclePrice, oraclePriceLoaded] = useOraclePrice(props.marketAddress);
-  const { marketState } = useMarket();
+  const [marketState] = useMarketState(props.marketAddress);
+  const positivePnl = props.pnl > 0;
 
   const isLiquidated = useMemo(() => {
     if (!oraclePrice?.price) {
