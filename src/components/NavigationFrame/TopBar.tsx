@@ -15,7 +15,11 @@ import { useWallet } from "../../utils/wallet";
 import { useMarket } from "../../utils/market";
 import { useLayout } from "../../utils/layout";
 import { useHistory } from "react-router";
-import { useSmallScreen, useWindowSize } from "../../utils/utils";
+import {
+  useSmallScreen,
+  useWindowSize,
+  useLocalStorageState,
+} from "../../utils/utils";
 
 const drawerWidth = 300;
 
@@ -177,6 +181,7 @@ const TopBarMarketPage = () => {
   const { useIsolatedPositions, setUseIsolatedPositions, userAccount } =
     useMarket();
   const history = useHistory();
+  const [refCode] = useLocalStorageState("referralCode");
   const { width } = useWindowSize();
   const smallScreen = width < 1125;
   const handleChangeIsolatedPositions = () => {
@@ -279,6 +284,7 @@ const TopBarMarketPage = () => {
       >
         <div className={classes.drawerHeader}>
           <List>
+            {/* Lock Layout */}
             <ListItem>
               <Grid
                 container
@@ -299,6 +305,7 @@ const TopBarMarketPage = () => {
                 </Grid>
               </Grid>
             </ListItem>
+            {/* Isolated Position */}
             <ListItem>
               <Grid
                 container
@@ -319,13 +326,35 @@ const TopBarMarketPage = () => {
                 </Grid>
               </Grid>
             </ListItem>
-
+            {/* Referrer */}
+            {!!refCode && (
+              <ListItem>
+                <Grid
+                  container
+                  justify="space-between"
+                  alignItems="center"
+                  spacing={5}
+                >
+                  <Grid item>
+                    <Typography className={classes.drawerText}>
+                      Your referrer
+                    </Typography>
+                  </Grid>
+                  <Grid item>
+                    <Typography className={classes.drawerText}>
+                      {refCode}
+                    </Typography>
+                  </Grid>
+                </Grid>
+              </ListItem>
+            )}
+            {/* Small screen wallet connect */}
             {smallScreen && (
               <ListItem>
                 <WalletConnect width={290} />
               </ListItem>
             )}
-
+            {/* Reset layout */}
             <ListItem>
               <div className={classes.resetLayetButtonContainer}>
                 <Button
