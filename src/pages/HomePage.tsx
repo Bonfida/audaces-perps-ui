@@ -10,7 +10,6 @@ import ipfs from "../assets/homepage/ipfs.png";
 import github from "../assets/homepage/github.png";
 import Link from "../components/Link";
 import { useParams } from "react-router-dom";
-import { useLocalStorageState } from "../utils/utils";
 import { notify } from "../utils/notifications";
 import community from "../assets/homepage/community.svg";
 import fast from "../assets/homepage/fast.svg";
@@ -28,7 +27,11 @@ import cubeBottom from "../assets/homepage/cube-bottom.svg";
 import { useVolume, useLeaderBoard, MARKETS } from "../utils/market";
 import LeaderboardTable from "../components/LeaderBoardTable";
 import { Trader } from "../utils/types";
-import { useSmallScreen, useWindowSize } from "../utils/utils";
+import {
+  useSmallScreen,
+  useWindowSize,
+  useLocalStorageState,
+} from "../utils/utils";
 import { useWallet } from "../utils/wallet";
 import { useConnection } from "../utils/connection";
 import { crankLiquidation, crankFunding } from "@audaces/perps";
@@ -300,6 +303,7 @@ const useStyles = makeStyles({
 const Banner = () => {
   const classes = useStyles();
   const history = useHistory();
+  const [market] = useLocalStorageState("market");
   return (
     <>
       <Typography className={classes.builtOnSolana}>Built on Solana</Typography>
@@ -310,7 +314,7 @@ const Banner = () => {
       <div className={classes.startTradingButtonContainer}>
         <Button
           className={classes.startTradingButton}
-          onClick={() => history.push("/trade/BTCPERP")}
+          onClick={() => history.push(`/trade/${market?.name || "BTC-PERP"}`)}
         >
           Start trading
         </Button>
