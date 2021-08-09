@@ -855,7 +855,7 @@ const Leaderboardsection = () => {
                 setCard(0);
               }}
             >
-              <WolveCard time="7D" selected={card === 0} />
+              <WolveCard time="24H" selected={card === 0} />
             </div>
 
             <div
