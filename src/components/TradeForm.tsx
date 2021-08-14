@@ -321,6 +321,7 @@ const TradeForm = () => {
 
   // Create a position
   const onClick = async () => {
+    console.log(`Referrer for the order ${referrer?.toBase58()}`);
     if (
       !userBalance ||
       !wallet ||

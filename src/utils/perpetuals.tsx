@@ -67,8 +67,12 @@ export const useQuoteAccountFromRefCode = (refCode: string | undefined) => {
         nameRegistryState.owner,
         USDC_MINT
       );
-      const accountInfo = await connection.getAccountInfo(usdcAddress);
-      if (!accountInfo?.data) return REFERRAL_FEES_ADDRESS; // Account does not exist
+      console.log(`Ref account is ${usdcAddress.toBase58()}`);
+      const accountInfo = await connection.getParsedAccountInfo(usdcAddress);
+      if (!accountInfo.value?.data) {
+        console.log(`Ref account not initialized`);
+        return REFERRAL_FEES_ADDRESS;
+      } // Account does not exist
       return usdcAddress;
     } catch (err) {
       console.warn(`Error getting refcode ${err}`);
