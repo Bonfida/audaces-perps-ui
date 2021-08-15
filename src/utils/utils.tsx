@@ -2,8 +2,6 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { PublicKey } from "@solana/web3.js";
 import BN from "bn.js";
 import { MAINNET_ENDPOINT } from "./connection";
-import useMediaQuery from "@material-ui/core/useMediaQuery/useMediaQuery";
-import useTheme from "@material-ui/core/styles/useTheme";
 import { TOKEN_PROGRAM_ID } from "@solana/spl-token";
 import words from "fun-word-list";
 
