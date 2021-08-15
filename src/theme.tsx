@@ -7,7 +7,7 @@ export const theme = createMuiTheme({
     },
   },
   typography: {
-    fontFamily: ["Source Sans Pro", "sans-serif"].join(","),
+    fontFamily: "Rota",
   },
   overrides: {
     MuiCssBaseline: {

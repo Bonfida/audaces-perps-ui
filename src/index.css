@@ -125,3 +125,8 @@ code {
     0px -1px 81px 17px rgba(255, 255, 255, 0.05);
   cursor: pointer;
 }
+
+@font-face {
+  font-family: "Rota";
+  src: local("Rota"), url(./assets/fonts/rota-regular.ttf) format("truetype");
+}
