@@ -38,6 +38,7 @@ import { crankLiquidation, crankFunding } from "@audaces/perps";
 import { sendSignedTransaction, signTransactions } from "../utils/send";
 import { PublicKey, Transaction } from "@solana/web3.js";
 import Spin from "../components/Spin";
+import "../index.css";
 
 const useStyles = makeStyles({
   h1: {
@@ -99,30 +100,6 @@ const useStyles = makeStyles({
     zIndex: -1,
     position: "absolute",
     overflow: "hidden",
-  },
-  cardContainer: {
-    background: "linear-gradient(135deg, #37BCBD 0%, #B846B2 61.99%)",
-    borderRadius: 16,
-    display: "flex",
-    justifyContent: "center",
-    width: 600,
-    height: 540,
-    "&:hover": {
-      background: "linear-gradient(135deg, #37BCBD 0%, #B846B2 100%)",
-    },
-  },
-  card: {
-    padding: 25,
-    borderRadius: 16,
-    height: "538px",
-    width: "100%",
-    margin: 1,
-    background:
-      "linear-gradient(135deg, rgba(19, 30, 48, 0.5) 0%, #0F0F11 61.99%)",
-    "&:hover": {
-      boxShadow:
-        "0px 4px 36px -7px rgba(255, 255, 255, 0.03), 0px -1px 81px 17px rgba(255, 255, 255, 0.05)",
-    },
   },
   cardTitle: {
     color: "#FFFFFF",
@@ -197,9 +174,10 @@ const useStyles = makeStyles({
   },
   cubeBottom: {
     position: "absolute",
-    bottom: -10,
+    bottom: -300,
     right: -50,
-    zIndex: -1,
+    zIndex: -2,
+    mixBlendMode: "hard-light",
   },
   volumeColoredText: {
     textTransform: "capitalize",
@@ -227,26 +205,12 @@ const useStyles = makeStyles({
     fontSize: 42,
     color: "#FFFFFF",
   },
-  wolveCardSelected: {
-    justifyContent: "center",
-    display: "flex",
-    borderRadius: 16,
-    height: 101,
-    width: 196,
-    margin: 1,
-    background:
-      "linear-gradient(135deg, rgba(19, 30, 48, 0.5) 0%, #0F0F11 61.99%)",
-    "&:hover": {
-      cursor: "pointer",
-      boxShadow:
-        "0px 4px 36px -7px rgba(255, 255, 255, 0.03), 0px -1px 81px 17px rgba(255, 255, 255, 0.05)",
-    },
-  },
   wolveCard: {
     justifyContent: "center",
     display: "flex",
-    borderRadius: 16,
-    height: 101,
+    alignItems: "center",
+    borderRadius: 8,
+    height: 120,
     width: 196,
     margin: 1,
     background:
@@ -397,43 +361,35 @@ const StakingCard = () => {
   const smallScreen = useSmallScreen();
   return (
     <div
-      className={classes.cardContainer}
+      className="fancy-card"
       style={{
-        width: smallScreen ? "auto" : "undefined",
-        height: smallScreen ? "auto" : "undefined",
-        margin: smallScreen ? 15 : "undefined",
+        width: smallScreen ? "auto" : undefined,
+        height: smallScreen ? "auto" : undefined,
+        margin: smallScreen ? 15 : undefined,
       }}
     >
+      <Typography className={classes.cardTitle}>Staking</Typography>
+      <img src={burn} className={classes.cardIcon} alt="" />
+      <Typography className={classes.cardSubtitle}>Buy and burn</Typography>
+      <Typography className={classes.cardDescription}>
+        30% of all fees generated go to FIDA buy and burns.
+      </Typography>
+      <img src={reward} className={classes.cardIcon} alt="" />
+      <Typography className={classes.cardSubtitle}>Staking reward</Typography>
+      <Typography className={classes.cardDescription}>
+        10% of the monthly buy and burn will be airdropped on FIDA stakers.
+      </Typography>
       <div
-        className={classes.card}
-        style={{
-          width: smallScreen ? "auto" : "undefined",
-          height: smallScreen ? "auto" : "undefined",
-        }}
+        className={classes.buttonContainer}
+        style={{ marginTop: "min(10%, 40px)" }}
       >
-        <Typography className={classes.cardTitle}>Staking</Typography>
-        <img src={burn} className={classes.cardIcon} alt="" />
-        <Typography className={classes.cardSubtitle}>Buy and burn</Typography>
-        <Typography className={classes.cardDescription}>
-          30% of all fees generated go to FIDA buy and burns.
-        </Typography>
-        <img src={reward} className={classes.cardIcon} alt="" />
-        <Typography className={classes.cardSubtitle}>Staking reward</Typography>
-        <Typography className={classes.cardDescription}>
-          10% of the monthly buy and burn will be airdropped on FIDA stakers.
-        </Typography>
-        <div
-          className={classes.buttonContainer}
-          style={{ marginTop: "min(10%, 40px)" }}
-        >
-          <Link external to={HelpUrls.stake} className={classes.link}>
-            <Button className={classes.button}>
-              <Typography className={classes.coloredText}>
-                Start staking
-              </Typography>
-            </Button>
-          </Link>
-        </div>
+        <Link external to={HelpUrls.stake} className={classes.link}>
+          <Button className={classes.button}>
+            <Typography className={classes.coloredText}>
+              Start staking
+            </Typography>
+          </Button>
+        </Link>
       </div>
     </div>
   );
@@ -532,111 +488,101 @@ const NodeCard = () => {
 
   return (
     <div
-      className={classes.cardContainer}
+      className="fancy-card"
       style={{
         width: smallScreen ? "auto" : undefined,
         margin: smallScreen ? 5 : undefined,
         height: smallScreen ? "auto" : undefined,
       }}
     >
-      <div
-        className={classes.card}
-        style={{
-          width: smallScreen ? "auto" : undefined,
-          height: smallScreen ? "auto" : undefined,
-        }}
-      >
-        {front && (
-          <>
-            <Typography className={classes.cardTitle}>Nodes</Typography>
-            <img src={safeBlack} className={classes.cardIcon} alt="" />
-            <Typography className={classes.cardSubtitle}>
-              Secure the network
-            </Typography>
-            <img src={reward} className={classes.cardIcon} alt="" />
-            <Typography className={classes.cardSubtitle}>
-              Earn a reward
+      {front && (
+        <>
+          <Typography className={classes.cardTitle}>Nodes</Typography>
+          <img src={safeBlack} className={classes.cardIcon} alt="" />
+          <Typography className={classes.cardSubtitle}>
+            Secure the network
+          </Typography>
+          <img src={reward} className={classes.cardIcon} alt="" />
+          <Typography className={classes.cardSubtitle}>
+            Earn a reward
+          </Typography>
+          <Typography className={classes.cardDescription}>
+            Nodes get rewarded for each transaction they crank.
+          </Typography>
+          <div
+            className={classes.buttonContainer}
+            style={{ marginTop: "min(10%, 40px)" }}
+          >
+            <Button className={classes.button} onClick={onClick}>
+              <Typography className={classes.coloredText}>Learn how</Typography>
+            </Button>
+          </div>
+        </>
+      )}
+      {!front && (
+        <Fade in={true} timeout={500}>
+          <div>
+            <div onClick={onClick} style={{ cursor: "pointer" }}>
+              <Typography className={classes.cardDescription}>
+                <img src={back} className={classes.backIcon} alt="" />
+                Back
+              </Typography>
+            </div>
+            <Typography className={classes.nodeColoredText}>
+              What are nodes?
             </Typography>
             <Typography className={classes.cardDescription}>
-              Nodes get rewarded for each transaction they crank.
+              Perpetual nodes secure the protocol by cranking liquidations and
+              updating funding rates. Anyone can run a node and help secure the
+              protocol
             </Typography>
-            <div
-              className={classes.buttonContainer}
-              style={{ marginTop: "min(10%, 40px)" }}
+            <Typography className={classes.nodeColoredText}>
+              Set up your node
+            </Typography>
+            <Typography className={classes.cardDescription}>
+              Anyone can set up a node and start cranking! Cranking can be done
+              using the JavaScript SDK available on NPM or a Rust executable
+              available on Github.
+            </Typography>
+            <Typography className={classes.nodeColoredText}>
+              Crank manually
+            </Typography>
+            <Typography className={classes.cardDescription}>
+              You can crank liquidations and funding rates manually and try
+              earning a rewards!
+            </Typography>
+            <Grid
+              container
+              justify="flex-start"
+              alignItems="center"
+              spacing={5}
+              style={{ marginTop: 10 }}
             >
-              <Button className={classes.button} onClick={onClick}>
-                <Typography className={classes.coloredText}>
-                  Learn how
-                </Typography>
-              </Button>
-            </div>
-          </>
-        )}
-        {!front && (
-          <Fade in={true} timeout={500}>
-            <div>
-              <div onClick={onClick} style={{ cursor: "pointer" }}>
-                <Typography className={classes.cardDescription}>
-                  <img src={back} className={classes.backIcon} alt="" />
-                  Back
-                </Typography>
-              </div>
-              <Typography className={classes.nodeColoredText}>
-                What are nodes?
-              </Typography>
-              <Typography className={classes.cardDescription}>
-                Perpetual nodes secure the protocol by cranking liquidations and
-                updating funding rates. Anyone can run a node and help secure
-                the protocol
-              </Typography>
-              <Typography className={classes.nodeColoredText}>
-                Set up your node
-              </Typography>
-              <Typography className={classes.cardDescription}>
-                Anyone can set up a node and start cranking! Cranking can be
-                done using the JavaScript SDK available on NPM or a Rust
-                executable available on Github.
-              </Typography>
-              <Typography className={classes.nodeColoredText}>
-                Crank manually
-              </Typography>
-              <Typography className={classes.cardDescription}>
-                You can crank liquidations and funding rates manually and try
-                earning a rewards!
-              </Typography>
-              <Grid
-                container
-                justify="flex-start"
-                alignItems="center"
-                spacing={5}
-                style={{ marginTop: 10 }}
-              >
-                <Grid item>
-                  <div className={classes.buttonContainer}>
-                    <Button
-                      className={classes.button}
-                      onClick={onClickLiquidation}
-                    >
-                      <Typography className={classes.coloredText}>
-                        {loading ? <Spin size={10} /> : <>Crank Liquidation</>}
-                      </Typography>
-                    </Button>
-                  </div>
-                </Grid>
-                <Grid item>
-                  <div className={classes.buttonContainer}>
-                    <Button className={classes.button} onClick={onClickFunding}>
-                      <Typography className={classes.coloredText}>
-                        {loading ? <Spin size={10} /> : <>Crank Funding</>}
-                      </Typography>
-                    </Button>
-                  </div>
-                </Grid>
+              <Grid item>
+                <div className={classes.buttonContainer}>
+                  <Button
+                    className={classes.button}
+                    onClick={onClickLiquidation}
+                  >
+                    <Typography className={classes.coloredText}>
+                      {loading ? <Spin size={10} /> : <>Crank Liquidation</>}
+                    </Typography>
+                  </Button>
+                </div>
               </Grid>
-            </div>
-          </Fade>
-        )}
-      </div>
+              <Grid item>
+                <div className={classes.buttonContainer}>
+                  <Button className={classes.button} onClick={onClickFunding}>
+                    <Typography className={classes.coloredText}>
+                      {loading ? <Spin size={10} /> : <>Crank Funding</>}
+                    </Typography>
+                  </Button>
+                </div>
+              </Grid>
+            </Grid>
+          </div>
+        </Fade>
+      )}
     </div>
   );
 };
@@ -798,14 +744,12 @@ const WolveCard = ({
     );
   }
   return (
-    <div className={classes.wolveCardContainer}>
-      <div className={classes.wolveCardSelected}>
-        <div>
-          <Typography className={classes.wolveCardTextSelected}>
-            {time}
-          </Typography>
-          <Typography className={classes.wolveCardSubtitle}>Leaders</Typography>
-        </div>
+    <div className="leader-card">
+      <div>
+        <Typography className={classes.wolveCardTextSelected}>
+          {time}
+        </Typography>
+        <Typography className={classes.wolveCardSubtitle}>Leaders</Typography>
       </div>
     </div>
   );

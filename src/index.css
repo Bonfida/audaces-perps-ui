@@ -31,3 +31,97 @@ code {
 .MuiTableContainer-root::-webkit-scrollbar-thumb:hover {
   background-color: #a8bbbf;
 }
+
+.fancy-card {
+  width: 600px;
+  height: 540px;
+  position: relative;
+  padding: 25px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-start;
+  flex-direction: column;
+}
+.fancy-card::before {
+  content: "";
+  z-index: -1;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  border-radius: 8px;
+  padding: 1px;
+  mask: inherit;
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: destination-out;
+  mask-composite: exclude;
+  box-shadow: 0px 4px 22px rgba(0, 0, 0, 0.17), 0px 15px 25px rgba(0, 0, 0, 0.1);
+  background-blend-mode: soft-light;
+  border: 1px solid;
+  background: linear-gradient(
+    135deg,
+    #6ffbff 0%,
+    rgba(167, 253, 255, 0.25) 54.69%,
+    rgba(255, 150, 252, 0.25) 66.15%,
+    #ff72f9 100%
+  );
+}
+
+.fancy-card:hover {
+  box-shadow: 0px 4px 36px -7px rgba(255, 255, 255, 0.03),
+    0px -1px 81px 17px rgba(255, 255, 255, 0.05);
+  cursor: pointer;
+}
+
+.leader-card {
+  position: relative;
+  padding: 10px;
+  height: 120px;
+  width: 196px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  border-radius: 8px;
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.15) 0%,
+    rgba(255, 255, 255, 0.1125) 9.37%,
+    rgba(255, 255, 255, 0.0375) 54.69%,
+    rgba(255, 255, 255, 0.0394911) 66.15%,
+    rgba(255, 255, 255, 0.15) 100%
+  );
+}
+.leader-card::before {
+  content: "";
+  z-index: -1;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  border-radius: 8px;
+  padding: 1px;
+  mask: inherit;
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: destination-out;
+  mask-composite: exclude;
+  box-shadow: 0px 4px 22px rgba(0, 0, 0, 0.17), 0px 15px 25px rgba(0, 0, 0, 0.1);
+  background-blend-mode: soft-light;
+  border: 1px solid;
+
+  background: linear-gradient(
+    135deg,
+    #6ffbff 0%,
+    rgba(167, 253, 255, 0.25) 54.69%,
+    rgba(255, 150, 252, 0.25) 66.15%,
+    #ff72f9 100%
+  );
+}
+
+.leader-card:hover {
+  box-shadow: 0px 4px 36px -7px rgba(255, 255, 255, 0.03),
+    0px -1px 81px 17px rgba(255, 255, 255, 0.05);
+  cursor: pointer;
+}
