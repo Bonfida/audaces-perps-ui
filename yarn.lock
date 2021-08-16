@@ -11,10 +11,10 @@
     deep-eql "^0.1.3"
     keypather "^1.10.2"
 
-"@audaces/perps@^0.0.6":
-  version "0.0.6"
-  resolved "https://registry.yarnpkg.com/@audaces/perps/-/perps-0.0.6.tgz#65bcb7613a7caac50e26e29f047c0739d00fcedc"
-  integrity sha512-p9nFCQuACvxJB4QdxJ6+fPk29X4QtqrAaQm3f5UfmGS05Euj2eqgYem5TZK9m17ORtNMRe6HrdYmyxMUttgQ9A==
+"@audaces/perps@^0.0.8":
+  version "0.0.8"
+  resolved "https://registry.yarnpkg.com/@audaces/perps/-/perps-0.0.8.tgz#a27af29389356aabce95dab55fbc8355970ad2f5"
+  integrity sha512-8PhmBnbdD6nV5kyAT1L+ECqEq9Uzycoh1RqQlkzy4guzxXmmQUCRWZtZf0jAxjPiHpLmz77BGwstVVwUZEfQrw==
   dependencies:
     "@pythnetwork/client" "^2.0.0"
     "@solana/spl-token" "0.1.5"
