@@ -23,6 +23,7 @@ import { notify } from "../utils/notifications";
 import { makeStyles } from "@material-ui/core/styles";
 import blockto from "../assets/wallets/blocto.png";
 import solflare from "../assets/wallets/solflare.svg";
+import coin98 from "../assets/wallets/coin98.png";
 
 const useStyles = makeStyles({
   buttonContainer: {
@@ -108,8 +109,8 @@ export const WALLET_PROVIDERS = [
   },
   {
     name: "Coin98",
-    url: "",
-    icon: undefined,
+    url: "https://coin98.com/",
+    icon: coin98,
     adapter: Coin98ExtensionWalletAdapter,
   },
 ];
