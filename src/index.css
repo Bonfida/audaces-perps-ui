@@ -128,5 +128,8 @@ code {
 
 @font-face {
   font-family: "Rota";
-  src: local("Rota"), url(./assets/fonts/rota-regular.ttf) format("truetype");
+  src: url(./assets/fonts/rota-regular.eot);
+  src: url(./assets/fonts/rota-regular.ttf) format("truetype"),
+    url(./assets/fonts/rota-regular.woff) format("woff"),
+    url(./assets/fonts//rota-regular.woff2) format("woff2");
 }
