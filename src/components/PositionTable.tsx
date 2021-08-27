@@ -29,7 +29,9 @@ import { useSmallScreen } from "../utils/utils";
 import LeverageChip, { LiquidatedChip } from "./Chips";
 import MouseOverPopOver from "./MouseOverPopOver";
 import { useReferrer } from "../utils/perpetuals";
-import { MARKETS, useMarketState } from "../utils/market";
+import { MARKETS, useMarketState, useMarket } from "../utils/market";
+import { useHistory } from "react-router";
+import { Market } from "../utils/types";
 
 const useStyles = makeStyles({
   table: {
@@ -134,6 +136,7 @@ const PositionTableHead = () => {
 
 const PositionRow = ({ props, index }: { props: Position; index: number }) => {
   const classes = useStyles();
+  const history = useHistory();
   const [openEditPosition, setOpenEditPosition] = useState(false);
   const [selectedButton, setSelectedButton] = useState("size");
   const [loading, setLoading] = useState(false);
@@ -149,6 +152,7 @@ const PositionRow = ({ props, index }: { props: Position; index: number }) => {
   const [oraclePrice, oraclePriceLoaded] = useOraclePrice(props.marketAddress);
   const [marketState] = useMarketState(props.marketAddress);
   const positivePnl = props.pnl > 0;
+  const { setMarket } = useMarket();
 
   const isLiquidated = useMemo(() => {
     if (!oraclePrice?.price) {
@@ -244,6 +248,13 @@ const PositionRow = ({ props, index }: { props: Position; index: number }) => {
     }
   };
 
+  const onClickMarketName = (market: Market | undefined) => () => {
+    if (market) {
+      setMarket(market);
+      history.push(`/trade/${market.name}`);
+    }
+  };
+
   if (isLiquidated) {
     return (
       <TableRow style={{ background: index % 2 === 0 ? "#141722" : undefined }}>
@@ -277,7 +288,12 @@ const PositionRow = ({ props, index }: { props: Position; index: number }) => {
         <Grid container alignItems="center">
           <Grid item>
             <Typography className={classes.marketName}>
-              {market ? market.name : "Unknown"}
+              <div
+                style={{ cursor: market ? "pointer" : undefined }}
+                onClick={onClickMarketName(market)}
+              >
+                {market ? market.name : "Unknown"}
+              </div>
             </Typography>
           </Grid>
           {!smallScreen && (
@@ -383,6 +399,13 @@ const PositionTable = () => {
   const classes = useStyles();
   const [positions, positionsLoaded] = useOpenPositions();
   const { connected } = useWallet();
+  const { marketAddress } = useMarket();
+  const currentPosition = positions?.find((p) =>
+    p.marketAddress.equals(marketAddress)
+  );
+  const otherPositions = positions
+    ? [...positions]?.filter((p) => !p.marketAddress.equals(marketAddress))
+    : [];
 
   if (!connected) {
     return (
@@ -425,10 +448,11 @@ const PositionTable = () => {
             overflowX: "scroll",
           }}
         >
-          {positions?.map((row, i) => {
+          {currentPosition && <PositionRow index={0} props={currentPosition} />}
+          {otherPositions?.map((row, i) => {
             return (
               <PositionRow
-                index={i}
+                index={i + 1}
                 props={row}
                 key={`position-${i}-${row.positionIndex}`}
               />
