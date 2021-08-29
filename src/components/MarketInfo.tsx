@@ -297,10 +297,10 @@ const MarketData = () => {
                   <InfoColumn
                     label="Funding Rates"
                     value={`${roundToDecimal(
-                      fundingRatios.fundingRatioLongs / 24,
+                      (100 * fundingRatios.fundingRatioLongs) / 24,
                       6
                     )}%/${roundToDecimal(
-                      fundingRatios.fundingRatioShorts / 24,
+                      (100 * fundingRatios.fundingRatioShorts) / 24,
                       6
                     )}%`}
                   />
