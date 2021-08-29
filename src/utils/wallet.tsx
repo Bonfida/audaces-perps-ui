@@ -10,12 +10,12 @@ import { Button, Grid, Typography } from "@material-ui/core";
 import Modal from "../components/Modal";
 import {
   WalletAdapter,
-  LedgerWalletAdapter,
   SolongWalletAdapter,
   PhantomWalletAdapter,
   SolflareExtensionWalletAdapter,
   BloctoWalletAdapter,
   MathWalletAdapter,
+  Coin98ExtensionWalletAdapter,
 } from "../wallet-adapters";
 import { useConnectionConfig } from "../utils/connection";
 import { useLocalStorageState } from "../utils/utils";
@@ -23,6 +23,7 @@ import { notify } from "../utils/notifications";
 import { makeStyles } from "@material-ui/core/styles";
 import blockto from "../assets/wallets/blocto.png";
 import solflare from "../assets/wallets/solflare.svg";
+import coin98 from "../assets/wallets/coin98.png";
 
 const useStyles = makeStyles({
   buttonContainer: {
@@ -95,12 +96,6 @@ export const WALLET_PROVIDERS = [
     adapter: SolflareExtensionWalletAdapter,
   },
   {
-    name: "Ledger",
-    url: "https://www.ledger.com",
-    icon: `${ASSET_URL}/ledger.svg`,
-    adapter: LedgerWalletAdapter,
-  },
-  {
     name: "Solong",
     url: "https://www.solong.com",
     icon: `${ASSET_URL}/solong.png`,
@@ -111,6 +106,12 @@ export const WALLET_PROVIDERS = [
     url: "https://www.mathwallet.org",
     icon: `${ASSET_URL}/mathwallet.svg`,
     adapter: MathWalletAdapter,
+  },
+  {
+    name: "Coin98",
+    url: "https://coin98.com/",
+    icon: coin98,
+    adapter: Coin98ExtensionWalletAdapter,
   },
 ];
 
