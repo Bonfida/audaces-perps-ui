@@ -400,6 +400,7 @@ const PositionTable = () => {
   const [positions, positionsLoaded] = useOpenPositions();
   const { connected } = useWallet();
   const { marketAddress } = useMarket();
+  const { useIsolatedPositions } = useMarket();
   const currentPosition = positions?.find((p) =>
     p.marketAddress.equals(marketAddress)
   );
@@ -448,16 +449,29 @@ const PositionTable = () => {
             overflowX: "scroll",
           }}
         >
-          {currentPosition && <PositionRow index={0} props={currentPosition} />}
-          {otherPositions?.map((row, i) => {
-            return (
-              <PositionRow
-                index={i + 1}
-                props={row}
-                key={`position-${i}-${row.positionIndex}`}
-              />
-            );
-          })}
+          {useIsolatedPositions &&
+            positions?.map((row, i) => {
+              return (
+                <PositionRow
+                  index={i + 1}
+                  props={row}
+                  key={`position-${i}-${row.positionIndex}`}
+                />
+              );
+            })}
+          {!useIsolatedPositions && currentPosition && (
+            <PositionRow index={0} props={currentPosition} />
+          )}
+          {!useIsolatedPositions &&
+            otherPositions?.map((row, i) => {
+              return (
+                <PositionRow
+                  index={i + 1}
+                  props={row}
+                  key={`position-${i}-${row.positionIndex}`}
+                />
+              );
+            })}
         </TableBody>
       </Table>
     </TableContainer>
