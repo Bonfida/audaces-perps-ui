@@ -398,6 +398,9 @@ const PositionRow = ({ props, index }: { props: Position; index: number }) => {
 const PositionTable = () => {
   const classes = useStyles();
   const [positions, positionsLoaded] = useOpenPositions();
+  positions?.sort((a, b) =>
+    a.marketAddress.toBase58().localeCompare(b.marketAddress.toBase58())
+  );
   const { connected } = useWallet();
   const { marketAddress } = useMarket();
   const { useIsolatedPositions } = useMarket();
