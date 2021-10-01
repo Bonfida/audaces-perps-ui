@@ -10,7 +10,11 @@ export const MAINNET_ENDPOINT = "https://solana-api.projectserum.com";
 export const ENDPOINTS: EndpointInfo[] = [
   {
     name: "mainnet-beta",
-    endpoint: "https://bonfida.rpcpool.com/",
+    // @ts-ignore
+    endpoint:
+      process.env.NODE_ENV === "production"
+        ? process.env.REACT_APP_CONNECTION
+        : process.env.REACT_APP_CONNECTION_DEV,
     custom: false,
   },
   { name: "localnet", endpoint: "http://127.0.0.1:8899", custom: false },
