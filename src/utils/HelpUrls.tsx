@@ -5,6 +5,7 @@ const HelpUrls = {
   help: "https://docs.bonfida.org/help/",
   solana: "https://solana.com/",
   ipfs: "https://ipfs.io/",
+  burn: "https://burn.bonfida.org",
 };
 
 export default HelpUrls;

@@ -39,6 +39,7 @@ import { sendSignedTransaction, signTransactions } from "../utils/send";
 import { PublicKey, Transaction } from "@solana/web3.js";
 import Spin from "../components/Spin";
 import "../index.css";
+import Emoji from "../components/Emoji";
 
 const useStyles = makeStyles({
   h1: {
@@ -368,25 +369,27 @@ const StakingCard = () => {
         margin: smallScreen ? 15 : undefined,
       }}
     >
-      <Typography className={classes.cardTitle}>Staking</Typography>
+      <Typography className={classes.cardTitle}>Buy and Burn</Typography>
       <img src={burn} className={classes.cardIcon} alt="" />
       <Typography className={classes.cardSubtitle}>Buy and burn</Typography>
       <Typography className={classes.cardDescription}>
         30% of all fees generated go to FIDA buy and burns.
       </Typography>
       <img src={reward} className={classes.cardIcon} alt="" />
-      <Typography className={classes.cardSubtitle}>Staking reward</Typography>
+      <Typography className={classes.cardSubtitle}>
+        Decentralized <Emoji emoji="🔥" />
+      </Typography>
       <Typography className={classes.cardDescription}>
-        10% of the monthly buy and burn will be airdropped on FIDA stakers.
+        The buy and burn was made decentralized and permissionless
       </Typography>
       <div
         className={classes.buttonContainer}
         style={{ marginTop: "min(10%, 40px)" }}
       >
-        <Link external to={HelpUrls.stake} className={classes.link}>
+        <Link external to={HelpUrls.burn} className={classes.link}>
           <Button className={classes.button}>
             <Typography className={classes.coloredText}>
-              Start staking
+              Start burning
             </Typography>
           </Button>
         </Link>
