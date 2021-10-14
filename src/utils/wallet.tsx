@@ -16,6 +16,7 @@ import {
   BloctoWalletAdapter,
   MathWalletAdapter,
   Coin98ExtensionWalletAdapter,
+  CloverWalletAdapter,
 } from "../wallet-adapters";
 import { useConnectionConfig } from "../utils/connection";
 import { useLocalStorageState } from "../utils/utils";
@@ -24,6 +25,7 @@ import { makeStyles } from "@material-ui/core/styles";
 import blockto from "../assets/wallets/blocto.png";
 import solflare from "../assets/wallets/solflare.svg";
 import coin98 from "../assets/wallets/coin98.png";
+import clover from "../assets/wallets/clover.png"
 
 const useStyles = makeStyles({
   buttonContainer: {
@@ -112,6 +114,12 @@ export const WALLET_PROVIDERS = [
     url: "https://coin98.com/",
     icon: coin98,
     adapter: Coin98ExtensionWalletAdapter,
+  },
+  {
+    name: "CloverWallet",
+    url: "https://clover.finance/",
+    icon: clover,
+    adapter: CloverWalletAdapter,
   },
 ];
 
