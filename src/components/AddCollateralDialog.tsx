@@ -6,7 +6,7 @@ import { checkTextFieldNumberInput, roundToDecimal } from "../utils/utils";
 import { useState } from "react";
 import { Transaction } from "@solana/web3.js";
 import { Position, increasePositionCollateral } from "@audaces/perps";
-import { useWallet } from "../utils/wallet";
+import { useWallet } from '@solana/wallet-adapter-react';
 import { useConnection } from "../utils/connection";
 import { sendTransaction } from "../utils/send";
 import Spin from "./Spin";
@@ -52,7 +52,7 @@ const useStyles = makeStyles({
 const AddCollateralDialog = ({ position }: { position: Position }) => {
   const classes = useStyles();
   const connection = useConnection();
-  const { wallet } = useWallet();
+  const wallet = useWallet();
   const [collateral, setCollateral] = useState<number | null>(null);
   const [loading, setLoading] = useState(false);
   const markPrice = useMarkPrice();
@@ -95,7 +95,7 @@ const AddCollateralDialog = ({ position }: { position: Position }) => {
   };
 
   const onClick = async () => {
-    if (!wallet || !collateral || !marketState?.quoteDecimals) {
+    if (!wallet.publicKey || !collateral || !marketState?.quoteDecimals) {
       return;
     }
     notify({

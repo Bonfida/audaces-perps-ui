@@ -11,7 +11,7 @@ import {
   PositionType,
 } from "@audaces/perps";
 import { useConnection } from "../utils/connection";
-import { useWallet } from "../utils/wallet";
+import { useWallet } from '@solana/wallet-adapter-react';
 import { sendTransaction } from "../utils/send";
 import { Transaction } from "@solana/web3.js";
 import Spin from "./Spin";
@@ -82,7 +82,7 @@ const useStyles = makeStyles({
 export const CompleteCloseDialog = ({ position }: { position: Position }) => {
   const classes = useStyles();
   const [loading, setLoading] = useState(false);
-  const { wallet } = useWallet();
+  const wallet = useWallet();
   const connection = useConnection();
   const referrer = useReferrer();
 
@@ -145,7 +145,7 @@ export const PartialCloseDialog = ({ position }: { position: Position }) => {
   const classes = useStyles();
   const [size, setSize] = useState("0");
   const [loading, setLoading] = useState(false);
-  const { wallet } = useWallet();
+  const wallet = useWallet();
   const connection = useConnection();
   const markPrice = useMarkPrice();
   const referrer = useReferrer();

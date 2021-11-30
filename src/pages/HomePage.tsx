@@ -32,7 +32,7 @@ import {
   useWindowSize,
   useLocalStorageState,
 } from "../utils/utils";
-import { useWallet } from "../utils/wallet";
+import { useWallet } from '@solana/wallet-adapter-react';
 import { useConnection } from "../utils/connection";
 import { crankLiquidation, crankFunding } from "@audaces/perps";
 import { sendSignedTransaction, signTransactions } from "../utils/send";
@@ -402,7 +402,7 @@ const NodeCard = () => {
   const classes = useStyles();
   const [front, setFront] = useState(true);
   const smallScreen = useSmallScreen();
-  const { wallet, connected } = useWallet();
+  const wallet = useWallet();
   const [loading, setLoading] = useState(false);
   const connection = useConnection();
 
@@ -411,7 +411,7 @@ const NodeCard = () => {
   };
 
   const onClickLiquidation = async () => {
-    if (!connected || !wallet?.publicKey) {
+    if (!wallet.connected || !wallet.publicKey) {
       notify({
         message: "Connect your wallet",
       });
@@ -453,7 +453,7 @@ const NodeCard = () => {
   };
 
   const onClickFunding = async () => {
-    if (!connected) {
+    if (!wallet.connected) {
       notify({
         message: "Connect your wallet",
       });

@@ -11,7 +11,7 @@ import Drawer from "@material-ui/core/Drawer";
 import List from "@material-ui/core/List";
 import ListItem from "@material-ui/core/ListItem";
 import { notify } from "../../utils/notifications";
-import { useWallet } from "../../utils/wallet";
+import { useWallet } from '@solana/wallet-adapter-react';
 import { useMarket } from "../../utils/market";
 import { useLayout } from "../../utils/layout";
 import { useHistory } from "react-router";
@@ -351,7 +351,7 @@ const TopBarMarketPage = () => {
             {/* Small screen wallet connect */}
             {smallScreen && (
               <ListItem>
-                <WalletConnect width={290} />
+                <WalletConnect />
               </ListItem>
             )}
             {/* Reset layout */}

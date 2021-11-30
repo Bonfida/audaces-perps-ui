@@ -15,7 +15,7 @@ import {
   TableHead,
   TableRow,
 } from "@material-ui/core";
-import { useWallet } from "../utils/wallet";
+import { useWallet } from '@solana/wallet-adapter-react';
 import WalletConnect from "./WalletConnect";
 import { useUserData } from "../utils/perpetuals";
 import Spin from "./Spin";
@@ -267,7 +267,7 @@ export const ModalAdd = ({
 }) => {
   const classes = useStyles();
   const connection = useConnection();
-  const { wallet, connected } = useWallet();
+  const wallet = useWallet();
   const { setRefreshUserAccount, marketState } = useMarket();
   const [collateral] = useAvailableCollateral();
   const [amount, setAmount] = useState<number | null>(null);
@@ -276,6 +276,7 @@ export const ModalAdd = ({
 
   useEffect(() => {
     const fn = async () => {
+      if (!wallet.publicKey) { return }
       const quoteAccount = await getQuoteAccount(wallet.publicKey);
       const info = await connection.getParsedAccountInfo(quoteAccount);
       if (!!info) {
@@ -285,7 +286,7 @@ export const ModalAdd = ({
     };
     fn();
     // eslint-disable-next-line
-  }, [connected, connection]);
+  }, [wallet.connected, connection]);
 
   const onChangeCollateral = (e) => {
     const { value, valid } = checkTextFieldNumberInput(e);
@@ -297,6 +298,7 @@ export const ModalAdd = ({
   };
 
   const onClick = async () => {
+    if (!wallet.publicKey) { return }
     try {
       setLoading(true);
       const userAccount = await UserAccount.retrieve(connection, acc);
@@ -422,7 +424,7 @@ const ModalWithdraw = ({
 }) => {
   const classes = useStyles();
   const connection = useConnection();
-  const { wallet } = useWallet();
+  const wallet = useWallet();
   const { userAccount, setRefreshUserAccount, marketState } = useMarket();
   const [collateral] = useAvailableCollateral();
   const [amount, setAmount] = useState<number | null>(null);
@@ -445,6 +447,7 @@ const ModalWithdraw = ({
   };
 
   const onClick = async () => {
+    if (!wallet.publicKey) { return }
     try {
       setLoading(true);
       if (
@@ -545,7 +548,7 @@ const AccountRow = ({
 }) => {
   const classes = useStyles();
   const connection = useConnection();
-  const { wallet } = useWallet();
+  const wallet = useWallet();
   const [loading, setLoading] = useState(false);
   const {
     userAccount,
@@ -612,6 +615,7 @@ const AccountRow = ({
   }
 
   const onClickDelete = async () => {
+    if (!wallet.publicKey) { return }
     if (acc.balance > 0) {
       return notify({ message: "Cannot delete account with collateral" });
     }

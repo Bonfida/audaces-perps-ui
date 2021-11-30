@@ -2,7 +2,7 @@ import React from "react";
 import { MuiThemeProvider } from "@material-ui/core/styles";
 import { CssBaseline } from "@material-ui/core";
 import { theme } from "./theme";
-import { WalletProvider } from "./utils/wallet";
+import WalletProviderWrapper from "./utils/wallet";
 import { ConnectionProvider } from "./utils/connection";
 import { SnackbarProvider } from "notistack";
 import { LayoutProvider } from "./utils/layout";
@@ -14,7 +14,7 @@ const App = ({ children }: { children: React.ReactNode }) => {
   return (
     <ConnectionProvider>
       <SnackbarProvider maxSnack={5} autoHideDuration={8000}>
-        <WalletProvider>
+        <WalletProviderWrapper>
           <MarketProvider>
             <LayoutProvider>
               <MuiThemeProvider theme={theme}>
@@ -23,7 +23,7 @@ const App = ({ children }: { children: React.ReactNode }) => {
               </MuiThemeProvider>
             </LayoutProvider>
           </MarketProvider>
-        </WalletProvider>
+        </WalletProviderWrapper>
       </SnackbarProvider>
     </ConnectionProvider>
   );

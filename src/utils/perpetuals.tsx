@@ -1,4 +1,4 @@
-import { useWallet } from "./wallet";
+import { useWallet } from '@solana/wallet-adapter-react';
 import { getProgramAccounts, USDC_MINT, useLocalStorageState } from "./utils";
 import { useAsyncData } from "./fetch-loop";
 import tuple from "immutable-tuple";
@@ -92,24 +92,24 @@ export const useReferrer = (): PublicKey | undefined => {
 
 export const useOpenPositions = () => {
   const connection = useConnection();
-  const { wallet, connected } = useWallet();
+  const wallet = useWallet();
   const get = async () => {
-    if (!connected || !wallet) {
+    if (!wallet.connected || !wallet.publicKey) {
       return null;
     }
     const result = await getOpenPositions(connection, wallet.publicKey);
     return result;
   };
-  return useAsyncData(get, tuple("useOpenPositions", connected), {
+  return useAsyncData(get, tuple("useOpenPositions", wallet.connected), {
     refreshInterval: 2_000,
   });
 };
 
 export const useAvailableCollateral = () => {
   const connection = useConnection();
-  const { wallet } = useWallet();
+  const wallet = useWallet();
   const get = async () => {
-    if (!wallet) {
+    if (!wallet.publicKey) {
       return {
         collateralAddress: null,
         amount: null,
@@ -118,7 +118,7 @@ export const useAvailableCollateral = () => {
       };
     }
     const collateralAddress = await findAssociatedTokenAddress(
-      wallet?.publicKey,
+      wallet.publicKey,
       USDC_MINT
     );
     const collateralAccountInfo = await connection.getParsedAccountInfo(
@@ -144,12 +144,12 @@ export const useAvailableCollateral = () => {
 };
 
 export const useTokenAccounts = (mint?: string) => {
-  const { wallet, connected } = useWallet();
+  const wallet = useWallet();
   const getTokenAccounts = async () => {
-    if (!connected) {
+    if (!wallet.connected || !wallet.publicKey) {
       return null;
     }
-    let accounts = await getProgramAccounts(wallet?.publicKey);
+    let accounts = await getProgramAccounts(wallet.publicKey);
     accounts = accounts?.sort((a, b) => {
       return (
         b.account.data.parsed.info.tokenAmount.uiAmount -
@@ -164,7 +164,7 @@ export const useTokenAccounts = (mint?: string) => {
 
   return useAsyncData(
     getTokenAccounts,
-    tuple("getTokenAccounts", wallet, connected)
+    tuple("getTokenAccounts", wallet, wallet.connected)
   );
 };
 
@@ -192,11 +192,11 @@ export const useOraclePrice = (marketAddress: PublicKey | undefined | null) => {
 };
 
 export const useUserData = () => {
-  const { wallet, connected } = useWallet();
+  const wallet = useWallet();
   const connection = useConnection();
   const { refreshUserAccount } = useMarket();
   const get = async () => {
-    if (!connected) {
+    if (!wallet.connected || !wallet.publicKey) {
       return null;
     }
     const userAccounts = await getUserAccountsForOwner(

@@ -11,7 +11,7 @@ import {
 import { getLeaderBoardName } from "../utils/utils";
 import LaunchIcon from "../assets/Link/explorer.svg";
 import { ExplorerLink } from "../components/Link";
-import { useWallet } from "../utils/wallet";
+import { useWallet } from '@solana/wallet-adapter-react';
 import Spin from "../components/Spin";
 import { useUserDomains } from "../utils/name-service";
 import { PublicKey } from "@solana/web3.js";
@@ -146,7 +146,7 @@ const LeaderboardTable = ({
   leaderboard: Trader[] | undefined | null;
   leaderboardLoaded: boolean;
 }) => {
-  const { connected, wallet } = useWallet();
+  const wallet = useWallet();
   const classes = useStyles();
   return (
     <TableContainer className={classes.container}>
@@ -164,7 +164,7 @@ const LeaderboardTable = ({
                     address={row.feePayer}
                     key={`leaderboard-24h-${i}`}
                     isUser={
-                      connected
+                      wallet.connected && wallet.publicKey
                         ? wallet.publicKey.toBase58() === row.feePayer
                         : false
                     }

@@ -6,7 +6,7 @@ import { useConnection } from "../utils/connection";
 import { notify } from "../utils/notifications";
 import { sendTransaction } from "../utils/send";
 import { Transaction } from "@solana/web3.js";
-import { useWallet } from "../utils/wallet";
+import { useWallet } from '@solana/wallet-adapter-react';
 import {
   createAssociatedTokenAccount,
   createUserAccount,
@@ -43,10 +43,11 @@ const CreateUserAccountButton = () => {
   const [loading, setLoading] = useState(false);
   const [collateral] = useAvailableCollateral();
   const connection = useConnection();
-  const { wallet } = useWallet();
+  const wallet = useWallet();
   const { marketAddress, setRefreshUserAccount } = useMarket();
 
   const onClickCreate = async () => {
+    if (!wallet.publicKey) { return }
     try {
       setLoading(true);
       if (!collateral?.collateralAddress) {
@@ -62,8 +63,8 @@ const CreateUserAccountButton = () => {
       if (!collateralInfo?.data) {
         notify({ message: "Creating collateral account" });
         const createAccountInstructions = await createAssociatedTokenAccount(
-          wallet?.publicKey,
-          wallet?.publicKey,
+          wallet.publicKey,
+          wallet.publicKey,
           USDC_MINT
         );
         await sendTransaction({

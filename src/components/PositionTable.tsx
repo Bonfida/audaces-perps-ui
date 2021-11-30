@@ -21,7 +21,7 @@ import EditPositionModal from "./EditPositionModal";
 import { notify } from "../utils/notifications";
 import { refreshAllCaches } from "../utils/fetch-loop";
 import { sendTransaction } from "../utils/send";
-import { useWallet } from "../utils/wallet";
+import { useWallet } from '@solana/wallet-adapter-react';
 import { useConnection } from "../utils/connection";
 import { Transaction } from "@solana/web3.js";
 import CreateIcon from "@material-ui/icons/Create";
@@ -140,7 +140,7 @@ const PositionRow = ({ props, index }: { props: Position; index: number }) => {
   const [openEditPosition, setOpenEditPosition] = useState(false);
   const [selectedButton, setSelectedButton] = useState("size");
   const [loading, setLoading] = useState(false);
-  const { wallet, connected } = useWallet();
+  const wallet = useWallet();
   const connection = useConnection();
   const smallScreen = useSmallScreen("md");
   const referrer = useReferrer();
@@ -166,7 +166,7 @@ const PositionRow = ({ props, index }: { props: Position; index: number }) => {
 
   const onClickClosePosition = async () => {
     setLoading(true);
-    if (!wallet.publicKey || !connected) {
+    if (!wallet.publicKey || !wallet.connected) {
       return notify({
         message: "Wallet not connected",
       });
@@ -208,7 +208,7 @@ const PositionRow = ({ props, index }: { props: Position; index: number }) => {
 
   const onClickClear = async () => {
     setLoading(true);
-    if (!wallet.publicKey || !connected) {
+    if (!wallet.publicKey || !wallet.connected) {
       return notify({
         message: "Wallet not connected",
       });

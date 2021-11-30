@@ -3,7 +3,7 @@ import { Button, Typography, Grid } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
 import { notify } from "../utils/notifications";
 import { useConnection } from "../utils/connection";
-import { useWallet } from "../utils/wallet";
+import { useWallet } from '@solana/wallet-adapter-react';
 import { crankLiquidation, crankFunding } from "@audaces/perps";
 import { useMarket } from "../utils/market";
 import { sendSignedTransaction, signTransactions } from "../utils/send";
@@ -66,12 +66,12 @@ const LiquidationButton = () => {
   const classes = useStyles();
   const [loading, setLoading] = useState(false);
   const connection = useConnection();
-  const { wallet, connected } = useWallet();
+  const wallet = useWallet();
   const { marketAddress } = useMarket();
   const [nbCranked, setNbCranked] = useLocalStorageState("nbCranked", 0);
 
   const onClick = async () => {
-    if (!connected || !wallet?.publicKey) {
+    if (!wallet.connected || !wallet.publicKey) {
       notify({
         message: "Connect your wallet",
       });
@@ -124,13 +124,13 @@ const FundingButton = () => {
   const classes = useStyles();
   const connection = useConnection();
   const [loading, setLoading] = useState(false);
-  const { wallet, connected } = useWallet();
+  const wallet = useWallet();
   const { marketAddress } = useMarket();
   const [collateral] = useAvailableCollateral();
   const [nbCranked, setNbCranked] = useLocalStorageState("nbCranked", 0);
 
   const onClick = async () => {
-    if (!connected || !collateral?.collateralAddress) {
+    if (!wallet.connected || !collateral?.collateralAddress) {
       notify({
         message: "Connect your wallet",
       });

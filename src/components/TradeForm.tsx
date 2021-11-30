@@ -29,7 +29,7 @@ import {
 import { useConnection } from "../utils/connection";
 import { Transaction, Keypair, TransactionInstruction } from "@solana/web3.js";
 import { useMarket, useMarkPrice, MAX_LEVERAGE } from "../utils/market";
-import { useWallet } from "../utils/wallet";
+import { useWallet } from '@solana/wallet-adapter-react';
 import { sendTransaction } from "../utils/send";
 import Spin from "./Spin";
 import { refreshAllCaches } from "../utils/fetch-loop";
@@ -179,7 +179,7 @@ const TradeForm = () => {
   const { userAccount, marketState, useIsolatedPositions, marketName } =
     useMarket();
   const connection = useConnection();
-  const { wallet, connected, connect } = useWallet();
+  const wallet = useWallet();
   const markPrice = useMarkPrice();
   const [slippage, setSlippage] = useState<null | number>(null);
   const referrer = useReferrer();
@@ -199,7 +199,7 @@ const TradeForm = () => {
       !!marketState?.quoteDecimals &&
       userAccount.balance / marketState?.quoteDecimals,
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [userAccount, openDeposit, connected]
+    [userAccount, openDeposit, wallet.connected]
   ); // USDC
 
   useMemo(() => {
@@ -237,7 +237,7 @@ const TradeForm = () => {
   // handleChange functions
   // Quote Size
   const handleChangeQuoteSize = (e) => {
-    if (!connected) {
+    if (!wallet.connected) {
       return notify({
         message: "Connect your wallet",
       });
@@ -276,7 +276,7 @@ const TradeForm = () => {
 
   // Base Size
   const handleChangeBaseSize = (e) => {
-    if (!connected) {
+    if (!wallet.connected) {
       return notify({
         message: "Connect your wallet",
       });
@@ -388,6 +388,7 @@ const TradeForm = () => {
     // Increase current position
     if (canIncrease) {
       try {
+        if (!wallet.publicKey) { return }
         if (parseFloat(quoteSize) < 5) {
           return notify({ message: "Min order size is 5 USDC" });
         }
@@ -429,6 +430,7 @@ const TradeForm = () => {
     // Decrease current position
     if (canDecrease) {
       try {
+        if (!wallet.publicKey) { return }
         setLoading(true);
         const _size = parseFloat(baseSize) * marketState?.coinDecimals;
         const tx = new Transaction();
@@ -695,14 +697,14 @@ const TradeForm = () => {
           <Button
             disabled={loading}
             className={side === 0 ? classes.buyButton : classes.sellButton}
-            onClick={connected ? onClick : connect}
+            onClick={wallet.connected ? onClick : wallet.connect}
           >
             <Typography
               className={classes.buttonText}
               color="primary"
               variant="body1"
             >
-              {!connected ? (
+              {!wallet.connected ? (
                 "Connect Wallet"
               ) : loading ? (
                 <Spin size={20} />
@@ -718,7 +720,7 @@ const TradeForm = () => {
             </Typography>
           </Button>
         )}
-        {!userAccount && connected && <CreateUserAccountButton />}
+        {!userAccount && wallet.connected && <CreateUserAccountButton />}
         {userAccount && userAccount?.balance === 0 && (
           <>
             <Button
@@ -740,11 +742,11 @@ const TradeForm = () => {
             />
           </>
         )}
-        {!connected && !userAccount && (
+        {!wallet.connected && !userAccount && (
           <Button
             disabled={loading}
             className={side === 0 ? classes.buyButton : classes.sellButton}
-            onClick={connect}
+            onClick={wallet.connect}
           >
             <Typography
               className={classes.buttonText}

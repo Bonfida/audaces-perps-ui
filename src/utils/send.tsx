@@ -13,9 +13,10 @@ import {
   PublicKey,
   Keypair,
 } from "@solana/web3.js";
-import Wallet from "@project-serum/sol-wallet-adapter";
 import { Buffer } from "buffer";
 import { Token, TOKEN_PROGRAM_ID } from "@solana/spl-token";
+import { WalletContextState } from "@solana/wallet-adapter-react";
+import { WalletNotConnectedError } from '@solana/wallet-adapter-base';
 
 export const getUnixTs = () => {
   return new Date().getTime() / 1000;
@@ -34,7 +35,7 @@ export async function sendTransaction({
   timeout = DEFAULT_TIMEOUT,
 }: {
   transaction: Transaction;
-  wallet: Wallet;
+  wallet: WalletContextState;
   signers?: Array<Keypair>;
   connection: Connection;
   sendingMessage?: string;
@@ -42,81 +43,42 @@ export async function sendTransaction({
   successMessage?: string;
   timeout?: number;
 }) {
-  if (wallet.isProgramWallet) {
-    const signedTransaction = await covertToProgramWalletTransaction({
-      transaction,
-      wallet,
-      signers,
-      connection
-    });
-    return await sendSignedTransaction({
-      signedTransaction,
-      connection,
-      sendingMessage,
-      sentMessage,
-      successMessage,
-      timeout,
-    });
-  } else {
-    const signedTransaction = await signTransaction({
-      transaction,
-      wallet,
-      signers,
-      connection,
-    });
-    return await sendSignedTransaction({
-      signedTransaction,
-      connection,
-      sendingMessage,
-      sentMessage,
-      successMessage,
-      timeout,
-    });
-  }
-}
+  const startTime = getUnixTs();
+  notify({ message: sendingMessage });
+  const txid: TransactionSignature = await wallet.sendTransaction(
+    transaction,
+    connection,
+    { signers: signers, skipPreflight: true }
+  );
+  notify({ message: sentMessage, variant: "success", txid });
 
-export async function signTransaction({
-  transaction,
-  wallet,
-  signers = [],
-  connection,
-}: {
-  transaction: Transaction;
-  wallet: Wallet;
-  signers?: Array<Keypair>;
-  connection: Connection;
-}) {
-  transaction.recentBlockhash = (
-    await connection.getRecentBlockhash("max")
-  ).blockhash;
-  transaction.setSigners(wallet.publicKey, ...signers.map((s) => s.publicKey));
-  if (signers.length > 0) {
-    transaction.partialSign(...signers);
-  }
-  return await wallet.signTransaction(transaction);
-}
+  console.log("Started awaiting confirmation for", txid);
 
-async function covertToProgramWalletTransaction({
-  transaction,
-  wallet,
-  signers = [],
-  connection,
-
-}: {
-  transaction: Transaction,
-  wallet: any,
-  signers: Array<Keypair>;
-  connection: Connection,
-}) {
-  transaction.recentBlockhash = (
-    await connection.getRecentBlockhash("max")
-  ).blockhash;
-  transaction.feePayer = wallet.publicKey;
-  if (signers.length > 0) {
-    transaction = await wallet.convertToProgramWalletTransaction(transaction);
-    transaction.partialSign(...signers);
+  let done = false;
+  (async () => {
+    while (!done && getUnixTs() - startTime < timeout) {
+      wallet.sendTransaction(
+        transaction,
+        connection,
+        { signers: signers, skipPreflight: true }
+      );
+      await sleep(300);
+    }
+  })();
+  try {
+    await awaitTransactionSignatureConfirmation(txid, timeout, connection);
+  } catch (err) {
+    if (err.timeout) {
+      throw new Error("Timed out awaiting confirmation on transaction");
+    }
+    throw new Error("Transaction failed");
+  } finally {
+    done = true;
   }
-  return transaction;
+  notify({ message: successMessage, variant: "success", txid });
+
+  console.log("Latency", txid, getUnixTs() - startTime);
+  return txid;
 }
 
 export async function signTransactions({
@@ -128,11 +90,17 @@ export async function signTransactions({
     transaction: Transaction;
     signers?: Array<Keypair>;
   }[];
-  wallet: Wallet;
+  wallet: WalletContextState;
   connection: Connection;
 }) {
+  if (!wallet.signAllTransactions) {
+    throw WalletNotConnectedError;
+  }
   const blockhash = (await connection.getRecentBlockhash("max")).blockhash;
   transactionsAndSigners.forEach(({ transaction, signers = [] }) => {
+    if (!wallet.publicKey) {
+      throw WalletNotConnectedError;
+    }
     transaction.recentBlockhash = blockhash;
     transaction.setSigners(
       wallet.publicKey,
@@ -332,7 +300,7 @@ export const sendSplToken = async ({
   sourceSpl: PublicKey;
   destination: PublicKey;
   amount: number;
-  wallet: Wallet;
+  wallet: WalletContextState;
   isSol: boolean;
 }) => {
   const signers: Array<Keypair> = [];
@@ -391,7 +359,7 @@ export async function closeAccount({
   source: PublicKey;
   destination: PublicKey;
   owner: PublicKey;
-  wallet: Wallet;
+  wallet: WalletContextState;
   connection: Connection;
 }) {
   // destination pubkey = owner pubkey

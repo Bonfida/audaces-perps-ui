@@ -15,7 +15,7 @@ import {
 } from "@material-ui/core";
 import LaunchIcon from "../assets/Link/explorer.svg";
 import { ExplorerLink } from "../components/Link";
-import { useWallet } from "../utils/wallet";
+import { useWallet } from '@solana/wallet-adapter-react';
 import Spin from "../components/Spin";
 import { useVolume } from "../utils/market";
 import ContentLoader from "react-content-loader";
@@ -196,7 +196,7 @@ const LeaderboardPage = () => {
     50
   );
 
-  const { connected, wallet } = useWallet();
+  const wallet = useWallet();
   const _now = Math.floor(new Date().getTime() / 1_000);
   const now = React.useMemo(() => _now - (_now % (60 * 60)), [_now]);
   const [volume24h, volume24hLoaded] = useVolume("all");
@@ -232,7 +232,7 @@ const LeaderboardPage = () => {
           />
         </Grid>
       </Grid>
-      {connected && (
+      {wallet.connected && wallet.publicKey && (
         <Typography
           className={classes.text}
           align="center"
@@ -266,8 +266,8 @@ const LeaderboardPage = () => {
                           address={row.feePayer}
                           key={`leaderboard-24h-${i}`}
                           isUser={
-                            connected
-                              ? wallet.publicKey.toBase58() === row.feePayer
+                            wallet.connected
+                              ? wallet.publicKey?.toBase58() === row.feePayer
                               : false
                           }
                           volume={row.volume}
@@ -309,8 +309,8 @@ const LeaderboardPage = () => {
                           address={row.feePayer}
                           key={`leaderboard-30d-${i}`}
                           isUser={
-                            connected
-                              ? wallet.publicKey.toBase58() === row.feePayer
+                            wallet.connected
+                              ? wallet.publicKey?.toBase58() === row.feePayer
                               : false
                           }
                           volume={row.volume}

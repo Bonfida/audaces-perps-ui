@@ -22,7 +22,7 @@ import {
   getDiscountAccount,
 } from "@audaces/perps";
 import tuple from "immutable-tuple";
-import { useWallet } from "./wallet";
+import { useWallet } from '@solana/wallet-adapter-react';
 import { apiGet, roundToDecimal, useLocalStorageState } from "./utils";
 
 const URL_API_TRADES = "https://serum-api.bonfida.com/perps/trades?market=";
@@ -67,7 +67,7 @@ export const MarketProvider = ({ children }) => {
     "useIsolatedPositions",
     false
   );
-  const { wallet, connected } = useWallet();
+  const wallet = useWallet();
 
   const marketAddress = useMemo(
     () => new PublicKey(market.address),
@@ -93,7 +93,7 @@ export const MarketProvider = ({ children }) => {
 
   useEffect(() => {
     const fn = async () => {
-      if (!connected) {
+      if (!wallet.connected || !wallet.publicKey) {
         return;
       }
       const userAccounts = await getUserAccountsForOwner(
@@ -112,7 +112,7 @@ export const MarketProvider = ({ children }) => {
     };
     fn();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [connected, market.address, refreshUserAccount, marketState]);
+  }, [wallet.connected, market.address, refreshUserAccount, marketState]);
 
   return (
     <MarketContext.Provider
@@ -224,9 +224,9 @@ export const useMarketTrades = (marketAddress: PublicKey) => {
 };
 
 export const useUserTrades = (marketAddress: PublicKey) => {
-  const { wallet, connected } = useWallet();
+  const wallet = useWallet();
   const fn = async () => {
-    if (!connected || !wallet.publicKey) return;
+    if (!wallet.connected || !wallet.publicKey) return;
     const result = await apiGet(
       `${URL_API_TRADES}${marketAddress.toBase58()}&feePayer=${wallet.publicKey.toBase58()}`
     );
@@ -238,7 +238,7 @@ export const useUserTrades = (marketAddress: PublicKey) => {
   };
   return useAsyncData(
     fn,
-    tuple("useUserTrades", marketAddress.toBase58(), connected)
+    tuple("useUserTrades", marketAddress.toBase58(), wallet.connected)
   );
 };
 
@@ -269,10 +269,10 @@ export const useUserFunding = () => {
 };
 
 export const useFidaAmount = () => {
-  const { wallet, connected } = useWallet();
+  const wallet = useWallet();
   const connection = useConnection();
   const fn = async () => {
-    if (!connected) return;
+    if (!wallet.connected || !wallet.publicKey ) return;
     const discountAccount = await getDiscountAccount(
       connection,
       wallet.publicKey
@@ -282,7 +282,7 @@ export const useFidaAmount = () => {
     // @ts-ignore
     return accountInfo.value?.data.parsed.info.tokenAmount.uiAmount;
   };
-  return useAsyncData(fn, tuple("useFidaAmount", connection, connected));
+  return useAsyncData(fn, tuple("useFidaAmount", connection, wallet.connected));
 };
 
 export const useLeaderBoard = (
