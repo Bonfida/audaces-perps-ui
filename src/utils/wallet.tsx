@@ -28,7 +28,7 @@ export const WalletProviderWrapper: FC = ({ children }) => {
   ], [network]);
 
   return (
-    <WalletProvider wallets={wallets}>
+    <WalletProvider wallets={wallets} autoConnect>
       <Children>
         {children}
       </Children>
