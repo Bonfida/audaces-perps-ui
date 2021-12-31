@@ -26,10 +26,9 @@ import {
   roundToDecimal,
   BNB_ADDRESS,
 } from "../utils/utils";
-import { useConnection } from "../utils/connection";
+import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 import { Transaction, Keypair, TransactionInstruction } from "@solana/web3.js";
 import { useMarket, useMarkPrice, MAX_LEVERAGE } from "../utils/market";
-import { useWallet } from "../utils/wallet";
 import { sendTransaction } from "../utils/send";
 import Spin from "./Spin";
 import { refreshAllCaches } from "../utils/fetch-loop";
@@ -178,7 +177,7 @@ const TradeForm = () => {
   const [quoteSize, setQuoteSize] = useState("0");
   const { userAccount, marketState, useIsolatedPositions, marketName } =
     useMarket();
-  const connection = useConnection();
+  const { connection } = useConnection();
   const { wallet, connected, connect } = useWallet();
   const markPrice = useMarkPrice();
   const [slippage, setSlippage] = useState<null | number>(null);

@@ -2,8 +2,7 @@ import React, { useState } from "react";
 import { Button, Typography, Grid } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
 import { notify } from "../utils/notifications";
-import { useConnection } from "../utils/connection";
-import { useWallet } from "../utils/wallet";
+import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 import { crankLiquidation, crankFunding } from "@audaces/perps";
 import { useMarket } from "../utils/market";
 import { sendSignedTransaction, signTransactions } from "../utils/send";
@@ -65,7 +64,7 @@ const useStyles = makeStyles({
 const LiquidationButton = () => {
   const classes = useStyles();
   const [loading, setLoading] = useState(false);
-  const connection = useConnection();
+  const { connection } = useConnection();
   const { wallet, connected } = useWallet();
   const { marketAddress } = useMarket();
   const [nbCranked, setNbCranked] = useLocalStorageState("nbCranked", 0);
@@ -122,7 +121,7 @@ const LiquidationButton = () => {
 
 const FundingButton = () => {
   const classes = useStyles();
-  const connection = useConnection();
+  const { connection } = useConnection();
   const [loading, setLoading] = useState(false);
   const { wallet, connected } = useWallet();
   const { marketAddress } = useMarket();

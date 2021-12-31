@@ -8,7 +8,7 @@ import {
   NAME_PROGRAM_ID,
   getHandleAndRegistryKey,
 } from "@bonfida/spl-name-service";
-import { useConnection } from "./connection";
+import { useConnection } from "@solana/wallet-adapter-react";
 import BN from "bn.js";
 import { useAsyncData } from "./fetch-loop";
 import tuple from "immutable-tuple";
@@ -100,7 +100,7 @@ export async function performReverseLookup(
 }
 
 export const useUserDomains = (address: PublicKey) => {
-  const connection = useConnection();
+  const { connection } = useConnection();
   const fn = async () => {
     const domains = await findOwnedNameAccountsForUser(connection, address);
     let names: string[] = [];

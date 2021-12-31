@@ -10,7 +10,7 @@ import { Grid } from "@material-ui/core";
 import ExplorerIcon from "../assets/Link/explorer.svg";
 import { ExplorerLink } from "./Link";
 import { useUserFunding, MARKETS, useMarket } from "../utils/market";
-import { useWallet } from "../utils/wallet";
+import { useWallet } from "@solana/wallet-adapter-react";
 import WalletConnect from "./WalletConnect";
 
 const useStyles = makeStyles({

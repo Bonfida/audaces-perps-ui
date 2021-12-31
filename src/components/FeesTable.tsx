@@ -11,7 +11,7 @@ import { Grid } from "@material-ui/core";
 import MouseOverPopOver from "./MouseOverPopOver";
 import InfoIcon from "@material-ui/icons/Info";
 import { useFidaAmount } from "../utils/market";
-import { useWallet } from "../utils/wallet";
+import { useWallet } from "@solana/wallet-adapter-react";
 import CheckIcon from "@material-ui/icons/Check";
 
 const useStyles = makeStyles({

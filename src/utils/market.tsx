@@ -14,7 +14,7 @@ import {
 } from "./types";
 import { PublicKey } from "@solana/web3.js";
 import { useAsyncData } from "./fetch-loop";
-import { useConnection } from "./connection";
+import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 import {
   MarketState,
   UserAccount,
@@ -22,7 +22,6 @@ import {
   getDiscountAccount,
 } from "@audaces/perps";
 import tuple from "immutable-tuple";
-import { useWallet } from "./wallet";
 import { apiGet, roundToDecimal, useLocalStorageState } from "./utils";
 
 const URL_API_TRADES = "https://serum-api.bonfida.com/perps/trades?market=";
@@ -53,7 +52,7 @@ const MarketContext: React.Context<null | MarketContextValues> =
   React.createContext<null | MarketContextValues>(null);
 
 export const MarketProvider = ({ children }) => {
-  const connection = useConnection();
+  const { connection } = useConnection();
   const [slippage, setSlippage] = useState(0.1);
   const [autoApprove, setAutoApprove] = useLocalStorageState(
     "autoApprove",
@@ -270,7 +269,7 @@ export const useUserFunding = () => {
 
 export const useFidaAmount = () => {
   const { wallet, connected } = useWallet();
-  const connection = useConnection();
+  const { connection } = useConnection();
   const fn = async () => {
     if (!connected) return;
     const discountAccount = await getDiscountAccount(
@@ -317,7 +316,7 @@ export const findSide = (action: string, side: string) => {
 };
 
 export const useMarketState = (marketAddress: PublicKey) => {
-  const connection = useConnection();
+  const { connection } = useConnection();
   const fn = async () => {
     const marketState = await MarketState.retrieve(connection, marketAddress);
     marketState.quoteDecimals = Math.pow(10, marketState.quoteDecimals);

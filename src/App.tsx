@@ -1,20 +1,57 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { MuiThemeProvider } from "@material-ui/core/styles";
 import { CssBaseline } from "@material-ui/core";
 import { theme } from "./theme";
-import { WalletProvider } from "./utils/wallet";
-import { ConnectionProvider } from "./utils/connection";
+import { ENDPOINTS } from "./utils/connection";
 import { SnackbarProvider } from "notistack";
 import { LayoutProvider } from "./utils/layout";
 import { MarketProvider } from "./utils/market";
+import {
+  ConnectionProvider,
+  WalletProvider,
+} from "@solana/wallet-adapter-react";
+import { WalletAdapterNetwork } from "@solana/wallet-adapter-base";
+import {
+  getBloctoWallet,
+  getPhantomWallet,
+  getSolflareWallet,
+  getSolletWallet,
+  getSolongWallet,
+  getCoin98Wallet,
+  getCloverWallet,
+  getTorusWallet,
+  getMathWallet,
+  getSlopeWallet,
+} from "@solana/wallet-adapter-wallets";
 import "react-grid-layout/css/styles.css";
 import "react-resizable/css/styles.css";
 
+require("@solana/wallet-adapter-react-ui/styles.css");
+
 const App = ({ children }: { children: React.ReactNode }) => {
+  const network = WalletAdapterNetwork.Mainnet;
+  const wallets = useMemo(
+    () => [
+      getPhantomWallet(),
+      getSolflareWallet(),
+      getSolletWallet({ network }),
+      getBloctoWallet({ network }),
+      getTorusWallet(),
+      getSolongWallet(),
+      getMathWallet(),
+      getCoin98Wallet(),
+      getCloverWallet(),
+      getSlopeWallet(),
+    ],
+    [network]
+  );
+
+  const endpoint = useMemo(() => ENDPOINTS[0].endpoint, []);
+
   return (
-    <ConnectionProvider>
+    <ConnectionProvider endpoint={endpoint}>
       <SnackbarProvider maxSnack={5} autoHideDuration={8000}>
-        <WalletProvider>
+        <WalletProvider wallets={wallets} autoConnect>
           <MarketProvider>
             <LayoutProvider>
               <MuiThemeProvider theme={theme}>

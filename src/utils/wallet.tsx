@@ -18,14 +18,14 @@ import {
   Coin98ExtensionWalletAdapter,
   CloverWalletAdapter,
 } from "../wallet-adapters";
-import { useConnectionConfig } from "../utils/connection";
+
 import { useLocalStorageState } from "../utils/utils";
 import { notify } from "../utils/notifications";
 import { makeStyles } from "@material-ui/core/styles";
 import blockto from "../assets/wallets/blocto.png";
 import solflare from "../assets/wallets/solflare.svg";
 import coin98 from "../assets/wallets/coin98.png";
-import clover from "../assets/wallets/clover.png"
+import clover from "../assets/wallets/clover.png";
 
 const useStyles = makeStyles({
   buttonContainer: {
@@ -126,7 +126,6 @@ export const WALLET_PROVIDERS = [
 const WalletContext = React.createContext<any>(null);
 
 export function WalletProvider({ children = null as any }) {
-  const { endpoint } = useConnectionConfig();
   const classes = useStyles();
   const [autoConnect, setAutoConnect] = useState(false);
   const [providerUrl, setProviderUrl] = useLocalStorageState("walletProvider");

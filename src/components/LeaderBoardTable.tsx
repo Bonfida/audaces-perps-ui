@@ -11,7 +11,7 @@ import {
 import { getLeaderBoardName } from "../utils/utils";
 import LaunchIcon from "../assets/Link/explorer.svg";
 import { ExplorerLink } from "../components/Link";
-import { useWallet } from "../utils/wallet";
+import { useWallet } from "@solana/wallet-adapter-react";
 import Spin from "../components/Spin";
 import { useUserDomains } from "../utils/name-service";
 import { PublicKey } from "@solana/web3.js";

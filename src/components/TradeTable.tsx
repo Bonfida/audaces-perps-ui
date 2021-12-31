@@ -6,7 +6,7 @@ import TableCell from "@material-ui/core/TableCell";
 import TableHead from "@material-ui/core/TableHead";
 import TableRow from "@material-ui/core/TableRow";
 import ExplorerIcon from "../assets/Link/explorer.svg";
-import { useWallet } from "../utils/wallet";
+import { useWallet } from "@solana/wallet-adapter-react";
 import { Grid } from "@material-ui/core";
 import WalletConnect from "./WalletConnect";
 import { useMarket, useUserTrades, MARKETS, findSide } from "../utils/market";

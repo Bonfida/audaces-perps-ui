@@ -17,13 +17,10 @@ import liquidity from "../assets/homepage/liquidity.svg";
 import safe from "../assets/homepage/safe.svg";
 import safeBlack from "../assets/homepage/safeBlack.svg";
 import whitepaper from "../assets/homepage/whitepaper.svg";
-import cubes from "../assets/homepage/cubes.png";
-import illusion from "../assets/homepage/illusion.svg";
 import burn from "../assets/homepage/burn.svg";
 import reward from "../assets/homepage/reward.svg";
 import back from "../assets/homepage/back.svg";
 import { useHistory } from "react-router";
-import cubeBottom from "../assets/homepage/cube-bottom.svg";
 import { useVolume, useLeaderBoard, MARKETS } from "../utils/market";
 import LeaderboardTable from "../components/LeaderBoardTable";
 import { Trader } from "../utils/types";
@@ -32,8 +29,7 @@ import {
   useWindowSize,
   useLocalStorageState,
 } from "../utils/utils";
-import { useWallet } from "../utils/wallet";
-import { useConnection } from "../utils/connection";
+import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 import { crankLiquidation, crankFunding } from "@audaces/perps";
 import { sendSignedTransaction, signTransactions } from "../utils/send";
 import { PublicKey, Transaction } from "@solana/web3.js";
@@ -404,7 +400,7 @@ const NodeCard = () => {
   const smallScreen = useSmallScreen();
   const { wallet, connected } = useWallet();
   const [loading, setLoading] = useState(false);
-  const connection = useConnection();
+  const { connection } = useConnection();
 
   const onClick = () => {
     setFront((prev) => !prev);
@@ -709,16 +705,6 @@ const VolumeSection = () => {
     <div style={{ position: "relative" }}>
       <Grid container justify="space-evenly" alignItems="center">
         <Grid item>
-          <img
-            alt=""
-            src={cubes}
-            style={{
-              width: "70%",
-              marginLeft: "10%",
-            }}
-          />
-        </Grid>
-        <Grid item>
           <VolumeDetails />
         </Grid>
       </Grid>
@@ -846,7 +832,6 @@ const HomePage = () => {
   return (
     <>
       <div style={{ position: "relative", overflow: "hidden" }}>
-        <img src={illusion} className={classes.illusion} alt="" />
         <div style={{ marginTop: "5%", marginLeft: "21vw" }}>
           <Banner />
         </div>
@@ -878,7 +863,6 @@ const HomePage = () => {
         <div style={{ marginTop: "5%", marginBottom: "5%" }}>
           <DecentralizedSection />
         </div>
-        <img src={cubeBottom} className={classes.cubeBottom} alt="" />
       </div>
     </>
   );
