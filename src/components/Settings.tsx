@@ -8,7 +8,7 @@ import { Button, IconButton } from "@material-ui/core";
 import { useMarket } from "../utils/market";
 import { nanoid } from "nanoid";
 import { notify } from "../utils/notifications";
-import { useWallet } from "../utils/wallet";
+import { useWallet } from "@solana/wallet-adapter-react";
 import MoreHorizIcon from "@material-ui/icons/MoreHoriz";
 import { useSmallScreen } from "../utils/utils";
 

@@ -6,8 +6,7 @@ import { checkTextFieldNumberInput, roundToDecimal } from "../utils/utils";
 import { useState } from "react";
 import { Transaction } from "@solana/web3.js";
 import { Position, increasePositionCollateral } from "@audaces/perps";
-import { useWallet } from "../utils/wallet";
-import { useConnection } from "../utils/connection";
+import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 import { sendTransaction } from "../utils/send";
 import Spin from "./Spin";
 import { refreshAllCaches } from "../utils/fetch-loop";
@@ -51,7 +50,7 @@ const useStyles = makeStyles({
 
 const AddCollateralDialog = ({ position }: { position: Position }) => {
   const classes = useStyles();
-  const connection = useConnection();
+  const { connection } = useConnection();
   const { wallet } = useWallet();
   const [collateral, setCollateral] = useState<number | null>(null);
   const [loading, setLoading] = useState(false);

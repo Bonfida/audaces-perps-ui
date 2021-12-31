@@ -15,7 +15,6 @@ import {
   TableHead,
   TableRow,
 } from "@material-ui/core";
-import { useWallet } from "../utils/wallet";
 import WalletConnect from "./WalletConnect";
 import { useUserData } from "../utils/perpetuals";
 import Spin from "./Spin";
@@ -26,7 +25,7 @@ import {
   withdrawCollateral,
 } from "@audaces/perps";
 import { useMarket, MARKETS } from "../utils/market";
-import { useConnection } from "../utils/connection";
+import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 import {
   checkTextFieldNumberInput,
   roundToDecimal,
@@ -266,7 +265,7 @@ export const ModalAdd = ({
   acc: PublicKey;
 }) => {
   const classes = useStyles();
-  const connection = useConnection();
+  const { connection } = useConnection();
   const { wallet, connected } = useWallet();
   const { setRefreshUserAccount, marketState } = useMarket();
   const [collateral] = useAvailableCollateral();
@@ -421,7 +420,7 @@ const ModalWithdraw = ({
   acc: UserAccount;
 }) => {
   const classes = useStyles();
-  const connection = useConnection();
+  const { connection } = useConnection();
   const { wallet } = useWallet();
   const { userAccount, setRefreshUserAccount, marketState } = useMarket();
   const [collateral] = useAvailableCollateral();
@@ -544,7 +543,7 @@ const AccountRow = ({
   index: number;
 }) => {
   const classes = useStyles();
-  const connection = useConnection();
+  const { connection } = useConnection();
   const { wallet } = useWallet();
   const [loading, setLoading] = useState(false);
   const {

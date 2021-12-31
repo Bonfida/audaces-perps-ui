@@ -1,8 +1,7 @@
-import { useWallet } from "./wallet";
 import { getProgramAccounts, USDC_MINT, useLocalStorageState } from "./utils";
 import { useAsyncData } from "./fetch-loop";
 import tuple from "immutable-tuple";
-import { useConnection } from "./connection";
+import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 import {
   findAssociatedTokenAddress,
   getUserAccountsForOwner,
@@ -43,7 +42,7 @@ export const getInputKey = async (input: string) => {
 };
 
 export const useQuoteAccountFromRefCode = (refCode: string | undefined) => {
-  const connection = useConnection();
+  const { connection } = useConnection();
   const get = async () => {
     if (!refCode || !ALLOW_REF_LINKS) return REFERRAL_FEES_ADDRESS;
     try {
@@ -91,7 +90,7 @@ export const useReferrer = (): PublicKey | undefined => {
 };
 
 export const useOpenPositions = () => {
-  const connection = useConnection();
+  const { connection } = useConnection();
   const { wallet, connected } = useWallet();
   const get = async () => {
     if (!connected || !wallet) {
@@ -106,7 +105,7 @@ export const useOpenPositions = () => {
 };
 
 export const useAvailableCollateral = () => {
-  const connection = useConnection();
+  const { connection } = useConnection();
   const { wallet } = useWallet();
   const get = async () => {
     if (!wallet) {
@@ -175,7 +174,7 @@ export const findUserAccountsForMint = (tokenAccounts: any, mint: string) => {
 };
 
 export const useOraclePrice = (marketAddress: PublicKey | undefined | null) => {
-  const connection = useConnection();
+  const { connection } = useConnection();
   const get = async () => {
     if (!marketAddress) return;
     const marketState = await MarketState.retrieve(connection, marketAddress);
@@ -193,7 +192,7 @@ export const useOraclePrice = (marketAddress: PublicKey | undefined | null) => {
 
 export const useUserData = () => {
   const { wallet, connected } = useWallet();
-  const connection = useConnection();
+  const { connection } = useConnection();
   const { refreshUserAccount } = useMarket();
   const get = async () => {
     if (!connected) {

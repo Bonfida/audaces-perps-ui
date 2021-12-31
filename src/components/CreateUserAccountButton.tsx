@@ -2,11 +2,10 @@ import React, { useState } from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import { Grid, Button } from "@material-ui/core";
 import { useAvailableCollateral } from "../utils/perpetuals";
-import { useConnection } from "../utils/connection";
+import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 import { notify } from "../utils/notifications";
 import { sendTransaction } from "../utils/send";
 import { Transaction } from "@solana/web3.js";
-import { useWallet } from "../utils/wallet";
 import {
   createAssociatedTokenAccount,
   createUserAccount,
@@ -42,7 +41,7 @@ const CreateUserAccountButton = () => {
   const classes = useStyles();
   const [loading, setLoading] = useState(false);
   const [collateral] = useAvailableCollateral();
-  const connection = useConnection();
+  const { connection } = useConnection();
   const { wallet } = useWallet();
   const { marketAddress, setRefreshUserAccount } = useMarket();
 

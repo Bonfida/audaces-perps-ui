@@ -15,7 +15,7 @@ import {
 } from "@material-ui/core";
 import LaunchIcon from "../assets/Link/explorer.svg";
 import { ExplorerLink } from "../components/Link";
-import { useWallet } from "../utils/wallet";
+import { useWallet } from "@solana/wallet-adapter-react";
 import Spin from "../components/Spin";
 import { useVolume } from "../utils/market";
 import ContentLoader from "react-content-loader";
