@@ -11,14 +11,9 @@ import github from "../assets/homepage/github.png";
 import Link from "../components/Link";
 import { useParams } from "react-router-dom";
 import { notify } from "../utils/notifications";
-import community from "../assets/homepage/community.svg";
-import fast from "../assets/homepage/fast.svg";
-import liquidity from "../assets/homepage/liquidity.svg";
-import safe from "../assets/homepage/safe.svg";
-import whitepaper from "../assets/homepage/whitepaper.svg";
 import back from "../assets/homepage/back.svg";
 import { useHistory } from "react-router";
-import { useVolume, useLeaderBoard, MARKETS } from "../utils/market";
+import { useVolume, useLeaderBoard } from "../utils/market";
 import LeaderboardTable from "../components/LeaderBoardTable";
 import { Trader } from "../utils/types";
 import {
@@ -26,10 +21,6 @@ import {
   useWindowSize,
   useLocalStorageState,
 } from "../utils/utils";
-import { useConnection, useWallet } from "@solana/wallet-adapter-react";
-import { crankLiquidation, crankFunding } from "@audaces/perps";
-import { PublicKey, Transaction } from "@solana/web3.js";
-import Spin from "../components/Spin";
 import "../index.css";
 import Emoji from "../components/Emoji";
 
@@ -256,75 +247,6 @@ const Banner = () => {
   );
 };
 
-const feelSections = [
-  {
-    title: "Fast and cheap",
-    description: <>Trade up to 15x leverage with near zero network fees.</>,
-    icon: fast,
-  },
-  {
-    title: "High liquidity",
-    description: <>Virtual AMMs provide deep liquidity from the start</>,
-    icon: liquidity,
-  },
-  {
-    title: "Safety first",
-    description: <>The protocol is backed by an insurance fund</>,
-    icon: safe,
-  },
-  {
-    title: "Community",
-    description: <>Host a UI or refer your friends and get 10% the fees!</>,
-    icon: community,
-  },
-  {
-    title: "Whitepaper",
-    description: (
-      <>
-        Read the white paper on{" "}
-        <Link
-          external
-          to={HelpUrls.whitePaper}
-          style={{ color: "white", textDecoration: "none", fontWeight: 800 }}
-        >
-          Arweave
-        </Link>
-      </>
-    ),
-    icon: whitepaper,
-  },
-];
-
-const FeelTheDifference = () => {
-  const classes = useStyles();
-  return (
-    <>
-      <Typography className={classes.h2}>Feel the difference</Typography>
-      <Grid
-        container
-        justify="flex-start"
-        alignItems="center"
-        spacing={5}
-        style={{ marginTop: 30 }}
-      >
-        {feelSections.map((s, i) => {
-          return (
-            <Grid item key={`feel-difference-section-${i}`}>
-              <img src={s.icon} className={classes.imgFeelSection} alt="" />
-              <Typography className={classes.titleFeelSection}>
-                {s.title}
-              </Typography>
-              <Typography className={classes.descriptionFeelSection}>
-                {s.description}
-              </Typography>
-            </Grid>
-          );
-        })}
-      </Grid>
-    </>
-  );
-};
-
 const StakingCard = () => {
   const classes = useStyles();
   const smallScreen = useSmallScreen();
@@ -372,9 +294,6 @@ const NodeCard = () => {
   const classes = useStyles();
   const [front, setFront] = useState(true);
   const smallScreen = useSmallScreen();
-  const { wallet, connected, sendTransaction } = useWallet();
-  const [loading, setLoading] = useState(false);
-  const { connection } = useConnection();
 
   const onClick = () => {
     setFront((prev) => !prev);
@@ -703,7 +622,6 @@ const Leaderboardsection = () => {
 };
 
 const HomePage = () => {
-  const classes = useStyles();
   const { refCode } = useParams<{ refCode: string }>();
   const [referralCode, setReferralCode] = useLocalStorageState("referralCode");
   if (!referralCode && !!refCode) {
