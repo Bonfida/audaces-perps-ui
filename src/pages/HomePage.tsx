@@ -448,45 +448,61 @@ const VolumeDetails = () => {
   const [volume30d] = useVolume("all", now - 30 * 24 * 60 * 60, now);
   const smallScreen = useSmallScreen();
   return (
-    <>
-      <Typography className={classes.h2} align="right">
+    <div
+      style={{
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        flexDirection: smallScreen ? "column" : "row",
+      }}
+    >
+      <Typography
+        className={classes.h2}
+        align="right"
+        style={{ marginRight: 100 }}
+      >
         Our trading volumes
       </Typography>
-      <Typography
-        className={classes.volumeColoredText}
-        style={{ fontSize: smallScreen ? "4rem" : undefined }}
-        align="right"
-      >
-        ${volume24h}
-      </Typography>
-      <Typography className={classes.volumeCaption} align="right">
-        24h Volume
-      </Typography>
-      <Grid
-        container
-        justify="flex-end"
-        alignItems={smallScreen ? "flex-end" : "center"}
-        spacing={5}
-        direction={smallScreen ? "column" : "row"}
-      >
-        <Grid item>
-          <Typography className={classes.secondaryVolume} align="right">
-            ${volume7d}
-          </Typography>
-          <Typography className={classes.volumeCaption} align="right">
-            7D Volume
-          </Typography>
+      <div>
+        <Typography
+          className={classes.volumeColoredText}
+          style={{
+            fontSize: smallScreen ? "4rem" : undefined,
+            marginBottom: smallScreen ? 0 : -40,
+          }}
+          align="right"
+        >
+          ${volume24h}
+        </Typography>
+        <Typography className={classes.volumeCaption} align="right">
+          24h Volume
+        </Typography>
+        <Grid
+          container
+          justify="flex-end"
+          alignItems={smallScreen ? "flex-end" : "center"}
+          spacing={5}
+          direction={smallScreen ? "column" : "row"}
+        >
+          <Grid item>
+            <Typography className={classes.secondaryVolume} align="right">
+              ${volume7d}
+            </Typography>
+            <Typography className={classes.volumeCaption} align="right">
+              7D Volume
+            </Typography>
+          </Grid>
+          <Grid item>
+            <Typography className={classes.secondaryVolume} align="right">
+              ${volume30d}
+            </Typography>
+            <Typography className={classes.volumeCaption} align="right">
+              30D Volume
+            </Typography>
+          </Grid>
         </Grid>
-        <Grid item>
-          <Typography className={classes.secondaryVolume} align="right">
-            ${volume30d}
-          </Typography>
-          <Typography className={classes.volumeCaption} align="right">
-            30D Volume
-          </Typography>
-        </Grid>
-      </Grid>
-    </>
+      </div>
+    </div>
   );
 };
 
