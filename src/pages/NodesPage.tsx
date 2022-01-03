@@ -1,13 +1,6 @@
-import React, { useState } from "react";
-import { Button, Typography, Grid } from "@material-ui/core";
+import React from "react";
+import { Typography, Grid } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
-import { notify } from "../utils/notifications";
-import { useConnection, useWallet } from "@solana/wallet-adapter-react";
-import { crankLiquidation, crankFunding } from "@audaces/perps";
-import { useMarket } from "../utils/market";
-import { Transaction } from "@solana/web3.js";
-import Spin from "../components/Spin";
-import { useAvailableCollateral } from "../utils/perpetuals";
 import { useLocalStorageState } from "../utils/utils";
 
 const useStyles = makeStyles({
