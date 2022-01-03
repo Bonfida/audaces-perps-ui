@@ -2,7 +2,6 @@ import React, { useMemo } from "react";
 import { MuiThemeProvider } from "@material-ui/core/styles";
 import { CssBaseline } from "@material-ui/core";
 import { theme } from "./theme";
-import { ENDPOINTS } from "./utils/connection";
 import { SnackbarProvider } from "notistack";
 import { LayoutProvider } from "./utils/layout";
 import { MarketProvider } from "./utils/market";
@@ -46,7 +45,7 @@ const App = ({ children }: { children: React.ReactNode }) => {
     [network]
   );
 
-  const endpoint = useMemo(() => ENDPOINTS[0].endpoint, []);
+  const endpoint = useMemo(() => process.env.REACT_APP_CONNECTION!, []);
 
   return (
     <ConnectionProvider endpoint={endpoint}>

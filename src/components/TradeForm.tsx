@@ -29,7 +29,6 @@ import {
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 import { Transaction, Keypair, TransactionInstruction } from "@solana/web3.js";
 import { useMarket, useMarkPrice, MAX_LEVERAGE } from "../utils/market";
-import { sendTransaction } from "../utils/send";
 import Spin from "./Spin";
 import { refreshAllCaches } from "../utils/fetch-loop";
 import { IsolatedPositionChip, LeverageValueChip } from "./Chips";

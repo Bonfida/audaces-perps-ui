@@ -31,15 +31,16 @@ const useStyles = makeStyles({
     fontWeight: 800,
   },
   img: {
-    height: 35,
+    height: 24,
     marginTop: 4,
   },
   marketName: {
-    fontSize: 20,
-    color: "white",
-    fontWeight: 700,
+    fontSize: 18,
+    color: "#FFFFFF",
   },
-  marketDataContainer: {},
+  marketDataContainer: {
+    marginLeft: 20,
+  },
   addButton: {
     background: "#02C77A",
     maxWidth: 300,
@@ -67,7 +68,7 @@ const useStyles = makeStyles({
   },
   arrowDown: {
     color: "white",
-    fontSize: 20,
+    height: 6,
     marginTop: 5,
   },
   menuPaper: {
@@ -101,7 +102,7 @@ const InfoColumn = ({
   );
 };
 
-const Header = () => {
+export const Header = () => {
   const classes = useStyles();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
@@ -119,7 +120,7 @@ const Header = () => {
     if (!path) {
       return setAnchorEl(null);
     }
-    history.push(m?.name?.split("-")?.join(""));
+    history.push("/trade/" + m?.name?.split("-")?.join(""));
     setMarket(m);
     setAnchorEl(null);
   };
@@ -132,7 +133,7 @@ const Header = () => {
           direction="row"
           justify="center"
           alignItems="center"
-          spacing={2}
+          spacing={1}
         >
           <Grid item>
             <img src={getIcon(baseCurrency)} className={classes.img} alt="" />
@@ -243,9 +244,6 @@ const MarketData = () => {
           direction="row"
           spacing={5}
         >
-          <Grid item>
-            <Header />
-          </Grid>
           {!!userAccount?.balance &&
             !!marketState?.quoteDecimals &&
             !smallScreen && (

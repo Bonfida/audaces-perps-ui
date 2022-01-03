@@ -15,10 +15,7 @@ import community from "../assets/homepage/community.svg";
 import fast from "../assets/homepage/fast.svg";
 import liquidity from "../assets/homepage/liquidity.svg";
 import safe from "../assets/homepage/safe.svg";
-import safeBlack from "../assets/homepage/safeBlack.svg";
 import whitepaper from "../assets/homepage/whitepaper.svg";
-import burn from "../assets/homepage/burn.svg";
-import reward from "../assets/homepage/reward.svg";
 import back from "../assets/homepage/back.svg";
 import { useHistory } from "react-router";
 import { useVolume, useLeaderBoard, MARKETS } from "../utils/market";
@@ -31,7 +28,6 @@ import {
 } from "../utils/utils";
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 import { crankLiquidation, crankFunding } from "@audaces/perps";
-import { sendSignedTransaction, signTransactions } from "../utils/send";
 import { PublicKey, Transaction } from "@solana/web3.js";
 import Spin from "../components/Spin";
 import "../index.css";
@@ -40,8 +36,6 @@ import Emoji from "../components/Emoji";
 const useStyles = makeStyles({
   h1: {
     color: "#FFFFFF",
-    textShadow:
-      "0px 2px 13px rgba(119, 227, 239, 0.28), 0px 4px 26px rgba(119, 227, 239, 0.34)",
     fontSize: 68,
     margin: 10,
     fontWeight: 800,
@@ -49,8 +43,6 @@ const useStyles = makeStyles({
   },
   h2: {
     color: "#FFFFFF",
-    textShadow:
-      "0px 2px 13px rgba(119, 227, 239, 0.28), 0px 4px 26px rgba(119, 227, 239, 0.34)",
     fontSize: 42,
     margin: 10,
     fontWeight: 800,
@@ -100,15 +92,13 @@ const useStyles = makeStyles({
   },
   cardTitle: {
     color: "#FFFFFF",
-    textShadow:
-      "0px 2px 13px rgba(119, 227, 239, 0.28), 0px 4px 26px rgba(119, 227, 239, 0.34)",
     fontSize: 68,
     margin: 10,
     fontWeight: 800,
     lineHeight: "1.0em",
   },
   cardSubtitle: {
-    color: "rgba(192, 169, 199, 1)",
+    color: "rgb(119, 227, 239)",
     fontSize: 42,
     fontWeight: 600,
   },
@@ -180,15 +170,7 @@ const useStyles = makeStyles({
     textTransform: "capitalize",
     fontWeight: 800,
     fontSize: 110,
-    backgroundImage: "linear-gradient(135deg, #60C0CB 18.23%, #6868FC 100%)",
-    backgroundClip: "text",
-    textShadow:
-      "0px 2px 13px rgba(119, 227, 239, 0.28), 0px 4px 26px rgba(119, 227, 239, 0.34)",
-    color: "rgba(119, 227, 239, 0.28)",
-    "-webkit-background-clip": "text",
-    "-moz-background-clip": "text",
-    "-webkit-text-fill-color": "transparent",
-    "-moz-text-fill-color": "transparent",
+    color: "rgb(119, 227, 239)",
   },
   volumeCaption: {
     marginTop: 0,
@@ -235,23 +217,13 @@ const useStyles = makeStyles({
     textTransform: "capitalize",
     fontWeight: 600,
     fontSize: 42,
-    backgroundImage: "linear-gradient(135deg, #60C0CB 18.23%, #6868FC 100%)",
-    backgroundClip: "text",
-    textShadow:
-      "0px 2px 13px rgba(119, 227, 239, 0.28), 0px 4px 26px rgba(119, 227, 239, 0.34)",
-    color: "rgba(119, 227, 239, 0.28)",
-    "-webkit-background-clip": "text",
-    "-moz-background-clip": "text",
-    "-webkit-text-fill-color": "transparent",
-    "-moz-text-fill-color": "transparent",
+    color: "rgb(119, 227, 239)",
   },
   wolveCardText: {
     textTransform: "capitalize",
     fontWeight: 600,
     fontSize: 42,
     color: "#FFFFFF",
-    textShadow:
-      "0px 2px 13px rgba(119, 227, 239, 0.28), 0px 4px 26px rgba(119, 227, 239, 0.34)",
   },
   wolveCardSubtitle: {
     textTransform: "capitalize",
@@ -366,18 +338,20 @@ const StakingCard = () => {
       }}
     >
       <Typography className={classes.cardTitle}>Buy and Burn</Typography>
-      <img src={burn} className={classes.cardIcon} alt="" />
-      <Typography className={classes.cardSubtitle}>Buy and burn</Typography>
-      <Typography className={classes.cardDescription}>
-        30% of all fees generated go to FIDA buy and burns.
-      </Typography>
-      <img src={reward} className={classes.cardIcon} alt="" />
-      <Typography className={classes.cardSubtitle}>
-        Decentralized <Emoji emoji="🔥" />
-      </Typography>
-      <Typography className={classes.cardDescription}>
-        The buy and burn was made decentralized and permissionless
-      </Typography>
+      <div>
+        <Typography className={classes.cardSubtitle}>Buy and burn</Typography>
+        <Typography className={classes.cardDescription}>
+          30% of all fees generated go to FIDA buy and burns.
+        </Typography>
+      </div>
+      <div>
+        <Typography className={classes.cardSubtitle}>
+          Decentralized <Emoji emoji="🔥" />
+        </Typography>
+        <Typography className={classes.cardDescription}>
+          The buy and burn was made decentralized and permissionless
+        </Typography>
+      </div>
       <div
         className={classes.buttonContainer}
         style={{ marginTop: "min(10%, 40px)" }}
@@ -398,91 +372,12 @@ const NodeCard = () => {
   const classes = useStyles();
   const [front, setFront] = useState(true);
   const smallScreen = useSmallScreen();
-  const { wallet, connected } = useWallet();
+  const { wallet, connected, sendTransaction } = useWallet();
   const [loading, setLoading] = useState(false);
   const { connection } = useConnection();
 
   const onClick = () => {
     setFront((prev) => !prev);
-  };
-
-  const onClickLiquidation = async () => {
-    if (!connected || !wallet?.publicKey) {
-      notify({
-        message: "Connect your wallet",
-      });
-      return;
-    }
-
-    try {
-      setLoading(true);
-      const [, instructions] = await crankLiquidation(
-        connection,
-        wallet?.publicKey,
-        new PublicKey(MARKETS[0].address)
-      );
-      const signed = await signTransactions({
-        transactionsAndSigners: instructions.map((i) => {
-          return { transaction: new Transaction().add(i) };
-        }),
-        connection: connection,
-        wallet: wallet,
-      });
-
-      for (let signedTransaction of signed) {
-        await sendSignedTransaction({ signedTransaction, connection });
-      }
-    } catch (err) {
-      if (err.message.includes("no-op")) {
-        return notify({
-          message: `No liquidation to crank`,
-          variant: "success",
-        });
-      }
-      console.warn(`Error - ${err}`);
-      notify({
-        message: `Error cranking transaction - ${err}`,
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const onClickFunding = async () => {
-    if (!connected) {
-      notify({
-        message: "Connect your wallet",
-      });
-      return;
-    }
-    try {
-      setLoading(true);
-      const [, instructions] = await crankFunding(
-        connection,
-        new PublicKey(MARKETS[0].address)
-      );
-      const signed = await signTransactions({
-        transactionsAndSigners: instructions.map((i) => {
-          return { transaction: new Transaction().add(i) };
-        }),
-        connection: connection,
-        wallet: wallet,
-      });
-
-      for (let signedTransaction of signed) {
-        await sendSignedTransaction({ signedTransaction, connection });
-      }
-    } catch (err) {
-      if (err.message.includes("no-op")) {
-        return notify({ message: `No funding to crank`, variant: "success" });
-      }
-      console.warn(`Error - ${err}`);
-      notify({
-        message: `Error cranking transaction - ${err}`,
-      });
-    } finally {
-      setLoading(false);
-    }
   };
 
   return (
@@ -497,17 +392,23 @@ const NodeCard = () => {
       {front && (
         <>
           <Typography className={classes.cardTitle}>Nodes</Typography>
-          <img src={safeBlack} className={classes.cardIcon} alt="" />
-          <Typography className={classes.cardSubtitle}>
-            Secure the network
-          </Typography>
-          <img src={reward} className={classes.cardIcon} alt="" />
-          <Typography className={classes.cardSubtitle}>
-            Earn a reward
-          </Typography>
-          <Typography className={classes.cardDescription}>
-            Nodes get rewarded for each transaction they crank.
-          </Typography>
+          <div>
+            <Typography className={classes.cardSubtitle}>
+              Secure the netwokr
+            </Typography>
+            <Typography className={classes.cardDescription}>
+              Nodes secure the network by cranking transactions.
+            </Typography>
+          </div>
+          <div>
+            <Typography className={classes.cardSubtitle}>
+              Earn a reward
+            </Typography>
+            <Typography className={classes.cardDescription}>
+              Nodes who crank funding rates and liquidations get rewarded for
+              each transaction they crank.
+            </Typography>
+          </div>
           <div
             className={classes.buttonContainer}
             style={{ marginTop: "min(10%, 40px)" }}
@@ -550,35 +451,22 @@ const NodeCard = () => {
               You can crank liquidations and funding rates manually and try
               earning a rewards!
             </Typography>
-            <Grid
-              container
-              justify="flex-start"
-              alignItems="center"
-              spacing={5}
-              style={{ marginTop: 10 }}
+            <div
+              style={{
+                marginTop: 10,
+              }}
             >
-              <Grid item>
-                <div className={classes.buttonContainer}>
-                  <Button
-                    className={classes.button}
-                    onClick={onClickLiquidation}
-                  >
-                    <Typography className={classes.coloredText}>
-                      {loading ? <Spin size={10} /> : <>Crank Liquidation</>}
-                    </Typography>
-                  </Button>
-                </div>
-              </Grid>
-              <Grid item>
-                <div className={classes.buttonContainer}>
-                  <Button className={classes.button} onClick={onClickFunding}>
-                    <Typography className={classes.coloredText}>
-                      {loading ? <Spin size={10} /> : <>Crank Funding</>}
-                    </Typography>
-                  </Button>
-                </div>
-              </Grid>
-            </Grid>
+              <div className={classes.buttonContainer}>
+                <Button
+                  className={classes.button}
+                  onClick={() => console.log()}
+                >
+                  <Typography className={classes.coloredText}>
+                    Github
+                  </Typography>
+                </Button>
+              </div>
+            </div>
           </div>
         </Fade>
       )}
@@ -832,21 +720,18 @@ const HomePage = () => {
   return (
     <>
       <div style={{ position: "relative", overflow: "hidden" }}>
-        <div style={{ marginTop: "5%", marginLeft: "21vw" }}>
-          <Banner />
-        </div>
         <div
           style={{
             marginTop: "5%",
-            marginBottom: "5%",
             marginLeft: "21vw",
           }}
         >
-          <FeelTheDifference />
+          <Banner />
         </div>
-        <div style={{ marginRight: "6%" }}>
+        <div style={{ marginTop: "5%", marginBottom: "5%" }}>
           <VolumeSection />
         </div>
+        <div style={{ marginRight: "6%" }}></div>
         <div id="nodes">
           <Grid container justify="center" alignItems="center" spacing={5}>
             <Grid item>

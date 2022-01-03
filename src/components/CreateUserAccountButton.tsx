@@ -4,7 +4,6 @@ import { Grid, Button } from "@material-ui/core";
 import { useAvailableCollateral } from "../utils/perpetuals";
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 import { notify } from "../utils/notifications";
-import { sendTransaction } from "../utils/send";
 import { Transaction } from "@solana/web3.js";
 import {
   createAssociatedTokenAccount,
