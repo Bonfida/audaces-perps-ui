@@ -20,7 +20,6 @@ import {
 import EditPositionModal from "./EditPositionModal";
 import { notify } from "../utils/notifications";
 import { refreshAllCaches } from "../utils/fetch-loop";
-import { sendTransaction } from "../utils/send";
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 import { Transaction } from "@solana/web3.js";
 import CreateIcon from "@material-ui/icons/Create";

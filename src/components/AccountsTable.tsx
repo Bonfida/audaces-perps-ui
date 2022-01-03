@@ -34,7 +34,6 @@ import {
 import { useAvailableCollateral } from "../utils/perpetuals";
 import { notify } from "../utils/notifications";
 import { PublicKey, Transaction } from "@solana/web3.js";
-import { sendTransaction } from "../utils/send";
 import CreateUserAccountButton from "./CreateUserAccountButton";
 import { InformationRow } from "./SummaryPosition";
 import LaunchIcon from "@material-ui/icons/Launch";

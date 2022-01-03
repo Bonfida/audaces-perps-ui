@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { makeStyles, Theme, createStyles } from "@material-ui/core/styles";
 import { useLocation } from "react-router-dom";
 import fida from "../../assets/homepage/fida.png";
-import { Typography, Grid, Divider, Button } from "@material-ui/core";
+import { Typography, Grid, Button } from "@material-ui/core";
 import WalletConnect from "../WalletConnect";
 import gear from "../../assets/components/topbar/gear.svg";
 import Switch from "../Switch";
@@ -20,6 +20,7 @@ import {
   useWindowSize,
   useLocalStorageState,
 } from "../../utils/utils";
+import { Header } from "../MarketInfo";
 
 const drawerWidth = 300;
 
@@ -62,8 +63,10 @@ const useStyles = makeStyles((theme: Theme) =>
       fontWeight: 600,
     },
     sectionsContainer: {
+      marginLeft: 20,
+      marginRight: 20,
       display: "flex",
-      justifyContent: "space-around",
+      justifyContent: "space-between",
     },
     sectionItem: {
       marginRight: 10,
@@ -90,7 +93,7 @@ const useStyles = makeStyles((theme: Theme) =>
     },
     settingsContainer: {
       display: "flex",
-      justifyContent: "center",
+      justifyContent: "space-around",
       alignItems: "center",
     },
     coloredText: {
@@ -137,7 +140,12 @@ const Sections = () => {
   return (
     <Grid container justify="flex-start" alignItems="center" spacing={5}>
       <Grid item>
-        <img src={fida} className={classes.fida} alt="" />
+        <img
+          src={fida}
+          className={classes.fida}
+          alt=""
+          onClick={() => history.push("/")}
+        />
       </Grid>
       {topBarElements.map((e) => {
         return (
@@ -148,6 +156,9 @@ const Sections = () => {
           </Grid>
         );
       })}
+      <Grid item>
+        <Header />
+      </Grid>
     </Grid>
   );
 };
@@ -159,7 +170,11 @@ const TopBarHomePage = () => {
     return null;
   }
   return (
-    <div style={{ marginLeft: "auto", marginRight: "auto", marginTop: 30 }}>
+    <div
+      style={{
+        marginTop: 30,
+      }}
+    >
       <div className={classes.sectionsContainer}>
         <div>
           <Sections />
@@ -247,29 +262,13 @@ const TopBarMarketPage = () => {
       )}
       {!smallScreen && (
         <div className={classes.topBarMarketPageContainer}>
-          <Grid container justify="space-between">
+          <Grid container justify="space-between" alignItems="center">
             <Grid item>
-              <div className={classes.settingsContainer}>
-                <img
-                  onClick={() => history.push("/")}
-                  src={fida}
-                  className={classes.fida}
-                  alt=""
-                  style={{ marginRight: 40 }}
-                />
-                <MarketInfo />
-              </div>
+              <MarketInfo />
             </Grid>
             <Grid item>
-              <div className={classes.settingsContainer}>
-                <WalletConnect />
-                <Divider orientation="vertical" className={classes.divider} />
-                <div
-                  onClick={() => setOpen(true)}
-                  style={{ cursor: "pointer" }}
-                >
-                  <img src={gear} style={{ height: 21 }} alt="" />
-                </div>
+              <div onClick={() => setOpen(true)} style={{ cursor: "pointer" }}>
+                <img src={gear} style={{ height: 21 }} alt="" />
               </div>
             </Grid>
           </Grid>
@@ -351,7 +350,7 @@ const TopBarMarketPage = () => {
             {/* Small screen wallet connect */}
             {smallScreen && (
               <ListItem>
-                <WalletConnect width={290} />
+                <WalletConnect />
               </ListItem>
             )}
             {/* Reset layout */}
@@ -378,7 +377,12 @@ const TopBar = () => {
   const location = useLocation();
   const isTradePage = location.pathname.includes("/trade");
   if (isTradePage) {
-    return <TopBarMarketPage />;
+    return (
+      <div style={{ display: "flex", flexDirection: "column", width: "100%" }}>
+        <TopBarHomePage />
+        <TopBarMarketPage />
+      </div>
+    );
   }
   return <TopBarHomePage />;
 };

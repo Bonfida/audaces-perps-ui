@@ -10,7 +10,6 @@ import {
   PositionType,
 } from "@audaces/perps";
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
-import { sendTransaction } from "../utils/send";
 import { Transaction } from "@solana/web3.js";
 import Spin from "./Spin";
 import { refreshAllCaches } from "../utils/fetch-loop";

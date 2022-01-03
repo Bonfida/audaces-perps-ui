@@ -5,7 +5,6 @@ import { notify } from "../utils/notifications";
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 import { crankLiquidation, crankFunding } from "@audaces/perps";
 import { useMarket } from "../utils/market";
-import { sendSignedTransaction, signTransactions } from "../utils/send";
 import { Transaction } from "@solana/web3.js";
 import Spin from "../components/Spin";
 import { useAvailableCollateral } from "../utils/perpetuals";
@@ -60,127 +59,6 @@ const useStyles = makeStyles({
     opacity: 0.75,
   },
 });
-
-const LiquidationButton = () => {
-  const classes = useStyles();
-  const [loading, setLoading] = useState(false);
-  const { connection } = useConnection();
-  const { wallet, connected } = useWallet();
-  const { marketAddress } = useMarket();
-  const [nbCranked, setNbCranked] = useLocalStorageState("nbCranked", 0);
-
-  const onClick = async () => {
-    if (!connected || !wallet?.publicKey) {
-      notify({
-        message: "Connect your wallet",
-      });
-      return;
-    }
-
-    try {
-      setLoading(true);
-      const [, instructions] = await crankLiquidation(
-        connection,
-        wallet?.publicKey,
-        marketAddress
-      );
-      const signed = await signTransactions({
-        transactionsAndSigners: instructions.map((i) => {
-          return { transaction: new Transaction().add(i) };
-        }),
-        connection: connection,
-        wallet: wallet,
-      });
-
-      for (let signedTransaction of signed) {
-        await sendSignedTransaction({ signedTransaction, connection });
-      }
-      setNbCranked(nbCranked + 1);
-    } catch (err) {
-      if (err.message.includes("no-op")) {
-        return notify({
-          message: `No liquidation to crank`,
-          variant: "success",
-        });
-      }
-      console.warn(`Error - ${err}`);
-      notify({
-        message: `Error cranking transaction - ${err}`,
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  return (
-    <Button disabled={loading} onClick={onClick} className={classes.button}>
-      {loading ? <Spin size={20} /> : "Crank Liquidation"}
-    </Button>
-  );
-};
-
-const FundingButton = () => {
-  const classes = useStyles();
-  const { connection } = useConnection();
-  const [loading, setLoading] = useState(false);
-  const { wallet, connected } = useWallet();
-  const { marketAddress } = useMarket();
-  const [collateral] = useAvailableCollateral();
-  const [nbCranked, setNbCranked] = useLocalStorageState("nbCranked", 0);
-
-  const onClick = async () => {
-    if (!connected || !collateral?.collateralAddress) {
-      notify({
-        message: "Connect your wallet",
-      });
-      return;
-    }
-    try {
-      setLoading(true);
-      const [, instructions] = await crankFunding(connection, marketAddress);
-      const signed = await signTransactions({
-        transactionsAndSigners: instructions.map((i) => {
-          return { transaction: new Transaction().add(i) };
-        }),
-        connection: connection,
-        wallet: wallet,
-      });
-
-      for (let signedTransaction of signed) {
-        await sendSignedTransaction({ signedTransaction, connection });
-      }
-      setNbCranked(nbCranked + 1);
-    } catch (err) {
-      if (err.message.includes("no-op")) {
-        return notify({ message: `No funding to crank`, variant: "success" });
-      }
-      console.warn(`Error - ${err}`);
-      notify({
-        message: `Error cranking transaction - ${err}`,
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
-  return (
-    <Button onClick={onClick} className={classes.button}>
-      {loading ? <Spin size={20} /> : "Crank Funding"}
-    </Button>
-  );
-};
-
-const CrankingButtons = () => {
-  return (
-    <Grid spacing={5} container justify="center" alignItems="center">
-      <Grid item>
-        <LiquidationButton />
-      </Grid>
-      <Grid item>
-        <FundingButton />
-      </Grid>
-    </Grid>
-  );
-};
 
 const Banner = () => {
   const classes = useStyles();
@@ -253,7 +131,7 @@ const NodesPage = () => {
     <>
       <Banner />
       <Text />
-      <CrankingButtons />
+
       <Counter />
     </>
   );

@@ -1,11 +1,12 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { PublicKey } from "@solana/web3.js";
 import BN from "bn.js";
-import { MAINNET_ENDPOINT } from "./connection";
 import { TOKEN_PROGRAM_ID } from "@solana/spl-token";
 import words from "fun-word-list";
 
 export const BONFIDA_API_URL = "https://serum-api.bonfida.com/";
+
+const MAINNET_ENDPOINT = process.env.REACT_APP_CONNECTION!;
 
 export const USDC_MINT = new PublicKey(
   "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"
