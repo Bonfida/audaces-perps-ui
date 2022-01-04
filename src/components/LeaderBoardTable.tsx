@@ -146,7 +146,7 @@ const LeaderboardTable = ({
   leaderboard: Trader[] | undefined | null;
   leaderboardLoaded: boolean;
 }) => {
-  const { connected, wallet } = useWallet();
+  const { publicKey } = useWallet();
   const classes = useStyles();
   return (
     <TableContainer className={classes.container}>
@@ -164,9 +164,7 @@ const LeaderboardTable = ({
                     address={row.feePayer}
                     key={`leaderboard-24h-${i}`}
                     isUser={
-                      connected
-                        ? wallet.publicKey.toBase58() === row.feePayer
-                        : false
+                      publicKey ? publicKey.toBase58() === row.feePayer : false
                     }
                   />
                 );

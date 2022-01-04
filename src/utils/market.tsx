@@ -66,7 +66,7 @@ export const MarketProvider = ({ children }) => {
     "useIsolatedPositions",
     false
   );
-  const { wallet, connected } = useWallet();
+  const { publicKey, connected } = useWallet();
 
   const marketAddress = useMemo(
     () => new PublicKey(market.address),
@@ -92,13 +92,10 @@ export const MarketProvider = ({ children }) => {
 
   useEffect(() => {
     const fn = async () => {
-      if (!connected) {
+      if (!publicKey) {
         return;
       }
-      const userAccounts = await getUserAccountsForOwner(
-        connection,
-        wallet.publicKey
-      );
+      const userAccounts = await getUserAccountsForOwner(connection, publicKey);
       const filtered = userAccounts
         ?.filter((u) => u?.market.equals(marketAddress))
         .sort((a, b) => {
@@ -223,11 +220,11 @@ export const useMarketTrades = (marketAddress: PublicKey) => {
 };
 
 export const useUserTrades = (marketAddress: PublicKey) => {
-  const { wallet, connected } = useWallet();
+  const { connected, publicKey } = useWallet();
   const fn = async () => {
-    if (!connected || !wallet.publicKey) return;
+    if (!publicKey) return;
     const result = await apiGet(
-      `${URL_API_TRADES}${marketAddress.toBase58()}&feePayer=${wallet.publicKey.toBase58()}`
+      `${URL_API_TRADES}${marketAddress.toBase58()}&feePayer=${publicKey.toBase58()}`
     );
     if (!result.success) {
       throw new Error("Error fetching past trade");
@@ -268,14 +265,11 @@ export const useUserFunding = () => {
 };
 
 export const useFidaAmount = () => {
-  const { wallet, connected } = useWallet();
+  const { connected, publicKey } = useWallet();
   const { connection } = useConnection();
   const fn = async () => {
-    if (!connected) return;
-    const discountAccount = await getDiscountAccount(
-      connection,
-      wallet.publicKey
-    );
+    if (!publicKey) return;
+    const discountAccount = await getDiscountAccount(connection, publicKey);
     if (!discountAccount) return 0;
     const accountInfo = await connection.getParsedAccountInfo(discountAccount);
     // @ts-ignore

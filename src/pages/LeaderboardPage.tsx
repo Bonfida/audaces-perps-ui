@@ -102,7 +102,7 @@ const LeaderBoardTableRow = ({
 }) => {
   const classes = useStyles();
   const [domains] = useUserDomains(new PublicKey(address));
-  console.log(volume);
+
   return (
     <TableRow
       style={{
@@ -196,7 +196,7 @@ const LeaderboardPage = () => {
     50
   );
 
-  const { connected, wallet } = useWallet();
+  const { publicKey } = useWallet();
   const _now = Math.floor(new Date().getTime() / 1_000);
   const now = React.useMemo(() => _now - (_now % (60 * 60)), [_now]);
   const [volume24h, volume24hLoaded] = useVolume("all");
@@ -232,14 +232,14 @@ const LeaderboardPage = () => {
           />
         </Grid>
       </Grid>
-      {connected && (
+      {publicKey && (
         <Typography
           className={classes.text}
           align="center"
           variant="body1"
           style={{ marginTop: 10, marginBottom: 10 }}
         >
-          My leaderboard name: {getLeaderBoardName(wallet.publicKey.toBase58())}
+          My leaderboard name: {getLeaderBoardName(publicKey.toBase58())}
         </Typography>
       )}
       <div className={classes.div}>
@@ -266,8 +266,8 @@ const LeaderboardPage = () => {
                           address={row.feePayer}
                           key={`leaderboard-24h-${i}`}
                           isUser={
-                            connected
-                              ? wallet.publicKey.toBase58() === row.feePayer
+                            publicKey
+                              ? publicKey.toBase58() === row.feePayer
                               : false
                           }
                           volume={row.volume}
@@ -309,8 +309,8 @@ const LeaderboardPage = () => {
                           address={row.feePayer}
                           key={`leaderboard-30d-${i}`}
                           isUser={
-                            connected
-                              ? wallet.publicKey.toBase58() === row.feePayer
+                            publicKey
+                              ? publicKey.toBase58() === row.feePayer
                               : false
                           }
                           volume={row.volume}
