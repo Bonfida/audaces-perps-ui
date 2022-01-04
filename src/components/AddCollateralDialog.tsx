@@ -4,13 +4,13 @@ import { notify } from "../utils/notifications";
 import { makeStyles } from "@material-ui/core/styles";
 import { checkTextFieldNumberInput, roundToDecimal } from "../utils/utils";
 import { useState } from "react";
-import { Transaction } from "@solana/web3.js";
 import { Position, increasePositionCollateral } from "@audaces/perps";
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 import Spin from "./Spin";
 import { refreshAllCaches } from "../utils/fetch-loop";
 import { UpdatedPosition } from "./SummaryPosition";
 import { useMarkPrice, useMarket } from "../utils/market";
+import { sendTx } from "../utils/send";
 
 const useStyles = makeStyles({
   modalTitle: {
@@ -50,7 +50,7 @@ const useStyles = makeStyles({
 const AddCollateralDialog = ({ position }: { position: Position }) => {
   const classes = useStyles();
   const { connection } = useConnection();
-  const { wallet } = useWallet();
+  const { publicKey, sendTransaction } = useWallet();
   const [collateral, setCollateral] = useState<number | null>(null);
   const [loading, setLoading] = useState(false);
   const markPrice = useMarkPrice();
@@ -93,7 +93,7 @@ const AddCollateralDialog = ({ position }: { position: Position }) => {
   };
 
   const onClick = async () => {
-    if (!wallet || !collateral || !marketState?.quoteDecimals) {
+    if (!publicKey || !collateral || !marketState?.quoteDecimals) {
       return;
     }
     notify({
@@ -104,15 +104,13 @@ const AddCollateralDialog = ({ position }: { position: Position }) => {
       const [signers, instructions] = await increasePositionCollateral(
         connection,
         position,
-        wallet.publicKey,
+        publicKey,
         collateral * marketState?.quoteDecimals
       );
-      await sendTransaction({
-        connection: connection,
-        wallet: wallet,
-        signers: signers,
-        transaction: new Transaction().add(...instructions),
+      await sendTx(connection, publicKey, instructions, sendTransaction, {
+        signers,
       });
+
       notify({
         message: "Collateral added",
         variant: "success",
@@ -153,7 +151,7 @@ const AddCollateralDialog = ({ position }: { position: Position }) => {
         </Grid>
         <Grid>
           <Button
-            disabled={loading || !wallet || !collateral}
+            disabled={loading || !publicKey || !collateral}
             onClick={onClick}
             className={classes.addButton}
           >

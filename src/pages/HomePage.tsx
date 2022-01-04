@@ -313,7 +313,7 @@ const NodeCard = () => {
           <Typography className={classes.cardTitle}>Nodes</Typography>
           <div>
             <Typography className={classes.cardSubtitle}>
-              Secure the netwokr
+              Secure the network
             </Typography>
             <Typography className={classes.cardDescription}>
               Nodes secure the network by cranking transactions.
@@ -378,7 +378,7 @@ const NodeCard = () => {
               <div className={classes.buttonContainer}>
                 <Button
                   className={classes.button}
-                  onClick={() => console.log()}
+                  onClick={() => window.open(HelpUrls.github, "_blank")}
                 >
                   <Typography className={classes.coloredText}>
                     Github

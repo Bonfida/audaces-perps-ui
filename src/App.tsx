@@ -45,7 +45,13 @@ const App = ({ children }: { children: React.ReactNode }) => {
     [network]
   );
 
-  const endpoint = useMemo(() => process.env.REACT_APP_CONNECTION!, []);
+  const endpoint = useMemo(
+    () =>
+      process.env.NODE_ENV === "production"
+        ? process.env.REACT_APP_CONNECTION!
+        : process.env.REACT_APP_CONNECTION_DEV!,
+    []
+  );
 
   return (
     <ConnectionProvider endpoint={endpoint}>

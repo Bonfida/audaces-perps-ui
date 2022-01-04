@@ -21,7 +21,6 @@ import EditPositionModal from "./EditPositionModal";
 import { notify } from "../utils/notifications";
 import { refreshAllCaches } from "../utils/fetch-loop";
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
-import { Transaction } from "@solana/web3.js";
 import CreateIcon from "@material-ui/icons/Create";
 import { useSmallScreen } from "../utils/utils";
 import LeverageChip, { LiquidatedChip } from "./Chips";
@@ -30,6 +29,7 @@ import { useReferrer } from "../utils/perpetuals";
 import { MARKETS, useMarketState, useMarket } from "../utils/market";
 import { useHistory } from "react-router";
 import { Market } from "../utils/types";
+import { sendTx } from "../utils/send";
 
 const useStyles = makeStyles({
   table: {
@@ -138,7 +138,7 @@ const PositionRow = ({ props, index }: { props: Position; index: number }) => {
   const [openEditPosition, setOpenEditPosition] = useState(false);
   const [selectedButton, setSelectedButton] = useState("size");
   const [loading, setLoading] = useState(false);
-  const { wallet, connected } = useWallet();
+  const { publicKey, sendTransaction, connected } = useWallet();
   const { connection } = useConnection();
   const smallScreen = useSmallScreen("md");
   const referrer = useReferrer();
@@ -164,7 +164,7 @@ const PositionRow = ({ props, index }: { props: Position; index: number }) => {
 
   const onClickClosePosition = async () => {
     setLoading(true);
-    if (!wallet.publicKey || !connected) {
+    if (!publicKey || !connected) {
       return notify({
         message: "Wallet not connected",
       });
@@ -173,19 +173,15 @@ const PositionRow = ({ props, index }: { props: Position; index: number }) => {
       message: "Closing position...",
     });
     try {
-      const tx = new Transaction();
       const [signers, instruction] = await completeClosePosition(
         connection,
         props,
-        wallet.publicKey,
+        publicKey,
         referrer
       );
-      tx.add(...instruction);
-      await sendTransaction({
-        transaction: tx,
-        wallet: wallet,
-        connection: connection,
-        signers: signers,
+
+      await sendTx(connection, publicKey, instruction, sendTransaction, {
+        signers,
       });
 
       notify({
@@ -206,7 +202,7 @@ const PositionRow = ({ props, index }: { props: Position; index: number }) => {
 
   const onClickClear = async () => {
     setLoading(true);
-    if (!wallet.publicKey || !connected) {
+    if (!publicKey || !connected) {
       return notify({
         message: "Wallet not connected",
       });
@@ -215,19 +211,14 @@ const PositionRow = ({ props, index }: { props: Position; index: number }) => {
       message: "Cleaning liquidated position...",
     });
     try {
-      const tx = new Transaction();
       const [signers, instruction] = await completeClosePosition(
         connection,
         props,
-        wallet.publicKey,
+        publicKey,
         referrer
       );
-      tx.add(...instruction);
-      await sendTransaction({
-        transaction: tx,
-        wallet: wallet,
-        connection: connection,
-        signers: signers,
+      await sendTx(connection, publicKey, instruction, sendTransaction, {
+        signers,
       });
 
       notify({
