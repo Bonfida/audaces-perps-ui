@@ -7,6 +7,7 @@ import TradePage from "./pages/TradePage";
 import HomePage from "./pages/HomePage";
 import NodesPage from "./pages/NodesPage";
 import LeaderboardPage from "./pages/LeaderboardPage";
+import CreateUi from "./pages/CreateUi";
 
 export default function Routes() {
   const { enqueueSnackbar, closeSnackbar } = useSnackbar();
@@ -21,6 +22,7 @@ export default function Routes() {
         <Route exact path="/trade/:market" component={TradePage} />
         <Route exact path="/ref/:refCode" component={HomePage} />
         <Route exact path="/leaderboard" component={LeaderboardPage} />
+        <Route exact path="/create-ui" component={CreateUi} />
       </NavigationFrame>
     </HashRouter>
   );

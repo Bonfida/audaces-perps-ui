@@ -42,10 +42,12 @@ const INTERNAL_LINKS = [
   { name: "Trade", url: "/trade/BTCUSDC" },
   { name: "Nodes", url: "/nodes" },
   { name: "Leaderboard", url: "/leaderboard" },
+  { name: "Create UI", url: "/create-ui" },
 ];
 
 const EXTERNAL_LINKS = [
   { name: "Help", url: "https://docs.bonfida.org" },
+  { name: "Forum", url: "https://forum.bonfida.org" },
   { name: "Twitter", url: "https://twitter.com/bonfida" },
   { name: "Telegram", url: "https://t.me/bonfidatg" },
 ];

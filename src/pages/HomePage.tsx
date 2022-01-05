@@ -48,12 +48,14 @@ const useStyles = makeStyles({
   },
   startTradingButton: {
     background: "linear-gradient(135deg, rgba(19, 30, 48, 0.5) 0%, #0F0F11 0%)",
-    borderRadius: 20,
+    borderRadius: 30,
     margin: 1,
     textTransform: "capitalize",
-    width: 200,
+    width: 300,
     color: "#77E3EF",
-    fontWeight: 700,
+    fontWeight: 800,
+    height: 60,
+    fontSize: 24,
     "&:hover": {
       background:
         "linear-gradient(135deg, rgba(19, 30, 48, 0.5) 0%, #0F0F11 0%)",
@@ -61,10 +63,11 @@ const useStyles = makeStyles({
   },
   startTradingButtonContainer: {
     background: "linear-gradient(135deg, #37BCBD 0%, #B846B2 61.99%)",
-    borderRadius: 25,
-    width: 202,
+    borderRadius: 30,
+    width: 302,
     marginTop: 20,
     marginLeft: 10,
+    height: 62,
   },
   imgFeelSection: {
     height: 35,
