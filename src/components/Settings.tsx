@@ -239,14 +239,6 @@ const Settings = (): JSX.Element => {
                   label="Lock Layout"
                 />
               </Grid>
-              <Grid item>
-                <ToggleButton
-                  key={nanoid()}
-                  on={useIsolatedPositions}
-                  onClick={handleChangeIsolatedPositions}
-                  label="Isolated Positions"
-                />
-              </Grid>
               <Grid
                 container
                 alignItems="center"

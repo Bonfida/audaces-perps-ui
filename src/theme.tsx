@@ -56,10 +56,24 @@ export const theme = createMuiTheme({
     MuiFormLabel: {
       root: {
         color: "white",
+        "&$disabled": { color: "white" },
       },
     },
     MuiInput: {
-      underline: {},
+      focused: {},
+      disabled: {},
+      error: {},
+      underline: {
+        "&:before": {
+          borderBottom: "1px solid rgba(255, 255, 255, 0.4)",
+        },
+        "&:after": {
+          borderBottom: "1px solid rgba(255, 255, 255, 0.4)",
+        },
+        "&:hover:not($disabled):not($focused):not($error):before": {
+          borderBottom: "1px solid rgba(255, 255, 255, 0.8)",
+        },
+      },
     },
     MuiTableCell: {
       stickyHeader: {

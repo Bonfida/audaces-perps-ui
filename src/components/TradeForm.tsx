@@ -1,745 +1,294 @@
 import React, { useState, useMemo } from "react";
 import FloatingCard from "./FloatingCard";
-import LeverageSlider from "./LeverageSlider";
-import { makeStyles } from "@material-ui/core/styles";
-import { notify } from "../utils/notifications";
+import { makeStyles, withStyles } from "@material-ui/core/styles";
+import AppBar from "@material-ui/core/AppBar";
+import Tabs from "@material-ui/core/Tabs";
+import Tab from "@material-ui/core/Tab";
+import clsx from "clsx";
 import {
-  Typography,
-  Button,
-  TextField,
+  Input,
   FormControl,
-  Tab,
-  Tabs,
-  AppBar,
-  Grid,
+  InputAdornment,
+  InputLabel,
+  Select,
+  MenuItem,
+  Switch,
+  FormControlLabel,
+  Button,
 } from "@material-ui/core";
-import {
-  PositionType,
-  createPosition,
-  completeClosePosition,
-  increasePosition,
-  getDiscountAccount,
-  reducePositionBaseSize,
-} from "@audaces/perps";
-import {
-  checkTextFieldNumberInput,
-  roundToDecimal,
-  BNB_ADDRESS,
-} from "../utils/utils";
-import { useConnection, useWallet } from "@solana/wallet-adapter-react";
-import { Keypair, TransactionInstruction } from "@solana/web3.js";
-import { useMarket, useMarkPrice, MAX_LEVERAGE } from "../utils/market";
-import Spin from "./Spin";
-import { refreshAllCaches } from "../utils/fetch-loop";
-import { IsolatedPositionChip, LeverageValueChip } from "./Chips";
-import MouseOverPopOver from "./MouseOverPopOver";
-import { useReferrer, useOpenPositions } from "../utils/perpetuals";
-import Emoji from "./Emoji";
-import CreateUserAccountButton from "./CreateUserAccountButton";
-import { ModalAdd } from "./AccountsTable";
-import { sendTx } from "../utils/send";
 
-const useStyles = makeStyles({
+const CssAppBar = withStyles({
   root: {
-    flexGrow: 1,
-  },
-  AppBar: {
-    background: "transparent",
-    paddingTop: 0,
-  },
-  sellIndicator: {
-    backgroundColor: "#FF3B69",
-  },
-  buyIndicator: {
-    backgroundColor: "#02C77A",
-  },
-  indicator: {
     backgroundColor: "transparent",
   },
-  buyTab: {
-    color: "#4EDC76",
-    fontSize: 14,
-    fontWeight: 800,
-    textTransform: "capitalize",
-  },
-  sellTab: {
-    color: "#EB5252",
-    fontSize: 14,
-    fontWeight: 800,
-    textTransform: "capitalize",
-  },
-  inputProps: {
-    color: "white",
-    width: "100%",
-    fontSize: 16,
-  },
-  whiteText: {
-    color: "white",
-    fontSize: 14,
-  },
-  approx: {
-    margin: 10,
-    fontSize: 14,
-    color: "white",
-  },
-  sizeContainer: {
-    marginTop: 50,
-  },
-  leverageContainer: {
-    paddingRight: "11%",
-    paddingLeft: 10,
-    marginLeft: 10,
-  },
-  buyButton: {
-    background: "#4EDC76",
-    maxWidth: 300,
-    width: "100%",
-    color: "#141722",
-    fontSize: 14,
-    fontWeight: 800,
-    "&:hover": {
-      cursor: "pointer",
-      background: "#4EDC76",
-      maxWidth: 300,
-      width: "100%",
-      color: "#141722",
+})(AppBar);
+
+enum Side {
+  Buy,
+  Sell,
+}
+
+enum UiOrderType {
+  Limit,
+  Market,
+}
+
+const useStyles = (arg) =>
+  makeStyles({
+    tabIndicator: {
+      backgroundColor: arg.side === Side.Buy ? "#02C77A" : "#FF3B69",
+    },
+    tab: {
       fontSize: 14,
+      fontWeight: 900,
+      textTransform: "capitalize",
+      width: "50%",
+      minWidth: "50%",
+    },
+    buyTab: {
+      color: "#4EDC76",
+    },
+    sellTab: {
+      color: "#EB5252",
+    },
+    unselectedTab: {
+      color: "rgb(124, 127, 131)",
+    },
+    inputAdornment: {
+      color: "rgba(255,255, 255, 0.8)",
+      textTransform: "uppercase",
+      fontWeight: 800,
+      fontSize: 14,
+    },
+    inputProps: {
+      color: "white",
+      width: "100%",
+      fontSize: 16,
+    },
+    select: {
+      color: "white",
+      width: "100%",
+      fontSize: 16,
+    },
+    formControlLabel: {
+      color: "white",
       fontWeight: 800,
     },
-  },
-  sellButton: {
-    background: "#EB5252",
-    maxWidth: 300,
-    width: "100%",
-    color: "#141722",
-    fontSize: 14,
-    fontWeight: 800,
-    borderColor: "transparent",
-    "&:hover": {
-      cursor: "pointer",
-      background: "#EB5252",
-      maxWidth: 300,
-      width: "100%",
-      color: "#141722",
-      fontSize: 14,
+    button: {
+      color: "white",
       fontWeight: 800,
+      textTransform: "capitalize",
+      fontSize: 16,
+      width: "90%",
+      backgroundColor: arg.side === Side.Buy ? "#02C77A" : "#FF3B69",
+      "&:hover": {
+        backgroundColor: "rgb(0, 152, 192)  ",
+      },
     },
-  },
-  buttonText: {
-    fontSize: 14,
-    color: "#141722",
-    fontWeight: 800,
-  },
-  maxPositionContainer: {
-    marginLeft: 5,
-    marginBottom: 4,
-  },
-  leverageWarning: {
-    color: "white",
-    fontWeight: 600,
-    textAlign: "center",
-  },
-  leverage: {
-    color: "#FFFFFF",
-    fontSize: 19,
-    fontWeight: 700,
-  },
-  flexContainer: {
-    justifyContent: "space-between",
-  },
-});
+    column: {
+      display: "flex",
+      flexDirection: "column",
+      justifyContent: "space-between",
+      height: "50%",
+    },
+    row: {
+      display: "flex",
+      justifyContent: "space-between",
+      alignItems: "flex-end",
+      margin: "10px 20px 10px 20px",
+    },
+    header: {
+      marginBottom: 20,
+    },
+    formControl: {
+      width: "50%",
+    },
+    input: {
+      width: "90%",
+    },
+    switchContainer: {
+      width: 200,
+    },
+    buttonContainer: {
+      display: "flex",
+      justifyContent: "center",
+    },
+  });
 
-const leverageMarks = [
-  {
-    value: 1,
-    label: "1x",
-  },
-  {
-    value: 5,
-    label: "5x",
-  },
-  {
-    value: 10,
-    label: "10x",
-  },
-  {
-    value: 15,
-    label: "15x",
-  },
-];
-
-const TradeForm = () => {
-  const classes = useStyles();
-  const [loading, setLoading] = useState(false);
-  const [leverage, setLeverage] = useState(1);
-  const [side, setSide] = useState(0);
-  const [baseSize, setBaseSize] = useState("0");
-  const [quoteSize, setQuoteSize] = useState("0");
-  const { userAccount, marketState, useIsolatedPositions, marketName } =
-    useMarket();
-  const { connection } = useConnection();
-  const { publicKey, sendTransaction, connected, connect } = useWallet();
-  const markPrice = useMarkPrice();
-  const [slippage, setSlippage] = useState<null | number>(null);
-  const referrer = useReferrer();
-  const [openDeposit, setOpenDeposit] = useState(false);
-  const [openPositions] = useOpenPositions();
-
-  const handleSetSide = (event, newValue) => {
-    setSide(newValue);
-  };
-
-  const baseCurrency = marketName.split("-")[0];
-  const quoteCurrency = "USDC";
-
-  const userBalance = useMemo(
-    () =>
-      userAccount &&
-      !!marketState?.quoteDecimals &&
-      userAccount.balance / marketState?.quoteDecimals,
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [userAccount, openDeposit, connected]
-  ); // USDC
-
-  useMemo(() => {
-    if (!quoteSize || !marketState) {
-      return;
-    }
-    setSlippage(
-      marketState?.getSlippageEstimation(
-        side,
-        parseFloat(quoteSize) * marketState.quoteDecimals
-      )
-    );
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [quoteSize]);
-
-  const currentPosition = openPositions?.find(
-    (p) => p.marketAddress.toBase58() === userAccount?.market.toBase58()
-  );
-
-  const isSameSide = (side === 0 ? "long" : "short") === currentPosition?.side;
-  const currentSize = currentPosition?.vCoinAmount || 0;
-  const canModifyPosition = currentPosition && !useIsolatedPositions;
-  const canDecrease = canModifyPosition && !isSameSide;
-  const canIncrease = canModifyPosition && isSameSide;
-  const canOpenPosition = useIsolatedPositions || !currentPosition;
-
-  const positionPercentage =
-    Math.floor(
-      (parseFloat(baseSize) /
-        // @ts-ignore (Can't be null)
-        (currentPosition?.vCoinAmount / marketState?.coinDecimals)) *
-        100
-    ) || 0;
-
-  // handleChange functions
-  // Quote Size
-  const handleChangeQuoteSize = (e) => {
-    if (!connected) {
-      return notify({
-        message: "Connect your wallet",
-      });
-    }
-    const { value, valid } = checkTextFieldNumberInput(e);
-    if (!valid || !marketState?.quoteDecimals) {
-      return setQuoteSize("0");
-    }
-    if (
-      !userBalance ||
-      ((canOpenPosition || canIncrease) && value > userBalance * leverage) ||
-      !markPrice
-    ) {
-      return notify({
-        message:
-          "User does not have enough balance - Increase your leverage or deposit more collateral",
-        variant: "error",
-      });
-    }
-    if (
-      canDecrease &&
-      value > (currentSize * markPrice) / marketState?.quoteDecimals
-    ) {
-      return notify({
-        message: "Amount is too big compared to position size",
-        variant: "error",
-      });
-    }
-    setQuoteSize(value);
-    // Convert to base size
-    const newBaseSize = parseFloat(value) / markPrice;
-    const newBaseSizeValid =
-      !isNaN(newBaseSize) && isFinite(newBaseSize) ? newBaseSize : null;
-    setBaseSize(newBaseSizeValid ? newBaseSize.toString() : "0");
-  };
-
-  // Base Size
-  const handleChangeBaseSize = (e) => {
-    if (!connected) {
-      return notify({
-        message: "Connect your wallet",
-      });
-    }
-    if (!markPrice || !marketState?.coinDecimals) {
-      return;
-    }
-    const { value, valid } = checkTextFieldNumberInput(e);
-    if (!valid) {
-      return setBaseSize("0");
-    }
-    const newQuoteSize = parseFloat(value) * markPrice;
-    const newQuoteSizeValid =
-      !isNaN(newQuoteSize) && isFinite(newQuoteSize) ? newQuoteSize : null;
-    if (
-      !userBalance ||
-      ((canOpenPosition || canIncrease) &&
-        newQuoteSize > userBalance * leverage) ||
-      !markPrice
-    ) {
-      return notify({
-        message:
-          "User does not have enough balance - Increase your leverage or deposit more collateral",
-        variant: "error",
-      });
-    }
-    if (canDecrease && value > currentSize / marketState?.coinDecimals) {
-      return notify({
-        message: "Amount is too big compared to position size",
-        variant: "error",
-      });
-    }
-    setBaseSize(value);
-    // Convert to quote size
-    setQuoteSize(newQuoteSizeValid ? newQuoteSize.toString() : "0");
-  };
-
-  // Leverage
-  const handleChangeLeverage = (leverage: number) => {
-    setLeverage(leverage);
-  };
-
-  // Create a position
-  const onClick = async () => {
-    console.log(`Referrer for the order ${referrer?.toBase58()}`);
-    if (
-      !userBalance ||
-      !publicKey ||
-      !userAccount ||
-      !marketState?.quoteDecimals
-    ) {
-      return;
-    }
-
-    // Open a new position
-    if (canOpenPosition) {
-      if (parseFloat(quoteSize) < 5) {
-        return notify({ message: "Min order size is 5 USDC" });
-      }
-      if (parseFloat(quoteSize) > userBalance * leverage) {
-        notify({
-          message: `Size too big - Max size is ${(
-            userBalance * leverage
-          ).toLocaleString()}`,
-          variant: "error",
-        });
-        return;
-      }
-      try {
-        const parsedSize = parseFloat(quoteSize) * marketState?.quoteDecimals;
-        if (parsedSize <= 0) {
-          notify({ message: "Size too small", variant: "error" });
-          return;
-        }
-        setLoading(true);
-        notify({ message: "Opening position..." });
-
-        const [signers, instructions] = await createPosition(
-          connection,
-          side === 0 ? PositionType.Long : PositionType.Short,
-          parsedSize,
-          leverage,
-          userAccount,
-          referrer
-        );
-
-        await sendTx(connection, publicKey, instructions, sendTransaction, {
-          signers,
-        });
-      } catch (err) {
-        console.warn(`Error opening position - ${err}`);
-        notify({
-          message: `Error opening position - ${err}`,
-          variant: "error",
-        });
-      } finally {
-        setLoading(false);
-        refreshAllCaches();
-      }
-    }
-
-    if (!currentPosition) return;
-
-    // Increase current position
-    if (canIncrease) {
-      try {
-        if (parseFloat(quoteSize) < 5) {
-          return notify({ message: "Min order size is 5 USDC" });
-        }
-        setLoading(true);
-
-        const [signers, instructions] = await increasePosition(
-          connection,
-          currentPosition.marketAddress,
-          (parseFloat(quoteSize) * marketState?.quoteDecimals) / leverage,
-          leverage,
-          currentPosition.positionIndex,
-          userAccount.owner,
-          userAccount.address,
-          BNB_ADDRESS,
-          await getDiscountAccount(connection, publicKey),
-          publicKey,
-          referrer
-        );
-        await sendTx(connection, publicKey, instructions, sendTransaction, {
-          signers,
-        });
-      } catch (err) {
-        console.warn(`Error increasing position ${err}`);
-        notify({
-          message: `Error increasing position ${err}`,
-          variant: "error",
-        });
-      } finally {
-        setLoading(false);
-        refreshAllCaches();
-      }
-    }
-
-    // Decrease current position
-    if (canDecrease) {
-      try {
-        setLoading(true);
-        const _size = parseFloat(baseSize) * marketState?.coinDecimals;
-
-        let signers: Keypair[] = [];
-        let instructions: TransactionInstruction[] = [];
-        if (_size === currentPosition.size) {
-          [signers, instructions] = await completeClosePosition(
-            connection,
-            currentPosition,
-            publicKey,
-            referrer
-          );
-        } else {
-          [signers, instructions] = await reducePositionBaseSize(
-            connection,
-            currentPosition,
-            _size,
-            publicKey,
-            referrer
-          );
-        }
-        await sendTx(connection, publicKey, instructions, sendTransaction, {
-          signers,
-        });
-      } catch (err) {
-        console.warn(`Error decreasing position ${err}`);
-        notify({
-          message: `Error decreasing position ${err}`,
-          variant: "error",
-        });
-      } finally {
-        setLoading(false);
-        refreshAllCaches();
-      }
-    }
-  };
-
-  const expectedLiqPrice = roundToDecimal(
-    marketState?.getLiquidationIndex(
-      side === 0 ? PositionType.Long : PositionType.Short,
-      parseFloat(baseSize) * marketState.coinDecimals,
-      (parseFloat(quoteSize) * marketState.quoteDecimals) / leverage
-    ),
-    2
-  )?.toLocaleString();
-
+const Header = ({
+  marketName,
+  side,
+  handleChange,
+}: {
+  marketName: string;
+  side: Side;
+  handleChange: (event: React.ChangeEvent<{}>, newValue: number) => void;
+}) => {
+  const classes = useStyles({ side })();
   return (
-    <FloatingCard padding="0 0 0 0">
-      {/* Select Side */}
-      {useIsolatedPositions && (
-        <Grid container justify="center">
-          <MouseOverPopOver
-            popOverText={
-              <>
-                Positions and margins are isolated. <br />
-                If you already have a position and want to change it use the{" "}
-                <strong>EDIT</strong> button
-              </>
-            }
-            textClassName={undefined}
-          >
-            <IsolatedPositionChip />
-          </MouseOverPopOver>
-        </Grid>
-      )}
-      <AppBar className={classes.AppBar} position="static" elevation={0}>
+    <div className={classes.header}>
+      <CssAppBar position="static" elevation={0}>
         <Tabs
-          variant="standard"
+          variant="fullWidth"
           value={side}
-          onChange={handleSetSide}
+          onChange={handleChange}
           classes={{
-            flexContainer: classes.flexContainer,
-            indicator: classes.indicator,
+            indicator: classes.tabIndicator,
           }}
         >
           <Tab
-            label="Buy"
-            className={classes.buyTab}
-            style={{
-              background: side === 1 ? "#141722" : "transparent",
-              width: "50%",
-              borderRadius: side === 0 ? "4px 4px 0px 0px" : "undefined",
-            }}
+            className={clsx(
+              classes.tab,
+              side === Side.Buy ? classes.buyTab : classes.unselectedTab
+            )}
+            label={`Buy ${marketName}`}
           />
           <Tab
-            label="Sell"
-            className={classes.sellTab}
-            style={{
-              background: side === 0 ? "#141722" : "transparent",
-              width: "50%",
-              borderRadius: side === 1 ? "4px 4px 0px 0px" : "undefined",
-            }}
+            className={clsx(
+              classes.tab,
+              side === Side.Sell ? classes.sellTab : classes.unselectedTab
+            )}
+            label={`Sell ${marketName}`}
           />
         </Tabs>
-      </AppBar>
-      <Grid
-        container
-        direction="column"
-        justify="flex-start"
-        alignItems="flex-start"
-        className={classes.sizeContainer}
-      >
-        <Grid item style={{ padding: 10, width: "90%" }}>
-          <FormControl style={{ width: "100%" }}>
-            <TextField
-              variant="outlined"
-              value={baseSize}
-              onChange={handleChangeBaseSize}
-              inputProps={{
-                className: classes.inputProps,
-              }}
-              InputLabelProps={{ shrink: true }}
-              label={baseCurrency}
-              type="number"
-            />
-          </FormControl>
-        </Grid>
-        <Grid item style={{ padding: 10, marginTop: 20, width: "90%" }}>
-          <FormControl style={{ width: "100%" }}>
-            <TextField
-              variant="outlined"
-              value={quoteSize}
-              onChange={handleChangeQuoteSize}
-              inputProps={{
-                className: classes.inputProps,
-              }}
-              InputLabelProps={{ shrink: true }}
-              label={quoteCurrency}
-              type="number"
-            />
-          </FormControl>
-        </Grid>
-      </Grid>
+      </CssAppBar>
+    </div>
+  );
+};
 
-      {/* Set leverage */}
-      {(canIncrease || canOpenPosition) && (
-        <div className={classes.leverageContainer}>
-          <Grid container justify="space-between" alignItems="center">
-            <Grid item>
-              <Typography variant="body1" className={classes.leverage}>
-                Leverage:
-              </Typography>
-            </Grid>
-            <Grid item>
-              <LeverageValueChip value={leverage} />
-            </Grid>
-          </Grid>
-          <LeverageSlider
-            value={leverage}
-            onChange={(e, v) => handleChangeLeverage(v as number)}
-            valueLabelDisplay="auto"
-            max={MAX_LEVERAGE}
-            marks={leverageMarks}
-          />
-        </div>
-      )}
-      {/* Position Size */}
-      {canDecrease && (
-        <div className={classes.leverageContainer}>
-          <Typography variant="body1" className={classes.whiteText}>
-            Position Size: {positionPercentage}%
-          </Typography>
-          <LeverageSlider
-            marks={undefined}
-            value={positionPercentage}
-            onChange={(e, v) => {
-              if (markPrice && currentPosition && !!marketState?.coinDecimals) {
-                const baseSize =
-                  ((v as number) *
-                    (currentPosition?.vCoinAmount /
-                      marketState?.coinDecimals)) /
-                  100;
-                setBaseSize(baseSize.toString());
-                setQuoteSize((baseSize * markPrice).toString());
+const TradeForm = () => {
+  const [side, setSide] = useState(Side.Buy);
+  const classes = useStyles({ side })();
+  const [uiOrderType, setUiOrderType] = useState(UiOrderType.Limit);
+  const [postOnly, setPostOnly] = useState(false);
+  const [ioc, setIoc] = useState(false);
+
+  const marketName = "BTC-PERP";
+
+  const handleChangeSide = (event: React.ChangeEvent<{}>, newValue: number) => {
+    setSide(newValue);
+  };
+
+  const handleChangeOrderType = (
+    event: React.ChangeEvent<{ value: unknown }>
+  ) => {
+    setUiOrderType(event.target.value as UiOrderType);
+  };
+
+  const handleIocPostOnly = (
+    state: boolean,
+    otherState: boolean,
+    setState: (arg: boolean) => void,
+    setOtherState: (arg: boolean) => void
+  ) => {
+    const newState = !state;
+    if (newState && otherState) {
+      setOtherState(false);
+    }
+    setState(newState);
+  };
+
+  return (
+    <FloatingCard padding="0 0 0 0">
+      <Header
+        side={side}
+        handleChange={handleChangeSide}
+        marketName={marketName}
+      />
+      <div className={classes.column}>
+        <div className={classes.row}>
+          <FormControl className={classes.formControl}>
+            <Input
+              className={classes.input}
+              placeholder="Price"
+              type="number"
+              inputProps={{ className: classes.inputProps }}
+              endAdornment={
+                <InputAdornment position="end">
+                  <span className={classes.inputAdornment}>USDC</span>
+                </InputAdornment>
               }
-            }}
-            valueLabelDisplay="auto"
-            max={100}
-          />
-        </div>
-      )}
-      {!!userBalance && !!leverage && (canIncrease || canOpenPosition) && (
-        <div className={classes.maxPositionContainer}>
-          <Typography
-            variant="body1"
-            className={classes.whiteText}
-            style={{ opacity: 0.6, cursor: "pointer", marginLeft: 10 }}
-            onClick={() => {
-              if (markPrice) {
-                // Apply 5% haircut to prevent users to have 0 in their user account (for funding extraction)
-                const value = Math.floor(
-                  leverage * userBalance * (1 - 5 / 100)
-                );
-                const valueString = value.toString();
-                setQuoteSize(valueString);
-                const newBaseSize = (value / markPrice).toString();
-                setBaseSize(newBaseSize);
-              }
-            }}
-          >
-            Max position:{" "}
-            {/*  Apply 5% haircut to prevent users to have 0 in their user account (for funding extraction) */}
-            {(leverage * userBalance * (1 - 5 / 100)).toLocaleString()}
-          </Typography>
-        </div>
-      )}
-      {!!slippage && (
-        <div className={classes.maxPositionContainer}>
-          <Typography
-            variant="body1"
-            className={classes.whiteText}
-            style={{ opacity: 0.6, marginLeft: 10 }}
-          >
-            Expected slippage: {`${roundToDecimal(slippage * 100, 3)}%`}
-          </Typography>
-        </div>
-      )}
-      {!!slippage && markPrice && (
-        <div className={classes.maxPositionContainer}>
-          <Typography
-            variant="body1"
-            className={classes.whiteText}
-            style={{ opacity: 0.6, marginLeft: 10 }}
-          >
-            Expected entry price:{" "}
-            {`${roundToDecimal(
-              markPrice * (1 + (side === 0 ? 1 : -1) * slippage),
-              2
-            )?.toLocaleString()}`}
-          </Typography>
-        </div>
-      )}
-      {leverage > 1 && canOpenPosition && (
-        <div className={classes.maxPositionContainer}>
-          <Grid container justify="center" direction="column">
-            {!!baseSize && !!quoteSize && expectedLiqPrice && (
-              <Grid item>
-                <Typography
-                  variant="body1"
-                  className={classes.whiteText}
-                  style={{ opacity: 0.6, marginLeft: 10 }}
-                >
-                  Expected liq. price: {expectedLiqPrice}
-                </Typography>
-              </Grid>
-            )}
-            <Grid item>
-              <p className={classes.leverageWarning}>
-                <Emoji emoji="⚠️" /> Trading on leverage involves a substantial
-                risk of being liquidated
-              </p>
-            </Grid>
-          </Grid>
-        </div>
-      )}
-      {/* Submit Button */}
-      <Grid container justify="center">
-        {!!userAccount && userAccount.balance > 0 && (
-          <Button
-            disabled={loading}
-            className={side === 0 ? classes.buyButton : classes.sellButton}
-            onClick={connected ? onClick : connect}
-          >
-            <Typography
-              className={classes.buttonText}
-              color="primary"
-              variant="body1"
-            >
-              {!connected ? (
-                "Connect Wallet"
-              ) : loading ? (
-                <Spin size={20} />
-              ) : canDecrease ? (
-                "Close"
-              ) : canIncrease && isSameSide ? (
-                "Increase"
-              ) : side === 0 ? (
-                "Buy/Long"
-              ) : (
-                "Sell/Short"
-              )}
-            </Typography>
-          </Button>
-        )}
-        {!userAccount && connected && <CreateUserAccountButton />}
-        {userAccount && userAccount?.balance === 0 && (
-          <>
-            <Button
-              className={side === 0 ? classes.buyButton : classes.sellButton}
-              onClick={() => setOpenDeposit(true)}
-            >
-              <Typography
-                className={classes.buttonText}
-                color="primary"
-                variant="body1"
-              >
-                Deposit Collateral
-              </Typography>
-            </Button>
-            <ModalAdd
-              open={openDeposit}
-              setOpen={setOpenDeposit}
-              acc={userAccount.address}
             />
-          </>
-        )}
-        {!connected && !userAccount && (
-          <Button
-            disabled={loading}
-            className={side === 0 ? classes.buyButton : classes.sellButton}
-            onClick={connect}
-          >
-            <Typography
-              className={classes.buttonText}
-              color="primary"
-              variant="body1"
+          </FormControl>
+          <FormControl className={classes.formControl}>
+            <InputLabel shrink id="demo-simple-select-placeholder-label-label">
+              Order type
+            </InputLabel>
+            <Select
+              className={classes.input}
+              inputProps={{ className: classes.select }}
+              value={uiOrderType}
+              onChange={handleChangeOrderType}
             >
-              Connect Wallet
-            </Typography>
+              <MenuItem value={UiOrderType.Limit}>Limit</MenuItem>
+              <MenuItem value={UiOrderType.Market}>Market</MenuItem>
+            </Select>
+          </FormControl>
+        </div>
+        <div className={classes.row}>
+          <FormControl className={classes.formControl}>
+            <Input
+              className={classes.input}
+              placeholder="Amount"
+              type="number"
+              inputProps={{ className: classes.inputProps }}
+              endAdornment={
+                <InputAdornment position="end">
+                  <span className={classes.inputAdornment}>BTC</span>
+                </InputAdornment>
+              }
+            />
+          </FormControl>
+          <FormControl className={classes.formControl}>
+            <Input
+              className={classes.input}
+              placeholder="Amount"
+              type="number"
+              inputProps={{ className: classes.inputProps }}
+              endAdornment={
+                <InputAdornment position="end">
+                  <span className={classes.inputAdornment}>USDC</span>
+                </InputAdornment>
+              }
+            />
+          </FormControl>
+        </div>
+        <div className={clsx(classes.row, classes.switchContainer)}>
+          <FormControlLabel
+            className={classes.formControlLabel}
+            control={
+              <Switch
+                checked={postOnly && !ioc}
+                onChange={() =>
+                  handleIocPostOnly(postOnly, ioc, setPostOnly, setIoc)
+                }
+                name="post"
+                color="primary"
+              />
+            }
+            label="POST"
+          />
+          <FormControlLabel
+            className={classes.formControlLabel}
+            control={
+              <Switch
+                checked={ioc && !postOnly}
+                onChange={() =>
+                  handleIocPostOnly(ioc, postOnly, setIoc, setPostOnly)
+                }
+                name="ioc"
+                color="primary"
+              />
+            }
+            label="IOC"
+          />
+        </div>
+        <div className={classes.buttonContainer}>
+          <Button className={classes.button}>
+            {side === Side.Buy ? "Buy" : "Sell"}
           </Button>
-        )}
-      </Grid>
+        </div>
+      </div>
     </FloatingCard>
   );
 };

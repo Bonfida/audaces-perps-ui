@@ -304,27 +304,6 @@ const TopBarMarketPage = () => {
                 </Grid>
               </Grid>
             </ListItem>
-            {/* Isolated Position */}
-            <ListItem>
-              <Grid
-                container
-                justify="space-between"
-                alignItems="center"
-                spacing={5}
-              >
-                <Grid item>
-                  <Typography className={classes.drawerText}>
-                    Isolated positions
-                  </Typography>
-                </Grid>
-                <Grid item>
-                  <Switch
-                    checked={useIsolatedPositions}
-                    onChange={handleChangeIsolatedPositions}
-                  />
-                </Grid>
-              </Grid>
-            </ListItem>
             {/* Referrer */}
             {!!refCode && (
               <ListItem>
