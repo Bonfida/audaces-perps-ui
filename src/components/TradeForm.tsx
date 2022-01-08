@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import React, { useState } from "react";
 import FloatingCard from "./FloatingCard";
 import { makeStyles, withStyles } from "@material-ui/core/styles";
 import AppBar from "@material-ui/core/AppBar";
@@ -16,12 +16,19 @@ import {
   FormControlLabel,
   Button,
 } from "@material-ui/core";
+import SwapHorizIcon from "@material-ui/icons/SwapHoriz";
 
 const CssAppBar = withStyles({
   root: {
     backgroundColor: "transparent",
   },
 })(AppBar);
+
+const CssSelect = withStyles({
+  icon: {
+    color: "white",
+  },
+})(Select);
 
 enum Side {
   Buy,
@@ -112,6 +119,17 @@ const useStyles = (arg) =>
     buttonContainer: {
       display: "flex",
       justifyContent: "center",
+      margin: "5px 10px 0px 10px",
+    },
+    swapIcon: {
+      margin: "0px 5px 0px 5px",
+      backgroundColor: arg.side === Side.Buy ? "#FF3B69" : "#02C77A",
+      "&:hover": {
+        backgroundColor: "rgb(0, 152, 192)  ",
+      },
+    },
+    arrowDropDownIcon: {
+      color: "white",
     },
   });
 
@@ -202,7 +220,11 @@ const TradeForm = () => {
               className={classes.input}
               placeholder="Price"
               type="number"
-              inputProps={{ className: classes.inputProps }}
+              inputProps={{
+                className: classes.inputProps,
+                min: 0,
+                type: "number",
+              }}
               endAdornment={
                 <InputAdornment position="end">
                   <span className={classes.inputAdornment}>USDC</span>
@@ -214,7 +236,7 @@ const TradeForm = () => {
             <InputLabel shrink id="demo-simple-select-placeholder-label-label">
               Order type
             </InputLabel>
-            <Select
+            <CssSelect
               className={classes.input}
               inputProps={{ className: classes.select }}
               value={uiOrderType}
@@ -222,7 +244,7 @@ const TradeForm = () => {
             >
               <MenuItem value={UiOrderType.Limit}>Limit</MenuItem>
               <MenuItem value={UiOrderType.Market}>Market</MenuItem>
-            </Select>
+            </CssSelect>
           </FormControl>
         </div>
         <div className={classes.row}>
@@ -231,7 +253,7 @@ const TradeForm = () => {
               className={classes.input}
               placeholder="Amount"
               type="number"
-              inputProps={{ className: classes.inputProps }}
+              inputProps={{ className: classes.inputProps, min: 0 }}
               endAdornment={
                 <InputAdornment position="end">
                   <span className={classes.inputAdornment}>BTC</span>
@@ -244,7 +266,7 @@ const TradeForm = () => {
               className={classes.input}
               placeholder="Amount"
               type="number"
-              inputProps={{ className: classes.inputProps }}
+              inputProps={{ className: classes.inputProps, min: 0 }}
               endAdornment={
                 <InputAdornment position="end">
                   <span className={classes.inputAdornment}>USDC</span>
@@ -286,6 +308,14 @@ const TradeForm = () => {
         <div className={classes.buttonContainer}>
           <Button className={classes.button}>
             {side === Side.Buy ? "Buy" : "Sell"}
+          </Button>
+          <Button
+            onClick={() =>
+              setSide((prev) => (prev === Side.Buy ? Side.Sell : Side.Buy))
+            }
+            className={classes.swapIcon}
+          >
+            <SwapHorizIcon />
           </Button>
         </div>
       </div>
