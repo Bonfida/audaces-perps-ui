@@ -62,16 +62,16 @@ export const LayoutProvider = ({ children }) => {
   let breakpointString = isXs ? "xs" : isSm ? "sm" : isMd ? "md" : "lg";
 
   // TradingView
-  let tradingViewWidth = isLg ? 10 : isMd ? 9 : isSm ? 12 : 12;
+  let tradingViewWidth = isLg ? 9 : isMd ? 9 : isSm ? 12 : 12;
   let tradingViewHeight = isLg ? 43 : isMd ? 25 : isSm ? 20 : 20;
   // UserTable
   let userTableWidth = isLg ? 12 : isMd ? 9 : isSm ? 12 : 12;
   let userTableHeight = isLg ? 15 : isMd ? 15 : isSm ? 15 : 15;
   // Trade Tabel
-  let tradePanelWidth = isLg ? 2 : isMd ? 3 : isSm ? 12 : 12;
+  let tradePanelWidth = isLg ? 3 : isMd ? 3 : isSm ? 12 : 12;
   let tradePanelHeight = isLg ? 18 : isMd ? 15 : isSm ? 20 : 20;
   // Trade Form
-  let tradeFormWidth = isLg ? 2 : isMd ? 3 : isSm ? 12 : 12;
+  let tradeFormWidth = isLg ? 3 : isMd ? 3 : isSm ? 12 : 12;
   let tradeFormHeight = isLg ? 25 : isMd ? 25 : isSm ? 25 : 25;
 
   // Layout Positions

@@ -38,15 +38,24 @@ const useStyles = makeStyles({
     color: "#4EDC76",
   },
   title: {
-    fontSize: 18,
+    fontSize: 16,
     color: "white",
     margin: "unset",
     fontWeight: 700,
     marginLeft: 15,
+    textAlign: "center",
   },
   container: {
     maxHeight: 350,
     width: "100%",
+  },
+  timeCellContainer: {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "flex-end",
+  },
+  time: {
+    marginRight: 5,
   },
 });
 
@@ -55,9 +64,16 @@ const TradeTableHead = () => {
   return (
     <TableHead>
       <TableRow>
-        <TableCell className={classes.tableCellHead}>Size</TableCell>
-        <TableCell className={classes.tableCellHead}>Price</TableCell>
-        <TableCell className={classes.tableCellHead}>Time</TableCell>
+        <TableCell align="left" className={classes.tableCellHead}>
+          Size
+        </TableCell>
+        <TableCell align="center" className={classes.tableCellHead}>
+          Price
+        </TableCell>
+        <TableCell align="right" className={classes.tableCellHead}>
+          Time
+        </TableCell>
+        <TableCell align="right" className={classes.tableCellHead} />
       </TableRow>
     </TableHead>
   );
@@ -70,23 +86,22 @@ const TradeTableRow = (props: PastTrade) => {
   const date = new Date(time * 1000);
   return (
     <TableRow>
-      <TableCell className={buySide ? classes.buyCell : classes.sellCell}>
+      <TableCell
+        align="left"
+        className={buySide ? classes.buyCell : classes.sellCell}
+      >
         {roundToDecimal(orderSize, 10)}
       </TableCell>
-      <TableCell className={classes.tableCell}>
+      <TableCell align="center" className={classes.tableCell}>
         {roundToDecimal(markPrice, 3)}
       </TableCell>
-      <TableCell className={classes.tableCell}>
-        <Grid container justify="flex-start" spacing={2}>
-          <Grid item>
-            {`${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`}
-          </Grid>
-          <Grid item>
-            <ExplorerLink tx={signature}>
-              <img src={LaunchIcon} alt="" />
-            </ExplorerLink>
-          </Grid>
-        </Grid>
+      <TableCell align="right" className={classes.tableCell}>
+        {`${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`}
+      </TableCell>
+      <TableCell>
+        <ExplorerLink tx={signature}>
+          <img src={LaunchIcon} alt="" />
+        </ExplorerLink>
       </TableCell>
     </TableRow>
   );

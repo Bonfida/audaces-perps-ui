@@ -9,7 +9,8 @@ export const BONFIDA_API_URL = "https://serum-api.bonfida.com/";
 const MAINNET_ENDPOINT = process.env.REACT_APP_CONNECTION!;
 
 export const USDC_MINT = new PublicKey(
-  "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"
+  // "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"
+  "DPp8zp7LpZ3ja5tcwFtoHDm8qbUNaD1V6iRE61fNEvFP" // Devnet
 );
 
 export const FIDA_MINT = "EchesyfXePKdLtoiZSL8pBe8Myagyy8ZRqsACNCFGnvp";

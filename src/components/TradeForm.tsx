@@ -17,6 +17,21 @@ import {
   Button,
 } from "@material-ui/core";
 import SwapHorizIcon from "@material-ui/icons/SwapHoriz";
+import {
+  placeOrder,
+  OrderType,
+  AUDACES_ID,
+  MARKET,
+  ECOSYSTEM,
+  Ecosystem,
+  MarketState,
+  Side,
+} from "@audaces/perps";
+import { notify } from "../utils/notifications";
+import { useWallet, useConnection } from "@solana/wallet-adapter-react";
+import { SelfTradeBehavior } from "@bonfida/aob";
+import { sendTx } from "../utils/send";
+import Spin from "./Spin";
 
 const CssAppBar = withStyles({
   root: {
@@ -30,11 +45,6 @@ const CssSelect = withStyles({
   },
 })(Select);
 
-enum Side {
-  Buy,
-  Sell,
-}
-
 enum UiOrderType {
   Limit,
   Market,
@@ -43,7 +53,7 @@ enum UiOrderType {
 const useStyles = (arg) =>
   makeStyles({
     tabIndicator: {
-      backgroundColor: arg.side === Side.Buy ? "#02C77A" : "#FF3B69",
+      backgroundColor: arg.side === Side.Bid ? "#02C77A" : "#FF3B69",
     },
     tab: {
       fontSize: 14,
@@ -87,7 +97,7 @@ const useStyles = (arg) =>
       textTransform: "capitalize",
       fontSize: 16,
       width: "90%",
-      backgroundColor: arg.side === Side.Buy ? "#02C77A" : "#FF3B69",
+      backgroundColor: arg.side === Side.Bid ? "#02C77A" : "#FF3B69",
       "&:hover": {
         backgroundColor: "rgb(0, 152, 192)  ",
       },
@@ -123,7 +133,7 @@ const useStyles = (arg) =>
     },
     swapIcon: {
       margin: "0px 5px 0px 5px",
-      backgroundColor: arg.side === Side.Buy ? "#FF3B69" : "#02C77A",
+      backgroundColor: arg.side === Side.Bid ? "#FF3B69" : "#02C77A",
       "&:hover": {
         backgroundColor: "rgb(0, 152, 192)  ",
       },
@@ -155,16 +165,18 @@ const Header = ({
           }}
         >
           <Tab
+            value={Side.Bid}
             className={clsx(
               classes.tab,
-              side === Side.Buy ? classes.buyTab : classes.unselectedTab
+              side === Side.Bid ? classes.buyTab : classes.unselectedTab
             )}
             label={`Buy ${marketName}`}
           />
           <Tab
+            value={Side.Ask}
             className={clsx(
               classes.tab,
-              side === Side.Sell ? classes.sellTab : classes.unselectedTab
+              side === Side.Ask ? classes.sellTab : classes.unselectedTab
             )}
             label={`Sell ${marketName}`}
           />
@@ -174,12 +186,26 @@ const Header = ({
   );
 };
 
+const marketPriceFromSide = (side: Side): number => {
+  switch (side) {
+    case Side.Bid:
+      return Number.MAX_SAFE_INTEGER;
+    default:
+      return 0;
+  }
+};
+
 const TradeForm = () => {
-  const [side, setSide] = useState(Side.Buy);
+  const [side, setSide] = useState(Side.Bid);
   const classes = useStyles({ side })();
   const [uiOrderType, setUiOrderType] = useState(UiOrderType.Limit);
   const [postOnly, setPostOnly] = useState(false);
+  const [price, setPrice] = useState<null | number>(null);
+  const [size, setSize] = useState<null | number>(null);
   const [ioc, setIoc] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const { sendTransaction, publicKey, connected } = useWallet();
+  const { connection } = useConnection();
 
   const marketName = "BTC-PERP";
 
@@ -206,6 +232,71 @@ const TradeForm = () => {
     setState(newState);
   };
 
+  const handleChangeSize = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const value = parseFloat(event.target.value);
+    if (isNaN(value) || !isFinite(value) || value < 0) {
+      return;
+    }
+    setSize(value);
+  };
+
+  const handleChangePrice = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const value = parseFloat(event.target.value);
+    if (isNaN(value) || !isFinite(value) || value < 0) {
+      return;
+    }
+    setPrice(value);
+  };
+
+  const handlePlaceOrder = async () => {
+    if (!publicKey || !price || !size) return;
+    try {
+      setLoading(true);
+      const marketIndex = 0;
+      const parsedPrice =
+        uiOrderType === UiOrderType.Market ? marketPriceFromSide(side) : price;
+      const parsedSize = size * Math.pow(10, 6);
+      const orderType = postOnly
+        ? OrderType.PostOnly
+        : ioc || uiOrderType === UiOrderType.Market
+        ? OrderType.IOC
+        : OrderType.Limit;
+
+      const ecosystem = await Ecosystem.retrieve(connection, ECOSYSTEM);
+      const market = await MarketState.retrieve(connection, MARKET);
+
+      const order_ix = await placeOrder(
+        publicKey,
+        side,
+        marketIndex,
+        parsedSize,
+        parsedPrice,
+        SelfTradeBehavior.CancelProvide,
+        orderType,
+        AUDACES_ID,
+        MARKET,
+        ECOSYSTEM,
+        ecosystem,
+        market,
+        undefined, // TODO discount account
+        undefined, // TODO discount owner
+        undefined // TODO referrer
+      );
+
+      await sendTx(
+        connection,
+        publicKey,
+        order_ix.instructions,
+        sendTransaction
+      );
+    } catch (err) {
+      notify({ message: "Error placing order", variant: "error" });
+      console.log(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <FloatingCard padding="0 0 0 0">
       <Header
@@ -220,6 +311,7 @@ const TradeForm = () => {
               className={classes.input}
               placeholder="Price"
               type="number"
+              onChange={handleChangePrice}
               inputProps={{
                 className: classes.inputProps,
                 min: 0,
@@ -251,6 +343,7 @@ const TradeForm = () => {
           <FormControl className={classes.formControl}>
             <Input
               className={classes.input}
+              onChange={handleChangeSize}
               placeholder="Amount"
               type="number"
               inputProps={{ className: classes.inputProps, min: 0 }}
@@ -306,12 +399,16 @@ const TradeForm = () => {
           />
         </div>
         <div className={classes.buttonContainer}>
-          <Button className={classes.button}>
-            {side === Side.Buy ? "Buy" : "Sell"}
+          <Button
+            disabled={!connected}
+            onClick={handlePlaceOrder}
+            className={classes.button}
+          >
+            {loading ? <Spin size={20} /> : side === Side.Bid ? "Buy" : "Sell"}
           </Button>
           <Button
             onClick={() =>
-              setSide((prev) => (prev === Side.Buy ? Side.Sell : Side.Buy))
+              setSide((prev) => (prev === Side.Bid ? Side.Ask : Side.Bid))
             }
             className={classes.swapIcon}
           >

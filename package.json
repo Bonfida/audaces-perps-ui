@@ -4,9 +4,11 @@
   "private": true,
   "homepage": ".",
   "dependencies": {
-    "@audaces/perps": "^0.0.10",
+    "@audaces/perps": "file:../bonfida-perps-priv/js",
+    "@bonfida/aob": "file:../agnostic-orderbook/js",
     "@bonfida/spl-name-service": "^0.1.14",
     "@heroicons/react": "^1.0.5",
+    "@lab49/react-order-book": "^0.1.1",
     "@ledgerhq/hw-transport-webusb": "^5.48.0",
     "@material-ui/core": "^4.11.3",
     "@material-ui/icons": "^4.11.2",

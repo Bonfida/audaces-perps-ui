@@ -5,6 +5,8 @@ import { TVChartContainer } from "../components/TVChartContainer";
 import TradePanel from "../components/TradePanel";
 import { useLayout } from "../utils/layout";
 import { Responsive, WidthProvider } from "react-grid-layout";
+import AccountView from "../components/AccountVIew";
+import Orderbook from "../components/OrderBook";
 
 const ResponsiveGridLayout = WidthProvider(Responsive);
 
@@ -55,6 +57,8 @@ const TradePage = () => {
           <UserTable />
         </div>
       </ResponsiveGridLayout>
+      <AccountView />
+      <Orderbook />
     </>
   );
 };

@@ -7,7 +7,6 @@ import Tab from "@material-ui/core/Tab";
 import TabPanel from "./TabPanel";
 import TradeTable from "./TradeTable";
 import PositionTable from "./PositionTable";
-import AccountsTable from "./AccountsTable";
 import { Typography } from "@material-ui/core";
 import { useSmallScreen } from "../utils/utils";
 import { useMarket } from "../utils/market";
@@ -18,7 +17,7 @@ const useStyles = makeStyles({
     minWidth: 650,
   },
   indicator: {
-    backgroundColor: "#77E3EF",
+    backgroundColor: "#FFFFFF",
   },
   container: {
     background: "#141721",
@@ -48,7 +47,7 @@ const Label = ({
     <Typography
       variant="body1"
       className={classes.text}
-      style={{ color: selected ? "#77E3EF" : undefined }}
+      style={{ color: selected ? "#FFFFFF" : "rgb(124, 127, 131)" }}
     >
       {children}
     </Typography>
@@ -58,19 +57,10 @@ const Label = ({
 const UserTable = () => {
   const classes = useStyles();
   const [tab, setTab] = React.useState(0);
-  const [loaded, setLoaded] = useState(false);
-  const { userAccount } = useMarket();
   const handleTabChange = (event: React.ChangeEvent<{}>, newValue: number) => {
     setTab(newValue);
   };
   const smallScreen = useSmallScreen();
-
-  useEffect(() => {
-    if (!loaded && (!userAccount || userAccount.balance === 0)) {
-      setTab(1);
-      setLoaded(true);
-    }
-  }, [userAccount, loaded]);
 
   return (
     <FloatingCard>
@@ -91,7 +81,7 @@ const UserTable = () => {
         />
         <Tab
           disableRipple
-          label={<Label selected={tab === 1}>Accounts</Label>}
+          label={<Label selected={tab === 1}>Open orders</Label>}
         />
         <Tab
           disableRipple
@@ -107,7 +97,7 @@ const UserTable = () => {
         <PositionTable />
       </TabPanel>
       <TabPanel value={tab} index={1}>
-        <AccountsTable />
+        {/* <AccountsTable /> */}
       </TabPanel>
       <TabPanel value={tab} index={2}>
         <TradeTable />

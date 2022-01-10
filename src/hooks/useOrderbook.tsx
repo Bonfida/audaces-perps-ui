@@ -16,7 +16,12 @@ export const useOrderbook = (marketKey: PublicKey | undefined | null) => {
     );
     const bids = await aobMarketState.loadBidsSlab(connection);
     const asks = await aobMarketState.loadAsksSlab(connection);
-    return { bids, asks };
+    return {
+      bids: bids.getL2DepthJS(10, false),
+      asks: asks.getL2DepthJS(10, true),
+    };
   };
-  return useAsyncData(fn, tuple("useOrderbook", marketKey?.toBase58()));
+  return useAsyncData(fn, tuple("useOrderbook", marketKey?.toBase58()), {
+    refreshInterval: 5_000,
+  });
 };

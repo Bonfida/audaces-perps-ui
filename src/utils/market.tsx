@@ -95,16 +95,16 @@ export const MarketProvider = ({ children }) => {
       if (!publicKey) {
         return;
       }
-      const userAccounts = await getUserAccountsForOwner(connection, publicKey);
-      const filtered = userAccounts
-        ?.filter((u) => u?.market.equals(marketAddress))
-        .sort((a, b) => {
-          if (a && b) {
-            return b?.balance - a?.balance;
-          }
-          return 0;
-        });
-      setUserAccount(filtered[0] as UserAccount);
+      // const userAccounts = await getUserAccountsForOwner(connection, publicKey);
+      // const filtered = userAccounts
+      //   ?.filter((u) => u?.market.equals(marketAddress))
+      //   .sort((a, b) => {
+      //     if (a && b) {
+      //       return b?.balance - a?.balance;
+      //     }
+      //     return 0;
+      //   });
+      // setUserAccount(filtered[0] as UserAccount);
     };
     fn();
     // eslint-disable-next-line react-hooks/exhaustive-deps

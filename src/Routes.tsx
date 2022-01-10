@@ -17,10 +17,8 @@ export default function Routes() {
   return (
     <HashRouter>
       <NavigationFrame>
-        <Route exact path="/" component={HomePage} />
-        <Route exact path="/nodes" component={NodesPage} />
+        <Route exact path="/" component={TradePage} />
         <Route exact path="/trade/:market" component={TradePage} />
-        <Route exact path="/ref/:refCode" component={HomePage} />
         <Route exact path="/leaderboard" component={LeaderboardPage} />
         <Route exact path="/create-ui" component={CreateUi} />
       </NavigationFrame>
