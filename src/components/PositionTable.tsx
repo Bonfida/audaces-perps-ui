@@ -4,7 +4,6 @@ import Grid from "@material-ui/core/Grid";
 import WalletConnect from "./WalletConnect";
 import Spin from "./Spin";
 import {
-  Typography,
   Table,
   TableBody,
   TableCell,
@@ -17,6 +16,8 @@ import CreateIcon from "@material-ui/icons/Create";
 import { useSmallScreen } from "../utils/utils";
 import MouseOverPopOver from "./MouseOverPopOver";
 import { useHistory } from "react-router";
+import { usePositions } from "../hooks/usePositions";
+import { useEcosystem } from "../hooks/useEcosystem";
 
 const useStyles = makeStyles({
   table: {
@@ -123,46 +124,23 @@ const PositionRow = () => {
   const classes = useStyles();
   const history = useHistory();
 
+  // Compute PnL here
+
   return <TableRow></TableRow>;
 };
 
 const PositionTable = () => {
   const classes = useStyles();
+  const [positions, positionsLoaded] = usePositions();
+  const [ecosystem, ecosystemLoaded] = useEcosystem();
+
+  const markPrice = 100; // TODO Change
 
   return (
     <TableContainer style={{ maxHeight: 250 }}>
       <Table>
         <PositionTableHead />
-        <TableBody
-          style={{
-            maxHeight: 200,
-            overflowX: "scroll",
-          }}
-        >
-          {/* {useIsolatedPositions &&
-            positions?.map((row, i) => {
-              return (
-                <PositionRow
-                  index={i + 1}
-                  props={row}
-                  key={`position-${i}-${row.positionIndex}`}
-                />
-              );
-            })}
-          {!useIsolatedPositions && currentPosition && (
-            <PositionRow index={0} props={currentPosition} />
-          )}
-          {!useIsolatedPositions &&
-            otherPositions?.map((row, i) => {
-              return (
-                <PositionRow
-                  index={i + 1}
-                  props={row}
-                  key={`position-${i}-${row.positionIndex}`}
-                />
-              );
-            })} */}
-        </TableBody>
+        <TableBody>{null}</TableBody>
       </Table>
     </TableContainer>
   );

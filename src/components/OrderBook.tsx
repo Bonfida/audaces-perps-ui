@@ -10,16 +10,25 @@ import { roundToDecimal } from "../utils/utils";
 
 const useStyles = makeStyles({
   root: {
-    maxWidth: 400,
+    width: "100%",
+    height: "100%",
+    overflow: "auto",
   },
   title: {
-    fontSize: 20,
+    fontSize: 14,
     color: "rgba(255, 255, 255, 1)",
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
     fontWeight: 600,
     marginBottom: 20,
+  },
+  spinningContainer: {
+    width: "100%",
+    height: "100%",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
   },
 });
 
@@ -43,20 +52,26 @@ const Orderbook = () => {
   };
 
   if (!orderbook || !orderbookLoaded || !book) {
-    return <Spin size={20} />;
+    return (
+      <div className={classes.spinningContainer}>
+        <Spin size={40} />
+      </div>
+    );
   }
   return (
     <div className={classes.root}>
       <FloatingCard>
-        <span className={classes.title}>Orderbook</span>
-        <OrderBook
-          stylePrefix="Orderbook"
-          book={book}
-          fullOpacity
-          interpolateColor={(color) => color}
-          showSpread={false}
-          spread=""
-        />
+        <div className={classes.root}>
+          <span className={classes.title}>Orderbook</span>
+          <OrderBook
+            stylePrefix="Orderbook"
+            book={book}
+            fullOpacity
+            interpolateColor={(color) => color}
+            showSpread={false}
+            spread=""
+          />
+        </div>
       </FloatingCard>
     </div>
   );

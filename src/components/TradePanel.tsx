@@ -8,13 +8,18 @@ import TableContainer from "@material-ui/core/TableContainer";
 import TableHead from "@material-ui/core/TableHead";
 import TableRow from "@material-ui/core/TableRow";
 import { PastTrade } from "../utils/types";
-import { Typography, Grid } from "@material-ui/core";
+import { withStyles } from "@material-ui/core";
 import { useMarket, useMarketTrades } from "../utils/market";
 import { roundToDecimal } from "../utils/utils";
 import LaunchIcon from "../assets/Link/explorer.svg";
 import { ExplorerLink } from "./Link";
 
 const useStyles = makeStyles({
+  root: {
+    width: "100%",
+    height: "100%",
+    overflow: "hidden",
+  },
   tableCell: {
     textTransform: "capitalize",
     fontSize: 14,
@@ -38,16 +43,19 @@ const useStyles = makeStyles({
     color: "#4EDC76",
   },
   title: {
-    fontSize: 16,
-    color: "white",
-    margin: "unset",
-    fontWeight: 700,
-    marginLeft: 15,
-    textAlign: "center",
+    fontSize: 14,
+    color: "rgba(255, 255, 255, 1)",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    fontWeight: 600,
+    marginBottom: 20,
   },
   container: {
-    maxHeight: 350,
+    // maxHeight: 350,
+    height: "100%",
     width: "100%",
+    overflow: "scroll",
   },
   timeCellContainer: {
     display: "flex",
@@ -59,21 +67,29 @@ const useStyles = makeStyles({
   },
 });
 
+const CssTableCell = withStyles({
+  root: {
+    padding: "5px 0px 2px 0px",
+    textAlign: "left",
+    borderBottom: "0.5px solid rgba(255, 255, 255, 0.1)",
+  },
+})(TableCell);
+
 const TradeTableHead = () => {
   const classes = useStyles();
   return (
     <TableHead>
       <TableRow>
-        <TableCell align="left" className={classes.tableCellHead}>
+        <CssTableCell align="left" className={classes.tableCellHead}>
           Size
-        </TableCell>
-        <TableCell align="center" className={classes.tableCellHead}>
+        </CssTableCell>
+        <CssTableCell align="center" className={classes.tableCellHead}>
           Price
-        </TableCell>
-        <TableCell align="right" className={classes.tableCellHead}>
+        </CssTableCell>
+        <CssTableCell align="right" className={classes.tableCellHead}>
           Time
-        </TableCell>
-        <TableCell align="right" className={classes.tableCellHead} />
+        </CssTableCell>
+        <CssTableCell align="right" className={classes.tableCellHead} />
       </TableRow>
     </TableHead>
   );
@@ -86,23 +102,23 @@ const TradeTableRow = (props: PastTrade) => {
   const date = new Date(time * 1000);
   return (
     <TableRow>
-      <TableCell
+      <CssTableCell
         align="left"
         className={buySide ? classes.buyCell : classes.sellCell}
       >
         {roundToDecimal(orderSize, 10)}
-      </TableCell>
-      <TableCell align="center" className={classes.tableCell}>
+      </CssTableCell>
+      <CssTableCell align="center" className={classes.tableCell}>
         {roundToDecimal(markPrice, 3)}
-      </TableCell>
-      <TableCell align="right" className={classes.tableCell}>
+      </CssTableCell>
+      <CssTableCell align="right" className={classes.tableCell}>
         {`${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`}
-      </TableCell>
-      <TableCell>
+      </CssTableCell>
+      <CssTableCell>
         <ExplorerLink tx={signature}>
           <img src={LaunchIcon} alt="" />
         </ExplorerLink>
-      </TableCell>
+      </CssTableCell>
     </TableRow>
   );
 };
@@ -114,19 +130,19 @@ const TradePanel = () => {
 
   return (
     <FloatinCard>
-      <TableContainer className={classes.container}>
-        <Typography className={classes.title} align="left" variant="body1">
-          Market Trades
-        </Typography>
-        <Table>
-          <TradeTableHead />
-          <TableBody style={{ maxHeight: 100, overflow: "scroll" }}>
-            {trades?.map((row, i) => {
-              return <TradeTableRow {...row} key={`market-trade-${i}`} />;
-            })}
-          </TableBody>
-        </Table>
-      </TableContainer>
+      <div className={classes.root}>
+        <span className={classes.title}>Market Trades</span>
+        <TableContainer className={classes.container}>
+          <Table>
+            <TradeTableHead />
+            <TableBody>
+              {trades?.map((row, i) => {
+                return <TradeTableRow {...row} key={`market-trade-${i}`} />;
+              })}
+            </TableBody>
+          </Table>
+        </TableContainer>
+      </div>
     </FloatinCard>
   );
 };

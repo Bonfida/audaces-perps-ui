@@ -13,7 +13,7 @@ interface Props extends SwitchProps {
 const CustomSwitch = withStyles((theme: Theme) =>
   createStyles({
     root: {
-      width: 42,
+      width: 60,
       height: 26,
       padding: 0,
       margin: theme.spacing(1),
@@ -21,7 +21,7 @@ const CustomSwitch = withStyles((theme: Theme) =>
     switchBase: {
       padding: 1,
       "&$checked": {
-        transform: "translateX(16px)",
+        transform: "translateX(34px)",
         color: theme.palette.common.white,
         "& + $track": {
           background: "linear-gradient(135deg, #60C0CB 18.23%, #6868FC 100%)",
@@ -40,8 +40,9 @@ const CustomSwitch = withStyles((theme: Theme) =>
     },
     track: {
       borderRadius: 26 / 2,
-      border: `1px solid ${theme.palette.grey[400]}`,
-      backgroundColor: theme.palette.grey[50],
+      border: `1px solid rgba(255, 255, 255, 0.1)`,
+      // backgroundColor: theme.palette.grey[50],
+      backgroundColor: "rgba(56, 60, 67, 0.5)",
       opacity: 1,
       transition: theme.transitions.create(["background-color", "border"]),
     },

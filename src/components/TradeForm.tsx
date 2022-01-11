@@ -12,7 +12,6 @@ import {
   InputLabel,
   Select,
   MenuItem,
-  Switch,
   FormControlLabel,
   Button,
 } from "@material-ui/core";
@@ -32,6 +31,8 @@ import { useWallet, useConnection } from "@solana/wallet-adapter-react";
 import { SelfTradeBehavior } from "@bonfida/aob";
 import { sendTx } from "../utils/send";
 import Spin from "./Spin";
+import { roundToDecimal } from "../utils/utils";
+import CustomSwitch from "./Switch";
 
 const CssAppBar = withStyles({
   root: {
@@ -81,6 +82,7 @@ const useStyles = (arg) =>
       color: "white",
       width: "100%",
       fontSize: 16,
+      fontWeight: 600,
     },
     select: {
       color: "white",
@@ -201,13 +203,15 @@ const TradeForm = () => {
   const [uiOrderType, setUiOrderType] = useState(UiOrderType.Limit);
   const [postOnly, setPostOnly] = useState(false);
   const [price, setPrice] = useState<null | number>(null);
-  const [size, setSize] = useState<null | number>(null);
+  const [quoteSize, setQuoteSize] = useState<null | number>(null);
+  const [baseSize, setBaseSize] = useState<null | number>(null);
   const [ioc, setIoc] = useState(false);
   const [loading, setLoading] = useState(false);
   const { sendTransaction, publicKey, connected } = useWallet();
   const { connection } = useConnection();
 
   const marketName = "BTC-PERP";
+  const marketPrice = 50_000;
 
   const handleChangeSide = (event: React.ChangeEvent<{}>, newValue: number) => {
     setSide(newValue);
@@ -232,30 +236,54 @@ const TradeForm = () => {
     setState(newState);
   };
 
-  const handleChangeSize = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChangeQuoteSize = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
     const value = parseFloat(event.target.value);
     if (isNaN(value) || !isFinite(value) || value < 0) {
-      return;
+      setBaseSize(0);
+      setQuoteSize(0);
     }
-    setSize(value);
+    if (uiOrderType === UiOrderType.Limit && price) {
+      setBaseSize(value / price);
+    }
+    if (uiOrderType === UiOrderType.Market && marketPrice) {
+      setBaseSize(value / marketPrice);
+    }
+    setQuoteSize(value);
+  };
+
+  const handleChangeBaseSize = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const value = parseFloat(event.target.value);
+    if (isNaN(value) || !isFinite(value) || value < 0) {
+      setBaseSize(0);
+      setQuoteSize(0);
+    }
+    if (uiOrderType === UiOrderType.Limit && price) {
+      setQuoteSize(value * price);
+    }
+    if (uiOrderType === UiOrderType.Market && marketPrice) {
+      setQuoteSize(value * marketPrice);
+    }
+    setBaseSize(value);
   };
 
   const handleChangePrice = (event: React.ChangeEvent<HTMLInputElement>) => {
     const value = parseFloat(event.target.value);
     if (isNaN(value) || !isFinite(value) || value < 0) {
-      return;
+      return setPrice(0);
     }
     setPrice(value);
   };
 
   const handlePlaceOrder = async () => {
-    if (!publicKey || !price || !size) return;
+    if (!publicKey || !price || !quoteSize) return;
     try {
       setLoading(true);
       const marketIndex = 0;
       const parsedPrice =
         uiOrderType === UiOrderType.Market ? marketPriceFromSide(side) : price;
-      const parsedSize = size * Math.pow(10, 6);
+      const parsedSize = quoteSize * Math.pow(10, 6);
       const orderType = postOnly
         ? OrderType.PostOnly
         : ioc || uiOrderType === UiOrderType.Market
@@ -308,8 +336,16 @@ const TradeForm = () => {
         <div className={classes.row}>
           <FormControl className={classes.formControl}>
             <Input
+              disabled={uiOrderType === UiOrderType.Market}
+              value={
+                uiOrderType === UiOrderType.Market
+                  ? "MARKET"
+                  : roundToDecimal(price, 4)
+              }
               className={classes.input}
-              placeholder="Price"
+              placeholder={
+                uiOrderType === UiOrderType.Market ? "MARKET" : "Price"
+              }
               type="number"
               onChange={handleChangePrice}
               inputProps={{
@@ -342,8 +378,9 @@ const TradeForm = () => {
         <div className={classes.row}>
           <FormControl className={classes.formControl}>
             <Input
+              value={roundToDecimal(baseSize, 3)}
               className={classes.input}
-              onChange={handleChangeSize}
+              onChange={handleChangeBaseSize}
               placeholder="Amount"
               type="number"
               inputProps={{ className: classes.inputProps, min: 0 }}
@@ -356,7 +393,9 @@ const TradeForm = () => {
           </FormControl>
           <FormControl className={classes.formControl}>
             <Input
+              value={roundToDecimal(quoteSize, 3)}
               className={classes.input}
+              onChange={handleChangeQuoteSize}
               placeholder="Amount"
               type="number"
               inputProps={{ className: classes.inputProps, min: 0 }}
@@ -372,7 +411,7 @@ const TradeForm = () => {
           <FormControlLabel
             className={classes.formControlLabel}
             control={
-              <Switch
+              <CustomSwitch
                 checked={postOnly && !ioc}
                 onChange={() =>
                   handleIocPostOnly(postOnly, ioc, setPostOnly, setIoc)
@@ -386,13 +425,13 @@ const TradeForm = () => {
           <FormControlLabel
             className={classes.formControlLabel}
             control={
-              <Switch
+              <CustomSwitch
                 checked={ioc && !postOnly}
                 onChange={() =>
                   handleIocPostOnly(ioc, postOnly, setIoc, setPostOnly)
                 }
                 name="ioc"
-                color="primary"
+                // color="primary"
               />
             }
             label="IOC"

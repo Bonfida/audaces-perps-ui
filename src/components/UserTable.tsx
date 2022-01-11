@@ -10,6 +10,7 @@ import PositionTable from "./PositionTable";
 import { Typography } from "@material-ui/core";
 import { useSmallScreen } from "../utils/utils";
 import { useMarket } from "../utils/market";
+import OpenOrdersTable from "./OpenOrdersTable";
 import FundingPaymentTable from "./FundingTable";
 
 const useStyles = makeStyles({
@@ -17,7 +18,8 @@ const useStyles = makeStyles({
     minWidth: 650,
   },
   indicator: {
-    backgroundColor: "#FFFFFF",
+    // backgroundColor: "#FFFFFF",
+    backgroundColor: "transparent",
   },
   container: {
     background: "#141721",
@@ -25,7 +27,7 @@ const useStyles = makeStyles({
     width: "100%",
   },
   text: {
-    fontSize: 18,
+    fontSize: 14,
     fontWeight: 800,
     textTransform: "capitalize",
     color: "#C8CCD6",
@@ -97,7 +99,7 @@ const UserTable = () => {
         <PositionTable />
       </TabPanel>
       <TabPanel value={tab} index={1}>
-        {/* <AccountsTable /> */}
+        <OpenOrdersTable />
       </TabPanel>
       <TabPanel value={tab} index={2}>
         <TradeTable />

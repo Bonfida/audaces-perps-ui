@@ -9,7 +9,14 @@ import WithdrawDialog from "./WithdrawDialog";
 
 const useStyles = makeStyles({
   root: {
-    maxWidth: 400,
+    height: "100%",
+    width: "100%",
+  },
+  container: {
+    height: "100%",
+    display: "flex",
+    justifyContent: "space-around",
+    flexDirection: "column",
   },
   row: {
     display: "flex",
@@ -18,13 +25,13 @@ const useStyles = makeStyles({
     margin: "5px 2px 5px 2px",
   },
   label: {
-    fontSize: 16,
+    fontSize: 12,
     color: "rgba(255, 255, 255, 0.7)",
     opacity: 0.7,
     fontWeight: 600,
   },
   value: {
-    fontSize: 16,
+    fontSize: 12,
     color: "rgba(255, 255, 255, 1)",
     fontWeight: 600,
   },
@@ -34,7 +41,7 @@ const useStyles = makeStyles({
     justifyContent: "center",
   },
   title: {
-    fontSize: 20,
+    fontSize: 14,
     color: "rgba(255, 255, 255, 1)",
     display: "flex",
     alignItems: "center",
@@ -95,33 +102,37 @@ const AccountView = () => {
   return (
     <div className={classes.root}>
       <FloatingCard>
-        <span className={classes.title}>Account</span>
-        <Row label="Total collateral" value={10} />
-        <Row label="Free collateral" value={2} />
-        <Row label="Leverage" value={1} />
-        <Row label="Margin" value={1} />
-        <Row label="Maintenance margin fraction" value="5%" />
-        <div className={classes.buttonContainer}>
-          <Button
-            disabled={!connected}
-            onClick={() => setDeposit(true)}
-            className={classes.button}
-          >
-            Deposit
-          </Button>
-          <Modal openModal={deposit} setOpen={setDeposit}>
-            <DepositDialog userAccount={userAccount} />
-          </Modal>
-          <Button
-            disabled={!connected}
-            onClick={() => setWithdraw(true)}
-            className={classes.button}
-          >
-            Withdraw
-          </Button>
-          <Modal openModal={withdraw} setOpen={setWithdraw}>
-            <WithdrawDialog />
-          </Modal>
+        <div className={classes.container}>
+          <span className={classes.title}>Account</span>
+          <div>
+            <Row label="Total collateral" value={10} />
+            <Row label="Free collateral" value={2} />
+            <Row label="Leverage" value={1} />
+            <Row label="Margin" value={1} />
+            <Row label="Maintenance margin fraction" value="5%" />
+          </div>
+          <div className={classes.buttonContainer}>
+            <Button
+              disabled={!connected}
+              onClick={() => setDeposit(true)}
+              className={classes.button}
+            >
+              Deposit
+            </Button>
+            <Modal openModal={deposit} setOpen={setDeposit}>
+              <DepositDialog userAccount={userAccount} />
+            </Modal>
+            <Button
+              disabled={!connected}
+              onClick={() => setWithdraw(true)}
+              className={classes.button}
+            >
+              Withdraw
+            </Button>
+            <Modal openModal={withdraw} setOpen={setWithdraw}>
+              <WithdrawDialog />
+            </Modal>
+          </div>
         </div>
       </FloatingCard>
     </div>

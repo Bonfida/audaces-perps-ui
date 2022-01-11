@@ -62,17 +62,25 @@ export const LayoutProvider = ({ children }) => {
   let breakpointString = isXs ? "xs" : isSm ? "sm" : isMd ? "md" : "lg";
 
   // TradingView
-  let tradingViewWidth = isLg ? 9 : isMd ? 9 : isSm ? 12 : 12;
-  let tradingViewHeight = isLg ? 43 : isMd ? 25 : isSm ? 20 : 20;
+  let tradingViewWidth = isLg ? 6 : isMd ? 6 : isSm ? 12 : 12;
+  let tradingViewHeight = isLg ? 30 : isMd ? 25 : isSm ? 20 : 20;
   // UserTable
   let userTableWidth = isLg ? 12 : isMd ? 9 : isSm ? 12 : 12;
   let userTableHeight = isLg ? 15 : isMd ? 15 : isSm ? 15 : 15;
   // Trade Tabel
   let tradePanelWidth = isLg ? 3 : isMd ? 3 : isSm ? 12 : 12;
-  let tradePanelHeight = isLg ? 18 : isMd ? 15 : isSm ? 20 : 20;
+  let tradePanelHeight = isLg ? 14 : isMd ? 13 : isSm ? 20 : 20;
   // Trade Form
   let tradeFormWidth = isLg ? 3 : isMd ? 3 : isSm ? 12 : 12;
-  let tradeFormHeight = isLg ? 25 : isMd ? 25 : isSm ? 25 : 25;
+  let tradeFormHeight = isLg ? 16 : isMd ? 25 : isSm ? 25 : 25;
+
+  // Orderbook
+  let orderbookWidth = isLg ? 3 : isMd ? 3 : isSm ? 12 : 12;
+  let orderbookHeight = isLg ? 16 : isMd ? 12 : isSm ? 18 : 18;
+
+  // Account view
+  let accountWidth = isLg ? 3 : isMd ? 3 : isSm ? 12 : 12;
+  let accountHeight = isLg ? 14 : isMd ? 15 : isSm ? 20 : 20;
 
   // Layout Positions
   let tradingViewPosition = isLg
@@ -88,16 +96,22 @@ export const LayoutProvider = ({ children }) => {
     : isMd
     ? [0, tradingViewHeight]
     : isSm
-    ? [0, tradingViewHeight]
-    : [0, tradingViewHeight + tradeFormHeight];
+    ? [0, tradingViewHeight + tradeFormHeight + orderbookHeight]
+    : [0, tradingViewHeight + tradeFormHeight + orderbookHeight];
 
   let tradePanelPosition = isLg
-    ? [tradingViewWidth, tradeFormHeight]
+    ? [tradingViewWidth, orderbookHeight]
     : isMd
-    ? [tradingViewWidth, tradeFormHeight]
+    ? [tradingViewWidth, orderbookHeight]
     : isSm
-    ? [0, tradingViewHeight + userTableHeight]
-    : [0, tradingViewHeight + userTableHeight + tradeFormHeight];
+    ? [
+        0,
+        tradingViewHeight + userTableHeight + tradeFormHeight + orderbookHeight,
+      ]
+    : [
+        0,
+        tradingViewHeight + userTableHeight + tradeFormHeight + orderbookHeight,
+      ];
 
   let tradeFormPosition = isLg
     ? [tradingViewWidth + tradePanelWidth, 0]
@@ -106,6 +120,36 @@ export const LayoutProvider = ({ children }) => {
     : isSm
     ? [0, tradingViewHeight]
     : [0, tradingViewHeight];
+
+  let orderBookPosition = isLg
+    ? [tradingViewWidth, 0]
+    : isMd
+    ? [tradingViewWidth, 0]
+    : isSm
+    ? [0, tradingViewHeight + tradeFormHeight]
+    : [0, tradingViewHeight + tradeFormHeight];
+
+  let accountPosition = isLg
+    ? [userTableWidth, tradeFormHeight]
+    : isMd
+    ? [userTableWidth, tradeFormHeight]
+    : isSm
+    ? [
+        0,
+        tradingViewHeight +
+          userTableHeight +
+          tradeFormHeight +
+          orderbookHeight +
+          tradePanelHeight,
+      ]
+    : [
+        0,
+        tradingViewHeight +
+          userTableHeight +
+          tradeFormHeight +
+          orderbookHeight +
+          tradePanelHeight,
+      ];
 
   // Layout configs
   let tradingViewConfig = {
@@ -142,12 +186,32 @@ export const LayoutProvider = ({ children }) => {
     minH: 20,
     i: "tradeForm",
   };
+  let orderbookConfig = {
+    x: orderBookPosition[0],
+    y: orderBookPosition[1],
+    w: orderbookWidth,
+    h: orderbookHeight,
+    minW: 2,
+    minH: 20,
+    i: "orderbook",
+  };
+  let accountViewConfig = {
+    x: accountPosition[0],
+    y: accountPosition[1],
+    w: accountWidth,
+    h: accountHeight,
+    minW: 2,
+    minH: 20,
+    i: "accountView",
+  };
 
   let defaultLayouts = [
     tradingViewConfig,
     userTableConfig,
     tradePanelConfig,
     tradeFormConfig,
+    orderbookConfig,
+    accountViewConfig,
   ];
 
   const [layouts, setLayouts] = useLocalStorageState("layouts", defaultLayouts);

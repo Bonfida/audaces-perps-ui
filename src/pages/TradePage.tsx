@@ -56,9 +56,21 @@ const TradePage = () => {
         >
           <UserTable />
         </div>
+        <div
+          className="draggable"
+          key="orderbook"
+          data-grid={getLayout("orderbook")}
+        >
+          <Orderbook />
+        </div>
+        <div
+          className="draggable"
+          key="accountView"
+          data-grid={getLayout("accountView")}
+        >
+          <AccountView />
+        </div>
       </ResponsiveGridLayout>
-      <AccountView />
-      <Orderbook />
     </>
   );
 };
