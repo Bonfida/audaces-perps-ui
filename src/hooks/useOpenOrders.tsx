@@ -46,7 +46,7 @@ export const useOpenOrders = () => {
         });
         continue;
       }
-      console.log(1);
+
       const ask = asks.getNodeByKey(userAccount.orders[i].orderId.toNumber());
       if (!!ask) {
         result.push({

@@ -23,6 +23,12 @@ const useStyles = makeStyles({
     color: "white",
     fontWeight: 800,
   },
+  tableCellTitle: {
+    textTransform: "capitalize",
+    fontSize: 14,
+    color: "rgb(124, 127, 131)",
+    fontWeight: 800,
+  },
   spinContainer: {
     display: "flex",
     alignItems: "center",
@@ -52,13 +58,13 @@ const OpenOrdersTableHead = () => {
   return (
     <TableHead>
       <TableRow>
-        <TableCell align="left" className={classes.tableCell}>
+        <TableCell align="left" className={classes.tableCellTitle}>
           Side
         </TableCell>
-        <TableCell align="center" className={classes.tableCell}>
+        <TableCell align="center" className={classes.tableCellTitle}>
           Size
         </TableCell>
-        <TableCell align="center" className={classes.tableCell}>
+        <TableCell align="center" className={classes.tableCellTitle}>
           Price
         </TableCell>
         <TableCell /> {/* Cancel column */}

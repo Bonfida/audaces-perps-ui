@@ -102,5 +102,12 @@ export const theme = createMuiTheme({
         backgroundColor: "rgb(56, 60, 67)",
       },
     },
+    MuiButtonGroup: {
+      root: {
+        "&:groupedOutlinedHorizontal:not(:last-child)": {
+          borderRightColor: "white",
+        },
+      },
+    },
   },
 });

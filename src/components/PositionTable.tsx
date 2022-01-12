@@ -1,6 +1,5 @@
 import React, { useState, useMemo } from "react";
 import { makeStyles } from "@material-ui/core/styles";
-import Grid from "@material-ui/core/Grid";
 import WalletConnect from "./WalletConnect";
 import Spin from "./Spin";
 import {
@@ -14,10 +13,14 @@ import {
 } from "@material-ui/core";
 import CreateIcon from "@material-ui/icons/Create";
 import { useSmallScreen } from "../utils/utils";
-import MouseOverPopOver from "./MouseOverPopOver";
+import { PublicKey } from "@solana/web3.js";
 import { useHistory } from "react-router";
-import { usePositions } from "../hooks/usePositions";
+import { useOpenPositions } from "../hooks/useOpenPositions";
 import { useEcosystem } from "../hooks/useEcosystem";
+import { Ecosystem, OpenMarket, Side } from "@audaces/perps";
+import { roundToDecimal } from "../utils/utils";
+import { useMarkPrice } from "../hooks/useMarkPrice";
+import clsx from "clsx";
 
 const useStyles = makeStyles({
   table: {
@@ -27,6 +30,12 @@ const useStyles = makeStyles({
     textTransform: "capitalize",
     fontSize: 14,
     color: "white",
+    fontWeight: 800,
+  },
+  tableCellTitle: {
+    textTransform: "capitalize",
+    fontSize: 14,
+    color: "rgb(124, 127, 131)",
     fontWeight: 800,
   },
   sellCell: {
@@ -77,42 +86,35 @@ const useStyles = makeStyles({
     fontWeight: 600,
     fontSize: 14,
   },
+  greenColor: {
+    color: "#02C77A",
+  },
+  redColor: {
+    color: "#FF3B69",
+  },
+  spinContainer: {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    height: "100%",
+  },
+  container: {
+    maxHeight: 250,
+    width: "100%",
+  },
 });
-
-const PenButton = ({ onClick }: { onClick: () => void }) => {
-  const classes = useStyles();
-  const smallScreen = useSmallScreen("lg");
-  if (smallScreen) {
-    return null;
-  }
-  return (
-    <IconButton disableRipple onClick={onClick} className={classes.iconButton}>
-      <CreateIcon className={classes.createIcon} />
-    </IconButton>
-  );
-};
 
 const PositionTableHead = () => {
   const classes = useStyles();
   return (
     <TableHead>
       <TableRow>
-        <TableCell className={classes.tableCell}>Market</TableCell>
-        <TableCell className={classes.tableCell}>Entry Price</TableCell>
-        <TableCell className={classes.tableCell}>Side</TableCell>
-        <TableCell className={classes.tableCell}>Size</TableCell>
-        <TableCell className={classes.tableCell}>PnL</TableCell>
-
-        <TableCell className={classes.tableCell}>
-          <MouseOverPopOver
-            popOverText={<>Liquidation is based on the index price</>}
-            textClassName={classes.popOverText}
-          >
-            <span className={classes.tableCell}>Liq. Price</span>
-          </MouseOverPopOver>
-        </TableCell>
-
-        <TableCell className={classes.tableCell}>Collateral</TableCell>
+        <TableCell className={classes.tableCellTitle}>Market</TableCell>
+        <TableCell className={classes.tableCellTitle}>Side</TableCell>
+        <TableCell className={classes.tableCellTitle}>Size</TableCell>
+        <TableCell className={classes.tableCellTitle}>Entry Price</TableCell>
+        <TableCell className={classes.tableCellTitle}>Mark price</TableCell>
+        <TableCell className={classes.tableCellTitle}>PnL</TableCell>
         <TableCell />
         <TableCell />
       </TableRow>
@@ -120,27 +122,102 @@ const PositionTableHead = () => {
   );
 };
 
-const PositionRow = () => {
+// TODO change
+const marketNameFromAddress = (address: PublicKey) => {
+  return "BTC-PERP";
+};
+
+const PositionRow = ({
+  ecosystem,
+  openMarket,
+}: {
+  ecosystem: Ecosystem;
+  openMarket: OpenMarket;
+}) => {
   const classes = useStyles();
   const history = useHistory();
+  const marketAddress = ecosystem.markets[openMarket.ecosystemIndex].address;
+  const [markPrice] = useMarkPrice(marketAddress);
 
-  // Compute PnL here
+  const baseDecimals = 6; // TODO use marketState
 
-  return <TableRow></TableRow>;
+  const entryPrice = Math.abs(
+    openMarket.quoteAmount.toNumber() / openMarket.baseAmount.toNumber()
+  );
+  const baseSize =
+    openMarket.baseAmount.toNumber() / Math.pow(10, baseDecimals);
+  const side = baseSize > 0 ? Side.Bid : Side.Ask;
+
+  const pnl = markPrice
+    ? side === Side.Bid
+      ? markPrice - entryPrice
+      : entryPrice - markPrice
+    : 0;
+
+  return (
+    <TableRow>
+      {/* Market */}
+      <TableCell className={classes.tableCell}>
+        {marketNameFromAddress(marketAddress)}
+      </TableCell>
+      {/* Side */}
+      <TableCell
+        className={clsx(
+          classes.tableCell,
+          side === Side.Bid ? classes.greenColor : classes.redColor
+        )}
+      >
+        {side === Side.Bid ? "Long" : "Short"}
+      </TableCell>
+      {/* Size */}
+      <TableCell className={classes.tableCell}>
+        {roundToDecimal(baseSize, 3)}
+      </TableCell>
+      {/* Entry price */}
+      <TableCell className={classes.tableCell}>
+        {roundToDecimal(entryPrice, 3) || 0}
+      </TableCell>
+      {/* Mark price */}
+      <TableCell className={classes.tableCell}>
+        {roundToDecimal(markPrice, 3)}
+      </TableCell>
+      {/* PnL */}
+      <TableCell
+        className={clsx(
+          classes.tableCell,
+          pnl >= 0 ? classes.greenColor : classes.redColor
+        )}
+      >
+        {roundToDecimal(pnl, 3)}
+      </TableCell>
+    </TableRow>
+  );
 };
 
 const PositionTable = () => {
   const classes = useStyles();
-  const [positions, positionsLoaded] = usePositions();
+  const [positions, positionsLoaded] = useOpenPositions();
   const [ecosystem, ecosystemLoaded] = useEcosystem();
 
   const markPrice = 100; // TODO Change
 
+  if (!positions || !ecosystem) {
+    return (
+      <div className={classes.spinContainer}>
+        <Spin size={50} />
+      </div>
+    );
+  }
+
   return (
-    <TableContainer style={{ maxHeight: 250 }}>
+    <TableContainer className={classes.container}>
       <Table>
         <PositionTableHead />
-        <TableBody>{null}</TableBody>
+        <TableBody>
+          {positions?.map((position) => {
+            return <PositionRow ecosystem={ecosystem} openMarket={position} />;
+          })}
+        </TableBody>
       </Table>
     </TableContainer>
   );

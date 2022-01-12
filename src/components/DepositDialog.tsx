@@ -25,6 +25,7 @@ import { notify } from "../utils/notifications";
 import Spin from "./Spin";
 import { useBalances } from "../hooks/useBalances";
 import clsx from "clsx";
+import { refreshAllCaches } from "../utils/fetch-loop";
 
 const CssInput = withStyles({
   input: {
@@ -85,6 +86,7 @@ const useStyles = makeStyles({
   selectedButton: {
     fontWeight: 800,
     backgroundColor: "rgb(55, 51, 78)",
+    color: "white",
   },
 });
 
@@ -139,7 +141,7 @@ const DepositDialog = ({
     setSelected(null);
     const value = parseFloat(event.target.value);
     if (isNaN(value) || !isFinite(value) || value < 0) {
-      return;
+      return setAmount(null);
     }
     setAmount(value);
   };
@@ -188,10 +190,11 @@ const DepositDialog = ({
         deposit_ix.instructions,
         sendTransaction
       );
+      refreshAllCaches();
+      setLoading(false);
     } catch (err) {
       console.log(err);
       notify({ message: "Error depositing", variant: "error" });
-    } finally {
       setLoading(false);
     }
   };

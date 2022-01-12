@@ -20,6 +20,7 @@ import { useWallet, useConnection } from "@solana/wallet-adapter-react";
 import { USDC_MINT } from "../utils/utils";
 import { notify } from "../utils/notifications";
 import Spin from "./Spin";
+import { refreshAllCaches } from "../utils/fetch-loop";
 
 const CssInput = withStyles({
   input: {
@@ -125,6 +126,7 @@ const WithdrawDialog = () => {
       console.log(err);
       notify({ message: "Error withdrawing", variant: "error" });
     } finally {
+      refreshAllCaches();
       setLoading(false);
     }
   };

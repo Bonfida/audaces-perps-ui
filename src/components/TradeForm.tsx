@@ -33,6 +33,7 @@ import { sendTx } from "../utils/send";
 import Spin from "./Spin";
 import { roundToDecimal } from "../utils/utils";
 import CustomSwitch from "./Switch";
+import { refreshAllCaches } from "../utils/fetch-loop";
 
 const CssAppBar = withStyles({
   root: {
@@ -321,6 +322,7 @@ const TradeForm = () => {
       notify({ message: "Error placing order", variant: "error" });
       console.log(err);
     } finally {
+      refreshAllCaches();
       setLoading(false);
     }
   };

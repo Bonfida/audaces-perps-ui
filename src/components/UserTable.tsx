@@ -18,7 +18,6 @@ const useStyles = makeStyles({
     minWidth: 650,
   },
   indicator: {
-    // backgroundColor: "#FFFFFF",
     backgroundColor: "transparent",
   },
   container: {

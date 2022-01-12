@@ -52,7 +52,6 @@ const useStyles = makeStyles({
     marginBottom: 20,
   },
   container: {
-    // maxHeight: 350,
     height: "100%",
     width: "100%",
     overflow: "scroll",

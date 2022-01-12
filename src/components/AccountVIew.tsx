@@ -6,6 +6,10 @@ import { useWallet } from "@solana/wallet-adapter-react";
 import Modal from "./Modal";
 import DepositDialog from "./DepositDialog";
 import WithdrawDialog from "./WithdrawDialog";
+import { roundToDecimal } from "../utils/utils";
+import { useFreeCollateral } from "../hooks/useFreeCollateral";
+import { useEcosystem } from "../hooks/useEcosystem";
+import { useMargin } from "../hooks/useMargin";
 
 const useStyles = makeStyles({
   root: {
@@ -94,10 +98,16 @@ const Row = ({
 
 const AccountView = () => {
   const classes = useStyles();
-  const { connected, publicKey, sendTransaction } = useWallet();
+  const { connected } = useWallet();
   const [userAccount, userAccountLoaded] = useUserAccount();
   const [deposit, setDeposit] = useState(false);
   const [withdraw, setWithdraw] = useState(false);
+  const [ecosystem] = useEcosystem();
+  const [freeCollateral] = useFreeCollateral(userAccount, ecosystem);
+  const [margin] = useMargin(userAccount, ecosystem);
+
+  const accountValue =
+    userAccount && userAccount?.header.credit.toNumber() / Math.pow(10, 6);
 
   return (
     <div className={classes.root}>
@@ -105,10 +115,24 @@ const AccountView = () => {
         <div className={classes.container}>
           <span className={classes.title}>Account</span>
           <div>
-            <Row label="Total collateral" value={10} />
-            <Row label="Free collateral" value={2} />
-            <Row label="Leverage" value={1} />
-            <Row label="Margin" value={1} />
+            {accountValue && (
+              <Row
+                label="Account value"
+                value={`US$ ${roundToDecimal(accountValue, 3)}`}
+              />
+            )}
+            {freeCollateral && (
+              <Row
+                label="Free collateral"
+                value={`US$ ${roundToDecimal(freeCollateral, 3)}`}
+              />
+            )}
+            {margin && (
+              <Row label="Leverage" value={roundToDecimal(1 / margin, 2)} />
+            )}
+            {margin && isFinite(margin) && (
+              <Row label="Margin" value={roundToDecimal(margin, 2)} />
+            )}
             <Row label="Maintenance margin fraction" value="5%" />
           </div>
           <div className={classes.buttonContainer}>

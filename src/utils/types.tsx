@@ -53,8 +53,8 @@ export interface TradeRowProps {
 
 export interface FeesRowProps {
   feeTier: number;
-  fee: string;
-  feeHighLeverage: string;
+  takerFee: string;
+  makerRebate: string;
   requirements: string;
   min: number;
   max: number;
