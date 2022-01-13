@@ -86,7 +86,6 @@ const useStyles = makeStyles({
   selectedButton: {
     fontWeight: 800,
     backgroundColor: "rgb(55, 51, 78)",
-    color: "white",
   },
 });
 

@@ -1,5 +1,5 @@
 import React from "react";
-import { makeStyles } from "@material-ui/core/styles";
+import { makeStyles, withStyles } from "@material-ui/core/styles";
 import {
   TableHead,
   TableRow,
@@ -15,6 +15,14 @@ import Spin from "../components/Spin";
 import clsx from "clsx";
 import DeleteIcon from "@material-ui/icons/Delete";
 import { useWallet, useConnection } from "@solana/wallet-adapter-react";
+
+const CssTableCell = withStyles({
+  root: {
+    padding: "5px 0px 2px 20px",
+    textAlign: "left",
+    borderBottom: "0.5px solid rgba(255, 255, 255, 0.1)",
+  },
+})(TableCell);
 
 const useStyles = makeStyles({
   tableCell: {
@@ -58,15 +66,9 @@ const OpenOrdersTableHead = () => {
   return (
     <TableHead>
       <TableRow>
-        <TableCell align="left" className={classes.tableCellTitle}>
-          Side
-        </TableCell>
-        <TableCell align="center" className={classes.tableCellTitle}>
-          Size
-        </TableCell>
-        <TableCell align="center" className={classes.tableCellTitle}>
-          Price
-        </TableCell>
+        <TableCell className={classes.tableCellTitle}>Side</TableCell>
+        <TableCell className={classes.tableCellTitle}>Size</TableCell>
+        <TableCell className={classes.tableCellTitle}>Price</TableCell>
         <TableCell /> {/* Cancel column */}
       </TableRow>
     </TableHead>
@@ -90,26 +92,21 @@ const OpenOrderTableRow = ({
 
   return (
     <TableRow>
-      <TableCell
-        align="left"
+      <CssTableCell
         className={clsx(
           classes.tableCell,
           side === Side.Bid ? classes.buyColor : classes.sellColor
         )}
       >
         {side === Side.Bid ? "Buy" : "Ask"}
-      </TableCell>
-      <TableCell align="center" className={classes.tableCell}>
-        {size}
-      </TableCell>
-      <TableCell align="center" className={classes.tableCell}>
-        {price}
-      </TableCell>
-      <TableCell align="right" className={classes.deleteCell}>
+      </CssTableCell>
+      <CssTableCell className={classes.tableCell}>{size}</CssTableCell>
+      <CssTableCell className={classes.tableCell}>{price}</CssTableCell>
+      <CssTableCell className={classes.deleteCell}>
         <Button onClick={handleDelete}>
           <DeleteIcon className={classes.deleteIcon} />
         </Button>
-      </TableCell>
+      </CssTableCell>
     </TableRow>
   );
 };

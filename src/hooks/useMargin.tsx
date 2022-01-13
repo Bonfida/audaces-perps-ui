@@ -22,15 +22,17 @@ export const computeMargin = async (
       console.log(`No oracle price`);
       continue;
     }
+
     totalNotional += Math.abs(price * size);
     accountValue += price * size;
+    console.log(size);
   }
 
   accountValue = Math.max(0, accountValue);
 
   const margin = accountValue / totalNotional;
 
-  return margin;
+  return { margin, accountValue, totalNotional };
 };
 
 export const useMargin = (

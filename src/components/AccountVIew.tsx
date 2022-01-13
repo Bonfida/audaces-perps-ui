@@ -115,24 +115,34 @@ const AccountView = () => {
         <div className={classes.container}>
           <span className={classes.title}>Account</span>
           <div>
-            {accountValue && (
-              <Row
-                label="Account value"
-                value={`US$ ${roundToDecimal(accountValue, 3)}`}
-              />
-            )}
-            {freeCollateral && (
-              <Row
-                label="Free collateral"
-                value={`US$ ${roundToDecimal(freeCollateral, 3)}`}
-              />
-            )}
-            {margin && (
-              <Row label="Leverage" value={roundToDecimal(1 / margin, 2)} />
-            )}
-            {margin && isFinite(margin) && (
-              <Row label="Margin" value={roundToDecimal(margin, 2)} />
-            )}
+            <Row
+              label="Account value"
+              value={
+                accountValue ? `US$ ${roundToDecimal(accountValue, 3)}` : 0
+              }
+            />
+
+            <Row
+              label="Free collateral"
+              value={
+                freeCollateral ? `US$ ${roundToDecimal(freeCollateral, 3)}` : 0
+              }
+            />
+
+            <Row
+              label="Leverage"
+              value={margin ? roundToDecimal(1 / margin.margin, 2) : 0}
+            />
+
+            <Row
+              label="Margin"
+              value={
+                margin && isFinite(margin.margin)
+                  ? roundToDecimal(margin.margin, 2)
+                  : 0
+              }
+            />
+
             <Row label="Maintenance margin fraction" value="5%" />
           </div>
           <div className={classes.buttonContainer}>

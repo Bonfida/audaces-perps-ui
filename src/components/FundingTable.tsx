@@ -12,6 +12,7 @@ import { ExplorerLink } from "./Link";
 import { useUserFunding, MARKETS, useMarket } from "../utils/market";
 import { useWallet } from "@solana/wallet-adapter-react";
 import WalletConnect from "./WalletConnect";
+import Spin from "./Spin";
 
 const useStyles = makeStyles({
   tableCell: {
@@ -26,6 +27,14 @@ const useStyles = makeStyles({
   },
   table: {
     minWidth: 650,
+  },
+  spinContainer: {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    height: "100%",
+    flexDirection: "column",
+    marginTop: "5%",
   },
 });
 
@@ -85,13 +94,13 @@ const FundingTableRow = ({
 const FundingPaymentTable = () => {
   const classes = useStyles();
   const { connected } = useWallet();
-  const [fundingPayments] = useUserFunding();
+  const [fundingPayments, fundingPaymentsLoaded] = useUserFunding();
 
-  if (!connected) {
+  if (!connected || !fundingPaymentsLoaded) {
     return (
-      <Grid container justify="center">
-        <WalletConnect />
-      </Grid>
+      <div className={classes.spinContainer}>
+        {connected ? <Spin size={50} /> : <WalletConnect />}
+      </div>
     );
   }
 

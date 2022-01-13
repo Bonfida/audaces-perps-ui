@@ -6,6 +6,7 @@ import {
   InputLabel,
   InputAdornment,
   Button,
+  ButtonGroup,
 } from "@material-ui/core";
 import usdc from "../assets/crypto/usdc.png";
 import OutlinedInput from "@material-ui/core/OutlinedInput";
@@ -21,6 +22,9 @@ import { USDC_MINT } from "../utils/utils";
 import { notify } from "../utils/notifications";
 import Spin from "./Spin";
 import { refreshAllCaches } from "../utils/fetch-loop";
+import { useMargin } from "../hooks/useMargin";
+import { useUserAccount } from "../hooks/useUserAccount";
+import { useEcosystem } from "../hooks/useEcosystem";
 
 const CssInput = withStyles({
   input: {
@@ -80,12 +84,48 @@ const useStyles = makeStyles({
   },
 });
 
+const MIN_MARGIN_RATIO = 0.05;
+
+enum DepositAmount {
+  TwentyFive = 25 / 100,
+  Fifty = 50 / 100,
+  SeventyFive = 75 / 100,
+  Hundred = 100 / 100,
+}
+
+const depositOptions = [
+  {
+    label: "25%",
+    value: DepositAmount.TwentyFive,
+  },
+  {
+    label: "50%",
+    value: DepositAmount.Fifty,
+  },
+  {
+    label: "75%",
+    value: DepositAmount.SeventyFive,
+  },
+  {
+    label: "100%",
+    value: DepositAmount.Hundred,
+  },
+];
+
 const WithdrawDialog = () => {
   const classes = useStyles();
   const [amount, setAmount] = useState<number | null>(null);
   const { publicKey, sendTransaction } = useWallet();
   const { connection } = useConnection();
   const [loading, setLoading] = useState(false);
+  const [userAccount] = useUserAccount();
+  const [ecosystem] = useEcosystem();
+  const [margin] = useMargin(userAccount, ecosystem);
+  console.log(margin);
+  const maxWithdraw = margin
+    ? (margin.accountValue - margin.totalNotional * MIN_MARGIN_RATIO) /
+      Math.pow(10, 6)
+    : 0;
 
   const handleChange = (
     event: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>
@@ -155,6 +195,26 @@ const WithdrawDialog = () => {
           labelWidth={100}
         />
       </FormControl>
+      <ButtonGroup
+        fullWidth
+        color="primary"
+        aria-label="outlined primary button group"
+      >
+        {depositOptions.map((option, key) => {
+          return (
+            <Button
+            // onClick={() => setSelected(option.value)}
+            // key={`${option}-${key}`}
+            // className={clsx(
+            //   selected === option.value ? classes.selectedButton : undefined
+            // )}
+            >
+              {option.label}
+            </Button>
+          );
+        })}
+      </ButtonGroup>
+      {/* Recompute margin and show results */}
       <Button
         disabled={!amount}
         onClick={handleDeposit}

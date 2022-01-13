@@ -1,5 +1,5 @@
 import React from "react";
-import { makeStyles } from "@material-ui/core/styles";
+import { makeStyles, withStyles } from "@material-ui/core/styles";
 import Table from "@material-ui/core/Table";
 import TableBody from "@material-ui/core/TableBody";
 import TableCell from "@material-ui/core/TableCell";
@@ -7,12 +7,20 @@ import TableHead from "@material-ui/core/TableHead";
 import TableRow from "@material-ui/core/TableRow";
 import ExplorerIcon from "../assets/Link/explorer.svg";
 import { useWallet } from "@solana/wallet-adapter-react";
-import { Grid } from "@material-ui/core";
+import Spin from "./Spin";
 import WalletConnect from "./WalletConnect";
 import { useMarket, useUserTrades, MARKETS, findSide } from "../utils/market";
 import { ExplorerLink } from "./Link";
 import TableContainer from "@material-ui/core/TableContainer";
 import { roundToDecimal } from "../utils/utils";
+
+const CssTableCell = withStyles({
+  root: {
+    padding: "5px 0px 2px 20px",
+    textAlign: "left",
+    borderBottom: "0.5px solid rgba(255, 255, 255, 0.1)",
+  },
+})(TableCell);
 
 const useStyles = makeStyles({
   table: {
@@ -22,6 +30,12 @@ const useStyles = makeStyles({
     textTransform: "capitalize",
     fontSize: 14,
     color: "white",
+    fontWeight: 800,
+  },
+  tableCellTitle: {
+    textTransform: "capitalize",
+    fontSize: 14,
+    color: "rgb(124, 127, 131)",
     fontWeight: 800,
   },
   sellCell: {
@@ -40,6 +54,14 @@ const useStyles = makeStyles({
     maxHeight: 250,
     width: "100%",
   },
+  spinContainer: {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    height: "100%",
+    flexDirection: "column",
+    marginTop: "5%",
+  },
 });
 
 const TradeTableHead = () => {
@@ -47,12 +69,12 @@ const TradeTableHead = () => {
   return (
     <TableHead>
       <TableRow>
-        <TableCell className={classes.tableCell}>Market</TableCell>
-        <TableCell className={classes.tableCell}>Side</TableCell>
-        <TableCell className={classes.tableCell}>Size</TableCell>
-        <TableCell className={classes.tableCell}>Price</TableCell>
-        <TableCell className={classes.tableCell}>Time</TableCell>
-        <TableCell className={classes.tableCell} />
+        <TableCell className={classes.tableCellTitle}>Market</TableCell>
+        <TableCell className={classes.tableCellTitle}>Side</TableCell>
+        <TableCell className={classes.tableCellTitle}>Size</TableCell>
+        <TableCell className={classes.tableCellTitle}>Price</TableCell>
+        <TableCell className={classes.tableCellTitle}>Time</TableCell>
+        <TableCell className={classes.tableCellTitle} />
       </TableRow>
     </TableHead>
   );
@@ -82,30 +104,30 @@ const TradeRow = ({
   const marketName = MARKETS.find((m) => m.address === market)?.name;
   return (
     <TableRow style={{ background: index % 2 === 0 ? "#141722" : undefined }}>
-      <TableCell className={classes.tableCell}>
+      <CssTableCell className={classes.tableCell}>
         {marketName ? marketName : "Unknown"}
-      </TableCell>
-      <TableCell
+      </CssTableCell>
+      <CssTableCell
         className={
           findSide(type, side) === "buy" ? classes.buyCell : classes.sellCell
         }
       >
         {findSide(type, side)}
-      </TableCell>
-      <TableCell className={classes.tableCell}>
+      </CssTableCell>
+      <CssTableCell className={classes.tableCell}>
         {roundToDecimal(orderSize, 10)}
-      </TableCell>
-      <TableCell className={classes.tableCell}>
+      </CssTableCell>
+      <CssTableCell className={classes.tableCell}>
         {roundToDecimal(markPrice, 3)}
-      </TableCell>
-      <TableCell
+      </CssTableCell>
+      <CssTableCell
         className={classes.tableCell}
-      >{`${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`}</TableCell>
-      <TableCell>
+      >{`${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`}</CssTableCell>
+      <CssTableCell>
         <ExplorerLink tx={signature}>
           <img src={ExplorerIcon} alt="" />
         </ExplorerLink>
-      </TableCell>
+      </CssTableCell>
     </TableRow>
   );
 };
@@ -114,13 +136,13 @@ const TradeTable = () => {
   const classes = useStyles();
   const { connected } = useWallet();
   const { marketAddress } = useMarket();
-  const [pastTrades] = useUserTrades(marketAddress);
+  const [pastTrades, pastTradesLoaded] = useUserTrades(marketAddress);
 
-  if (!connected) {
+  if (!connected || !pastTradesLoaded) {
     return (
-      <Grid container justify="center">
-        <WalletConnect />
-      </Grid>
+      <div className={classes.spinContainer}>
+        {connected ? <Spin size={50} /> : <WalletConnect />}
+      </div>
     );
   }
 

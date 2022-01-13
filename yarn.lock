@@ -5,7 +5,7 @@
 "@audaces/perps@file:../bonfida-perps-priv/js":
   version "0.0.2"
   dependencies:
-    "@bonfida/aaob" "file:../../Library/Caches/Yarn/v6/npm-@audaces-perps-0.0.2-478d2c02-603f-4080-879f-94af7ce10e88-1641972176638/node_modules/agnostic-orderbook/js"
+    "@bonfida/aaob" "file:../../Library/Caches/Yarn/v6/npm-@audaces-perps-0.0.2-bb0f7196-2aaf-435b-9535-70f9bfcc5ab9-1642062187194/node_modules/agnostic-orderbook/js"
     "@pythnetwork/client" "^2.5.1"
     "@solana/spl-token" "0.1.8"
     "@solana/web3.js" "^1.31.0"
@@ -10586,6 +10586,11 @@ react-is@^16.6.0, react-is@^16.7.0, react-is@^16.8.1:
   version "17.0.1"
   resolved "https://registry.yarnpkg.com/react-is/-/react-is-17.0.1.tgz#5b3531bd76a645a4c9fb6e693ed36419e3301339"
   integrity sha512-NAnt2iGDXohE5LI7uBnLnqvLQMtzhkiAOLXTmv+qnF9Ky7xAPcX8Up/xWIhxvLVGJvuLiNc4xQLtuqDRzb4fSA==
+
+react-loading-skeleton@^3.0.2:
+  version "3.0.2"
+  resolved "https://registry.yarnpkg.com/react-loading-skeleton/-/react-loading-skeleton-3.0.2.tgz#f1ba7344e03fb3363f2986e0f879d88249fc230f"
+  integrity sha512-rlALwuZEcjazUDeIy3+fEhm20Uk9Yd/zZGeITU034K2ts5/yEf7RuZaV2FyrPWypIII4LAsFEo9WDTPKp6G0fQ==
 
 react-refresh@^0.8.3:
   version "0.8.3"

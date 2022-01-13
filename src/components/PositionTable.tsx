@@ -9,10 +9,7 @@ import {
   TableContainer,
   TableHead,
   TableRow,
-  IconButton,
 } from "@material-ui/core";
-import CreateIcon from "@material-ui/icons/Create";
-import { useSmallScreen } from "../utils/utils";
 import { PublicKey } from "@solana/web3.js";
 import { useHistory } from "react-router";
 import { useOpenPositions } from "../hooks/useOpenPositions";
@@ -20,6 +17,7 @@ import { useEcosystem } from "../hooks/useEcosystem";
 import { Ecosystem, OpenMarket, Side } from "@audaces/perps";
 import { roundToDecimal } from "../utils/utils";
 import { useMarkPrice } from "../hooks/useMarkPrice";
+import { useWallet } from "@solana/wallet-adapter-react";
 import clsx from "clsx";
 
 const useStyles = makeStyles({
@@ -97,6 +95,8 @@ const useStyles = makeStyles({
     alignItems: "center",
     justifyContent: "center",
     height: "100%",
+    flexDirection: "column",
+    marginTop: "5%",
   },
   container: {
     maxHeight: 250,
@@ -196,15 +196,16 @@ const PositionRow = ({
 
 const PositionTable = () => {
   const classes = useStyles();
+  const { connected } = useWallet();
   const [positions, positionsLoaded] = useOpenPositions();
   const [ecosystem, ecosystemLoaded] = useEcosystem();
 
   const markPrice = 100; // TODO Change
 
-  if (!positions || !ecosystem) {
+  if (!positions || !ecosystem || !connected) {
     return (
       <div className={classes.spinContainer}>
-        <Spin size={50} />
+        {connected ? <Spin size={50} /> : <WalletConnect />}
       </div>
     );
   }
