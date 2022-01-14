@@ -9,12 +9,22 @@ import {
   TableBody,
   Button,
 } from "@material-ui/core";
-import { Side } from "@audaces/perps";
 import { useOpenOrders } from "../hooks/useOpenOrders";
 import Spin from "../components/Spin";
 import clsx from "clsx";
 import DeleteIcon from "@material-ui/icons/Delete";
 import { useWallet, useConnection } from "@solana/wallet-adapter-react";
+import {
+  Side,
+  cancelOrder,
+  ECOSYSTEM,
+  MarketState,
+  AUDACES_ID,
+} from "@audaces/perps";
+import { PublicKey } from "@solana/web3.js";
+import { sendTx } from "../utils/send";
+import { refreshAllCaches } from "../utils/fetch-loop";
+import { roundToDecimal } from "../utils/utils";
 
 const CssTableCell = withStyles({
   root: {
@@ -79,16 +89,39 @@ const OpenOrderTableRow = ({
   side,
   size,
   price,
+  orderIndex,
+  market,
 }: {
   side: Side;
   size: number;
   price: number;
+  orderIndex: number;
+  market: PublicKey;
 }) => {
   const classes = useStyles();
   const { connection } = useConnection();
   const { publicKey, sendTransaction, connected } = useWallet();
 
-  const handleDelete = async () => {};
+  const handleDelete = async () => {
+    if (!connected || !publicKey) return;
+    try {
+      const marketState = await MarketState.retrieve(connection, market);
+      const ix = await cancelOrder(
+        publicKey,
+        market,
+        marketState,
+        ECOSYSTEM,
+        orderIndex,
+        AUDACES_ID
+      );
+
+      await sendTx(connection, publicKey, ix.instructions, sendTransaction);
+    } catch (err) {
+      console.log(err);
+    } finally {
+      refreshAllCaches();
+    }
+  };
 
   return (
     <TableRow>
@@ -101,7 +134,9 @@ const OpenOrderTableRow = ({
         {side === Side.Bid ? "Buy" : "Ask"}
       </CssTableCell>
       <CssTableCell className={classes.tableCell}>{size}</CssTableCell>
-      <CssTableCell className={classes.tableCell}>{price}</CssTableCell>
+      <CssTableCell className={classes.tableCell}>
+        {roundToDecimal(price, 4)}
+      </CssTableCell>
       <CssTableCell className={classes.deleteCell}>
         <Button onClick={handleDelete}>
           <DeleteIcon className={classes.deleteIcon} />
@@ -127,7 +162,18 @@ const OpenOrdersTable = () => {
       <Table>
         <OpenOrdersTableHead />
         <TableBody>
-          <OpenOrderTableRow side={Side.Bid} size={1} price={10} />
+          {openOrders?.map((o, idx) => {
+            return (
+              <OpenOrderTableRow
+                key={`order-${idx}`}
+                side={o.side}
+                size={o.size}
+                price={o.price}
+                orderIndex={o.orderIndex}
+                market={o.market}
+              />
+            );
+          })}
         </TableBody>
       </Table>
     </TableContainer>

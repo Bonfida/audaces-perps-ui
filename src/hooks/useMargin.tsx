@@ -7,10 +7,14 @@ import tuple from "immutable-tuple";
 export const computeMargin = async (
   connection: Connection,
   userAccount: UserAccount | null | undefined,
-  ecosystem: Ecosystem | null | undefined
+  ecosystem: Ecosystem | null | undefined,
+  offset?: number | null
 ) => {
   if (!userAccount || !ecosystem) return;
   let accountValue = userAccount.header.credit.toNumber();
+  if (!!offset) {
+    accountValue += offset * Math.pow(10, 6); // Offset without decimals
+  }
   let totalNotional = 0;
 
   for (let om of userAccount.openMarkets) {
@@ -37,15 +41,19 @@ export const computeMargin = async (
 
 export const useMargin = (
   userAccount: UserAccount | null | undefined,
-  ecosystem: Ecosystem | null | undefined
+  ecosystem: Ecosystem | null | undefined,
+  offset?: number | null
 ) => {
   const { connection } = useConnection();
   const fn = async () => {
     try {
-      return await computeMargin(connection, userAccount, ecosystem);
+      return await computeMargin(connection, userAccount, ecosystem, offset);
     } catch (err) {
       console.log(err);
     }
   };
-  return useAsyncData(fn, tuple("useMargin", !!userAccount, !!ecosystem));
+  return useAsyncData(
+    fn,
+    tuple("useMargin", !!userAccount, !!ecosystem, offset)
+  );
 };

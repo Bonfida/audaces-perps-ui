@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   makeStyles,
   withStyles,
@@ -7,6 +7,7 @@ import {
   InputAdornment,
   Button,
   ButtonGroup,
+  Divider,
 } from "@material-ui/core";
 import usdc from "../assets/crypto/usdc.png";
 import OutlinedInput from "@material-ui/core/OutlinedInput";
@@ -18,13 +19,14 @@ import {
 } from "@audaces/perps";
 import { sendTx } from "../utils/send";
 import { useWallet, useConnection } from "@solana/wallet-adapter-react";
-import { USDC_MINT } from "../utils/utils";
+import { USDC_MINT, roundToDecimal } from "../utils/utils";
 import { notify } from "../utils/notifications";
 import Spin from "./Spin";
 import { refreshAllCaches } from "../utils/fetch-loop";
 import { useMargin } from "../hooks/useMargin";
 import { useUserAccount } from "../hooks/useUserAccount";
 import { useEcosystem } from "../hooks/useEcosystem";
+import clsx from "clsx";
 
 const CssInput = withStyles({
   input: {
@@ -82,35 +84,115 @@ const useStyles = makeStyles({
     alignItems: "center",
     justifyContent: "space-around",
   },
+  maxButton: {
+    color: "#FFFFFF",
+    textTransform: "uppercase",
+    backgroundColor: "#37324d",
+    "&:hover": {
+      backgroundColor: "rgb(55, 51, 78)",
+    },
+  },
+  endAdornment: {
+    marginLeft: 10,
+  },
+  newMarginInfo: {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    width: "100%",
+    color: "rgb(255, 255, 255)",
+    fontSize: 18,
+    textAlign: "center",
+  },
+  divider: {
+    width: "30%",
+    margin: "0px 10px 0px 10px",
+    backgroundColor: "rgba(255,255,255,0.5)",
+  },
+  selectedButton: {
+    fontWeight: 800,
+    backgroundColor: "rgb(55, 51, 78)",
+  },
+  row: {
+    fontSize: 14,
+    marginTop: 10,
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
+    color: "rgb(255, 255, 255)",
+  },
 });
 
 const MIN_MARGIN_RATIO = 0.05;
 
-enum DepositAmount {
+enum WithdrawAmount {
   TwentyFive = 25 / 100,
   Fifty = 50 / 100,
   SeventyFive = 75 / 100,
   Hundred = 100 / 100,
 }
 
-const depositOptions = [
+const withdrawOption = [
   {
     label: "25%",
-    value: DepositAmount.TwentyFive,
+    value: WithdrawAmount.TwentyFive,
   },
   {
     label: "50%",
-    value: DepositAmount.Fifty,
+    value: WithdrawAmount.Fifty,
   },
   {
     label: "75%",
-    value: DepositAmount.SeventyFive,
+    value: WithdrawAmount.SeventyFive,
   },
   {
     label: "100%",
-    value: DepositAmount.Hundred,
+    value: WithdrawAmount.Hundred,
   },
 ];
+
+const Row = ({
+  label,
+  value,
+}: {
+  label: React.ReactNode;
+  value: React.ReactNode;
+}) => {
+  const classes = useStyles();
+  return (
+    <div className={classes.row}>
+      <span>{label}</span>
+      <span>{value}</span>
+    </div>
+  );
+};
+
+const NewMarginInfo = ({
+  leverage,
+  margin,
+  accountValue,
+}: {
+  leverage: number;
+  margin: number;
+  accountValue: number;
+}) => {
+  const classes = useStyles();
+  return (
+    <div style={{ width: "100%" }}>
+      <div className={classes.newMarginInfo}>
+        <Divider className={classes.divider} />
+        <span>New margin</span>
+        <Divider className={classes.divider} />
+      </div>
+      <Row label="New leverage" value={roundToDecimal(leverage, 2) + "x"} />
+      <Row label="New margin" value={roundToDecimal(margin, 2)} />
+      <Row
+        label="New account value"
+        value={roundToDecimal(accountValue / Math.pow(10, 6), 3)}
+      />
+    </div>
+  );
+};
 
 const WithdrawDialog = () => {
   const classes = useStyles();
@@ -121,11 +203,23 @@ const WithdrawDialog = () => {
   const [userAccount] = useUserAccount();
   const [ecosystem] = useEcosystem();
   const [margin] = useMargin(userAccount, ecosystem);
-  console.log(margin);
+  const [selected, setSelected] = useState<null | WithdrawAmount>(null);
+  const [newMargin] = useMargin(
+    userAccount,
+    ecosystem,
+    amount ? -amount : null
+  );
+
   const maxWithdraw = margin
     ? (margin.accountValue - margin.totalNotional * MIN_MARGIN_RATIO) /
-      Math.pow(10, 6)
+      Math.pow(10, 9)
     : 0;
+
+  useEffect(() => {
+    if (maxWithdraw && selected) {
+      setAmount(selected * maxWithdraw);
+    }
+  }, [maxWithdraw, selected]);
 
   const handleChange = (
     event: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>
@@ -181,6 +275,7 @@ const WithdrawDialog = () => {
           fullWidth={true}
           className={classes.outlineInput}
           placeholder="USDC amount"
+          value={roundToDecimal(amount, 3)}
           onChange={handleChange}
           inputProps={{
             classes: classes.inputProps,
@@ -192,6 +287,17 @@ const WithdrawDialog = () => {
               <img src={usdc} alt="" className={classes.img} />
             </InputAdornment>
           }
+          endAdornment={
+            <InputAdornment position="start" className={classes.endAdornment}>
+              <Button
+                onClick={() => setSelected(WithdrawAmount.Hundred)}
+                variant="contained"
+                className={classes.maxButton}
+              >
+                Max
+              </Button>
+            </InputAdornment>
+          }
           labelWidth={100}
         />
       </FormControl>
@@ -200,14 +306,14 @@ const WithdrawDialog = () => {
         color="primary"
         aria-label="outlined primary button group"
       >
-        {depositOptions.map((option, key) => {
+        {withdrawOption.map((option, key) => {
           return (
             <Button
-            // onClick={() => setSelected(option.value)}
-            // key={`${option}-${key}`}
-            // className={clsx(
-            //   selected === option.value ? classes.selectedButton : undefined
-            // )}
+              onClick={() => setSelected(option.value)}
+              key={`${option}-${key}`}
+              className={clsx(
+                selected === option.value ? classes.selectedButton : undefined
+              )}
             >
               {option.label}
             </Button>
@@ -215,7 +321,21 @@ const WithdrawDialog = () => {
         })}
       </ButtonGroup>
       {/* Recompute margin and show results */}
+      {amount && (
+        <>
+          {newMargin ? (
+            <NewMarginInfo
+              accountValue={newMargin.accountValue}
+              margin={newMargin.margin}
+              leverage={1 / newMargin.margin}
+            />
+          ) : (
+            <Spin size={20} />
+          )}
+        </>
+      )}
       <Button
+        variant="contained"
         disabled={!amount}
         onClick={handleDeposit}
         className={classes.button}

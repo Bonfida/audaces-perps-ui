@@ -7,6 +7,7 @@ import {
   InputAdornment,
   Button,
   ButtonGroup,
+  Divider,
 } from "@material-ui/core";
 import usdc from "../assets/crypto/usdc.png";
 import OutlinedInput from "@material-ui/core/OutlinedInput";
@@ -26,6 +27,8 @@ import Spin from "./Spin";
 import { useBalances } from "../hooks/useBalances";
 import clsx from "clsx";
 import { refreshAllCaches } from "../utils/fetch-loop";
+import { useMargin } from "../hooks/useMargin";
+import { useEcosystem } from "../hooks/useEcosystem";
 
 const CssInput = withStyles({
   input: {
@@ -87,6 +90,39 @@ const useStyles = makeStyles({
     fontWeight: 800,
     backgroundColor: "rgb(55, 51, 78)",
   },
+  maxButton: {
+    color: "#FFFFFF",
+    textTransform: "uppercase",
+    backgroundColor: "#37324d",
+    "&:hover": {
+      backgroundColor: "rgb(55, 51, 78)",
+    },
+  },
+  endAdornment: {
+    marginLeft: 10,
+  },
+  row: {
+    fontSize: 14,
+    marginTop: 10,
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
+    color: "rgb(255, 255, 255)",
+  },
+  newMarginInfo: {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    width: "100%",
+    color: "rgb(255, 255, 255)",
+    fontSize: 18,
+    textAlign: "center",
+  },
+  divider: {
+    width: "30%",
+    margin: "0px 10px 0px 10px",
+    backgroundColor: "rgba(255,255,255,0.5)",
+  },
 });
 
 enum DepositAmount {
@@ -115,6 +151,49 @@ const depositOptions = [
   },
 ];
 
+const Row = ({
+  label,
+  value,
+}: {
+  label: React.ReactNode;
+  value: React.ReactNode;
+}) => {
+  const classes = useStyles();
+  return (
+    <div className={classes.row}>
+      <span>{label}</span>
+      <span>{value}</span>
+    </div>
+  );
+};
+
+const NewMarginInfo = ({
+  leverage,
+  margin,
+  accountValue,
+}: {
+  leverage: number;
+  margin: number;
+  accountValue: number;
+}) => {
+  const classes = useStyles();
+  return (
+    <div style={{ width: "100%" }}>
+      <div className={classes.newMarginInfo}>
+        <Divider className={classes.divider} />
+        <span>New margin</span>
+        <Divider className={classes.divider} />
+      </div>
+      <Row label="New leverage" value={roundToDecimal(leverage, 2) + "x"} />
+      <Row label="New margin" value={roundToDecimal(margin, 2)} />
+      <Row
+        label="New account value"
+        value={roundToDecimal(accountValue / Math.pow(10, 6), 3)}
+      />
+    </div>
+  );
+};
+
 const DepositDialog = ({
   userAccount,
 }: {
@@ -127,6 +206,8 @@ const DepositDialog = ({
   const [loading, setLoading] = useState(false);
   const [usdcBalance, usdcBalanceLoaded] = useBalances(USDC_MINT);
   const [selected, setSelected] = useState<null | DepositAmount>(null);
+  const [ecosystem] = useEcosystem();
+  const [margin] = useMargin(userAccount, ecosystem, amount);
 
   useEffect(() => {
     if (usdcBalanceLoaded && usdcBalance && selected) {
@@ -220,6 +301,17 @@ const DepositDialog = ({
               <img src={usdc} alt="" className={classes.img} />
             </InputAdornment>
           }
+          endAdornment={
+            <InputAdornment position="start" className={classes.endAdornment}>
+              <Button
+                onClick={() => setSelected(DepositAmount.Hundred)}
+                variant="contained"
+                className={classes.maxButton}
+              >
+                Max
+              </Button>
+            </InputAdornment>
+          }
           labelWidth={100}
         />
       </FormControl>
@@ -242,7 +334,22 @@ const DepositDialog = ({
           );
         })}
       </ButtonGroup>
+      {/* Recompute margin and show results */}
+      {amount && (
+        <>
+          {margin ? (
+            <NewMarginInfo
+              accountValue={margin.accountValue}
+              margin={margin.margin}
+              leverage={1 / margin.margin}
+            />
+          ) : (
+            <Spin size={20} />
+          )}
+        </>
+      )}
       <Button
+        variant="contained"
         disabled={!amount}
         onClick={handleDeposit}
         className={classes.button}

@@ -223,4 +223,13 @@ https://5f4988473b6fd20022f12dcc-jgqdbsylxj.chromatic.com/?path=/docs/orderbook-
 
 .Orderbook__spread {
   color: rgb(255, 255, 255);
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+}
+
+.Orderbook__spread-header {
+  font-weight: bold;
+  margin-right: 5%;
 }

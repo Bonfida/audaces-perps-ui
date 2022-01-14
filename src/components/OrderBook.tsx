@@ -7,6 +7,7 @@ import "../index.css";
 import FloatingCard from "./FloatingCard";
 import { makeStyles } from "@material-ui/core";
 import { roundToDecimal } from "../utils/utils";
+import { median } from "mathjs";
 
 const useStyles = makeStyles({
   root: {
@@ -51,6 +52,9 @@ const Orderbook = () => {
     ]),
   };
 
+  const showSpread =
+    book && book.asks && book.bids && book.asks[0] && book.bids[0];
+
   if (!orderbook || !orderbookLoaded || !book) {
     return (
       <div className={classes.spinningContainer}>
@@ -68,8 +72,15 @@ const Orderbook = () => {
             book={book}
             fullOpacity
             interpolateColor={(color) => color}
-            showSpread={false}
-            spread=""
+            showSpread={showSpread}
+            spread={
+              showSpread
+                ? roundToDecimal(
+                    median(book!.asks![0][0]!, book!.bids![0][0]!),
+                    3
+                  )
+                : null
+            }
           />
         </div>
       </FloatingCard>

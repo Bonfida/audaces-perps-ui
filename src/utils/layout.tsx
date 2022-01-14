@@ -63,7 +63,7 @@ export const LayoutProvider = ({ children }) => {
 
   // TradingView
   let tradingViewWidth = isLg ? 6 : isMd ? 6 : isSm ? 12 : 12;
-  let tradingViewHeight = isLg ? 30 : isMd ? 25 : isSm ? 20 : 20;
+  let tradingViewHeight = isLg ? 32 : isMd ? 27 : isSm ? 20 : 20;
   // UserTable
   let userTableWidth = isLg ? 12 : isMd ? 9 : isSm ? 12 : 12;
   let userTableHeight = isLg ? 15 : isMd ? 15 : isSm ? 15 : 15;
@@ -72,11 +72,11 @@ export const LayoutProvider = ({ children }) => {
   let tradePanelHeight = isLg ? 14 : isMd ? 13 : isSm ? 20 : 20;
   // Trade Form
   let tradeFormWidth = isLg ? 3 : isMd ? 3 : isSm ? 12 : 12;
-  let tradeFormHeight = isLg ? 16 : isMd ? 25 : isSm ? 25 : 25;
+  let tradeFormHeight = isLg ? 18 : isMd ? 27 : isSm ? 25 : 25;
 
   // Orderbook
   let orderbookWidth = isLg ? 3 : isMd ? 3 : isSm ? 12 : 12;
-  let orderbookHeight = isLg ? 16 : isMd ? 12 : isSm ? 18 : 18;
+  let orderbookHeight = isLg ? 18 : isMd ? 14 : isSm ? 18 : 18;
 
   // Account view
   let accountWidth = isLg ? 3 : isMd ? 3 : isSm ? 12 : 12;

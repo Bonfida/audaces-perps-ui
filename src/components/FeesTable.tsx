@@ -164,6 +164,7 @@ const FeeTableRow = ({
 const FeeTable = () => {
   const classes = useStyles();
   const [fidaAmount] = useFidaAmount();
+  const { connected } = useWallet();
   return (
     <TableContainer className={classes.container}>
       <Table>
@@ -174,7 +175,11 @@ const FeeTable = () => {
               <FeeTableRow
                 {...row}
                 index={i}
-                isUserFeeTier={row.min < fidaAmount && fidaAmount < row.max}
+                isUserFeeTier={
+                  fidaAmount
+                    ? row.min < fidaAmount && fidaAmount < row.max
+                    : i === 0
+                }
                 key={`fee-tier-${i}`}
               />
             );
