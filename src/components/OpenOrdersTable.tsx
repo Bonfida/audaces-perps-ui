@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { makeStyles, withStyles } from "@material-ui/core/styles";
 import {
   TableHead,
@@ -104,10 +104,12 @@ const OpenOrderTableRow = ({
   const classes = useStyles();
   const { connection } = useConnection();
   const { publicKey, sendTransaction, connected } = useWallet();
+  const [loading, setLoading] = useState(false);
 
   const handleDelete = async () => {
     if (!connected || !publicKey) return;
     try {
+      setLoading(true);
       const marketState = await MarketState.retrieve(connection, market);
       const ix = await cancelOrder(
         publicKey,
@@ -122,6 +124,7 @@ const OpenOrderTableRow = ({
     } catch (err) {
       console.log(err);
     } finally {
+      setLoading(false);
       refreshAllCaches();
     }
   };
@@ -142,7 +145,11 @@ const OpenOrderTableRow = ({
       </CssTableCell>
       <CssTableCell className={classes.deleteCell}>
         <Button onClick={handleDelete}>
-          <DeleteIcon className={classes.deleteIcon} />
+          {loading ? (
+            <Spin size={20} />
+          ) : (
+            <DeleteIcon className={classes.deleteIcon} />
+          )}
         </Button>
       </CssTableCell>
     </TableRow>
