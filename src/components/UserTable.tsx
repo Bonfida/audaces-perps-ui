@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import FeeTable from "./FeesTable";
 import FloatingCard from "./FloatingCard";
@@ -9,9 +9,12 @@ import TradeTable from "./TradeTable";
 import PositionTable from "./PositionTable";
 import { Typography } from "@material-ui/core";
 import { useSmallScreen } from "../utils/utils";
-import { useMarket } from "../utils/market";
 import OpenOrdersTable from "./OpenOrdersTable";
 import FundingPaymentTable from "./FundingTable";
+import { useOpenPositions } from "../hooks/useOpenPositions";
+import { useEcosystem } from "../hooks/useEcosystem";
+import { useOpenOrders } from "../hooks/useOpenOrders";
+import { useWallet } from "@solana/wallet-adapter-react";
 
 const useStyles = makeStyles({
   table: {
@@ -57,11 +60,19 @@ const Label = ({
 
 const UserTable = () => {
   const classes = useStyles();
+  const { connected } = useWallet();
   const [tab, setTab] = React.useState(0);
   const handleTabChange = (event: React.ChangeEvent<{}>, newValue: number) => {
     setTab(newValue);
   };
   const smallScreen = useSmallScreen();
+  const [positions, positionsLoaded] = useOpenPositions();
+  const [ecosystem, ecosystemLoaded] = useEcosystem();
+  const [openOrders, openOrdersLoaded] = useOpenOrders();
+
+  const totalPositions =
+    positions?.filter((p) => p.baseAmount.toNumber() > 0).length || 0;
+  const totalOpenOrders = openOrders?.length || 0;
 
   return (
     <FloatingCard>
@@ -78,11 +89,19 @@ const UserTable = () => {
       >
         <Tab
           disableRipple
-          label={<Label selected={tab === 0}>Positions</Label>}
+          label={
+            <Label selected={tab === 0}>
+              Positions {connected ? `(${totalPositions})` : null}
+            </Label>
+          }
         />
         <Tab
           disableRipple
-          label={<Label selected={tab === 1}>Open orders</Label>}
+          label={
+            <Label selected={tab === 1}>
+              Open orders {connected ? `(${totalOpenOrders})` : null}
+            </Label>
+          }
         />
         <Tab
           disableRipple
@@ -95,10 +114,18 @@ const UserTable = () => {
         <Tab disableRipple label={<Label selected={tab === 4}>Fees</Label>} />
       </Tabs>
       <TabPanel value={tab} index={0}>
-        <PositionTable />
+        <PositionTable
+          positions={positions}
+          ecosystem={ecosystem}
+          positionsLoaded={positionsLoaded}
+          ecosystemLoaded={ecosystemLoaded}
+        />
       </TabPanel>
       <TabPanel value={tab} index={1}>
-        <OpenOrdersTable />
+        <OpenOrdersTable
+          openOrders={openOrders}
+          openOrdersLoaded={openOrdersLoaded}
+        />
       </TabPanel>
       <TabPanel value={tab} index={2}>
         <TradeTable />

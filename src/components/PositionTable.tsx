@@ -194,15 +194,21 @@ const PositionRow = ({
   );
 };
 
-const PositionTable = () => {
+const PositionTable = ({
+  positions,
+  ecosystem,
+  positionsLoaded,
+  ecosystemLoaded,
+}: {
+  positions: OpenMarket[] | null | undefined;
+  ecosystem: Ecosystem | null | undefined;
+  positionsLoaded: boolean;
+  ecosystemLoaded: boolean;
+}) => {
   const classes = useStyles();
   const { connected } = useWallet();
-  const [positions, positionsLoaded] = useOpenPositions();
-  const [ecosystem, ecosystemLoaded] = useEcosystem();
 
-  const markPrice = 100; // TODO Change
-
-  if (!positions || !ecosystem || !connected) {
+  if (!positionsLoaded || !ecosystemLoaded || !connected || !ecosystem) {
     return (
       <div className={classes.spinContainer}>
         {connected ? <Spin size={50} /> : <WalletConnect />}

@@ -5,7 +5,7 @@
 "@audaces/perps@file:../bonfida-perps-priv/js":
   version "0.0.2"
   dependencies:
-    "@bonfida/aaob" "file:../../Library/Caches/Yarn/v6/npm-@audaces-perps-0.0.2-87315d6b-8702-4144-a892-256430b6f3a2-1642143441693/node_modules/agnostic-orderbook/js"
+    "@bonfida/aaob" "file:../../Library/Caches/Yarn/v6/npm-@audaces-perps-0.0.2-8fab94ea-e0fd-4832-8d0d-523acf58321b-1642159275339/node_modules/agnostic-orderbook/js"
     "@pythnetwork/client" "^2.5.1"
     "@solana/spl-token" "0.1.8"
     "@solana/web3.js" "^1.31.0"

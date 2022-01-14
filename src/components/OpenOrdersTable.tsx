@@ -9,7 +9,6 @@ import {
   TableBody,
   Button,
 } from "@material-ui/core";
-import { useOpenOrders } from "../hooks/useOpenOrders";
 import Spin from "../components/Spin";
 import clsx from "clsx";
 import DeleteIcon from "@material-ui/icons/Delete";
@@ -25,6 +24,8 @@ import { PublicKey } from "@solana/web3.js";
 import { sendTx } from "../utils/send";
 import { refreshAllCaches } from "../utils/fetch-loop";
 import { roundToDecimal } from "../utils/utils";
+import { IOpenOrder } from "@audaces/perps";
+import WalletConnect from "./WalletConnect";
 
 const CssTableCell = withStyles({
   root: {
@@ -52,6 +53,8 @@ const useStyles = makeStyles({
     alignItems: "center",
     justifyContent: "center",
     height: "100%",
+    flexDirection: "column",
+    marginTop: "5%",
   },
   container: {
     maxHeight: 250,
@@ -146,14 +149,20 @@ const OpenOrderTableRow = ({
   );
 };
 
-const OpenOrdersTable = () => {
+const OpenOrdersTable = ({
+  openOrders,
+  openOrdersLoaded,
+}: {
+  openOrders: IOpenOrder[] | null | undefined;
+  openOrdersLoaded: boolean;
+}) => {
   const classes = useStyles();
-  const [openOrders, openOrdersLoaded] = useOpenOrders();
+  const { connected } = useWallet();
 
-  if (!openOrdersLoaded) {
+  if (!openOrdersLoaded || !openOrders) {
     return (
       <div className={classes.spinContainer}>
-        <Spin size={50} />
+        {connected ? <Spin size={50} /> : <WalletConnect />}
       </div>
     );
   }
