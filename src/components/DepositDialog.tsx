@@ -184,11 +184,18 @@ const NewMarginInfo = ({
         <span>New margin</span>
         <Divider className={classes.divider} />
       </div>
-      <Row label="New leverage" value={roundToDecimal(leverage, 2) + "x"} />
-      <Row label="New margin" value={roundToDecimal(margin, 2)} />
+      {!isNaN(leverage) && isFinite(leverage) && !!leverage && (
+        <Row label="New leverage" value={roundToDecimal(leverage, 2) + "x"} />
+      )}
+      {!isNaN(margin) && isFinite(margin) && (
+        <Row label="New margin" value={roundToDecimal(margin, 2)} />
+      )}
       <Row
         label="New account value"
-        value={roundToDecimal(accountValue / Math.pow(10, 6), 3)}
+        value={roundToDecimal(
+          accountValue / Math.pow(10, 6),
+          3
+        )?.toLocaleString()}
       />
     </div>
   );

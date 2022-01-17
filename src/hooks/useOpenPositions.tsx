@@ -9,9 +9,14 @@ export const useOpenPositions = () => {
 
   const fn = async () => {
     if (!connected || !publicKey) return;
-    const [key] = await UserAccount.findAddress(publicKey, AUDACES_ID);
-    const userAccount = await UserAccount.retrieve(connection, key);
-    return userAccount.openMarkets;
+    try {
+      const [key] = await UserAccount.findAddress(publicKey, AUDACES_ID);
+      const userAccount = await UserAccount.retrieve(connection, key);
+      return userAccount.openMarkets.filter((e) => !e.baseAmount.isZero());
+    } catch (err) {
+      console.log(err);
+      return null;
+    }
   };
 
   return useAsyncData(fn, tuple("useOpenPositions", connected));

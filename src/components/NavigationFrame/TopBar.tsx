@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { makeStyles, Theme, createStyles } from "@material-ui/core/styles";
 import { useLocation } from "react-router-dom";
 import fida from "../../assets/homepage/fida.png";
@@ -10,9 +10,6 @@ import MarketInfo from "../MarketInfo";
 import Drawer from "@material-ui/core/Drawer";
 import List from "@material-ui/core/List";
 import ListItem from "@material-ui/core/ListItem";
-import { notify } from "../../utils/notifications";
-import { useWallet } from "@solana/wallet-adapter-react";
-import { useMarket } from "../../utils/market";
 import { useLayout } from "../../utils/layout";
 import { useHistory } from "react-router";
 import {
@@ -191,44 +188,11 @@ const TopBarHomePage = () => {
 const TopBarMarketPage = () => {
   const classes = useStyles();
   const [open, setOpen] = useState(false);
-  const { connected } = useWallet();
   const { locked, setLocked, resetLayout } = useLayout();
-  const { useIsolatedPositions, setUseIsolatedPositions, userAccount } =
-    useMarket();
   const history = useHistory();
   const [refCode] = useLocalStorageState("referralCode");
   const { width } = useWindowSize();
   const smallScreen = width < 1125;
-  const handleChangeIsolatedPositions = () => {
-    // If no userAccount
-    if (!userAccount?.openPositions) {
-      setUseIsolatedPositions(!useIsolatedPositions);
-    }
-    // If 0 or 1 position can use isolated positions
-    else if (userAccount?.openPositions.length <= 1) {
-      setUseIsolatedPositions(!useIsolatedPositions);
-    }
-    // If 1 < positions can only use isolated positions
-    else if (useIsolatedPositions) {
-      notify({
-        message:
-          "You need to have only 1 position open to turn off the isolated positions mode",
-      });
-    } else {
-      setUseIsolatedPositions(!useIsolatedPositions);
-    }
-  };
-
-  useEffect(() => {
-    if (!connected || !userAccount) return;
-    if (
-      !!userAccount?.openPositions &&
-      userAccount?.openPositions.length > 1 &&
-      !useIsolatedPositions
-    ) {
-      setUseIsolatedPositions(true);
-    }
-  }, [connected, useIsolatedPositions, setUseIsolatedPositions, userAccount]);
 
   return (
     <>

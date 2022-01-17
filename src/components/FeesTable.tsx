@@ -1,6 +1,5 @@
 import React from "react";
 import { FeesRowProps } from "../utils/types";
-import { useFidaAmount } from "../utils/market";
 import { useWallet } from "@solana/wallet-adapter-react";
 import CheckIcon from "@material-ui/icons/Check";
 import {
@@ -163,14 +162,14 @@ const FeeTableRow = ({
 
 const FeeTable = () => {
   const classes = useStyles();
-  const [fidaAmount] = useFidaAmount();
-  const { connected } = useWallet();
+  // const [fidaAmount] = useFidaAmount();
+
   return (
     <TableContainer className={classes.container}>
       <Table>
         <FeesTableHead />
         <TableBody>
-          {FEES.map((row, i) => {
+          {/* {FEES.map((row, i) => {
             return (
               <FeeTableRow
                 {...row}
@@ -183,7 +182,7 @@ const FeeTable = () => {
                 key={`fee-tier-${i}`}
               />
             );
-          })}
+          })} */}
         </TableBody>
       </Table>
     </TableContainer>

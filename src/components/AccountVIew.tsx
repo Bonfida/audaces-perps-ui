@@ -118,14 +118,18 @@ const AccountView = () => {
             <Row
               label="Account value"
               value={
-                accountValue ? `US$ ${roundToDecimal(accountValue, 3)}` : 0
+                accountValue
+                  ? `US$ ${roundToDecimal(accountValue, 3)?.toLocaleString()}`
+                  : 0
               }
             />
 
             <Row
               label="Free collateral"
               value={
-                freeCollateral ? `US$ ${roundToDecimal(freeCollateral, 3)}` : 0
+                freeCollateral
+                  ? `US$ ${roundToDecimal(freeCollateral, 3)?.toLocaleString()}`
+                  : 0
               }
             />
 

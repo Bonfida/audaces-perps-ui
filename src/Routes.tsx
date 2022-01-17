@@ -4,8 +4,6 @@ import { useSnackbar } from "notistack";
 import SnackbarUtils from "./utils/SnackbarUtils";
 import NavigationFrame from "./components/NavigationFrame";
 import TradePage from "./pages/TradePage";
-import HomePage from "./pages/HomePage";
-import NodesPage from "./pages/NodesPage";
 import LeaderboardPage from "./pages/LeaderboardPage";
 import CreateUi from "./pages/CreateUi";
 

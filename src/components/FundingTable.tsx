@@ -6,10 +6,9 @@ import TableContainer from "@material-ui/core/TableContainer";
 import TableHead from "@material-ui/core/TableHead";
 import TableRow from "@material-ui/core/TableRow";
 import { makeStyles } from "@material-ui/core/styles";
-import { Grid } from "@material-ui/core";
 import ExplorerIcon from "../assets/Link/explorer.svg";
 import { ExplorerLink } from "./Link";
-import { useUserFunding, MARKETS, useMarket } from "../utils/market";
+import { MARKETS, useMarket } from "../utils/market";
 import { useWallet } from "@solana/wallet-adapter-react";
 import WalletConnect from "./WalletConnect";
 import Spin from "./Spin";
@@ -94,30 +93,30 @@ const FundingTableRow = ({
 const FundingPaymentTable = () => {
   const classes = useStyles();
   const { connected } = useWallet();
-  const [fundingPayments, fundingPaymentsLoaded] = useUserFunding();
+  // const [fundingPayments, fundingPaymentsLoaded] = useUserFunding();
 
-  if (!connected || !fundingPaymentsLoaded) {
-    return (
-      <div className={classes.spinContainer}>
-        {connected ? <Spin size={50} /> : <WalletConnect />}
-      </div>
-    );
-  }
+  // if (!connected || !fundingPaymentsLoaded) {
+  //   return (
+  //     <div className={classes.spinContainer}>
+  //       {connected ? <Spin size={50} /> : <WalletConnect />}
+  //     </div>
+  //   );
+  // }
 
-  if (!fundingPayments) {
-    return null;
-  }
+  // if (!fundingPayments) {
+  //   return null;
+  // }
 
   return (
     <TableContainer className={classes.container}>
       <Table>
         <FundingTableHead />
         <TableBody>
-          {fundingPayments?.map((row, i) => {
+          {/* {fundingPayments?.map((row, i) => {
             return (
               <FundingTableRow {...row} index={i} key={`funding-table-${i}`} />
             );
-          })}
+          })} */}
         </TableBody>
       </Table>
     </TableContainer>

@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import React from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import WalletConnect from "./WalletConnect";
 import Spin from "./Spin";
@@ -11,9 +11,6 @@ import {
   TableRow,
 } from "@material-ui/core";
 import { PublicKey } from "@solana/web3.js";
-import { useHistory } from "react-router";
-import { useOpenPositions } from "../hooks/useOpenPositions";
-import { useEcosystem } from "../hooks/useEcosystem";
 import { Ecosystem, OpenMarket, Side } from "@audaces/perps";
 import { roundToDecimal } from "../utils/utils";
 import { useMarkPrice } from "../hooks/useMarkPrice";
@@ -135,7 +132,6 @@ const PositionRow = ({
   openMarket: OpenMarket;
 }) => {
   const classes = useStyles();
-  const history = useHistory();
   const marketAddress = ecosystem.markets[openMarket.ecosystemIndex].address;
   const [markPrice] = useMarkPrice(marketAddress);
 
@@ -207,7 +203,7 @@ const PositionTable = ({
 }) => {
   const classes = useStyles();
   const { connected } = useWallet();
-
+  console.log(positionsLoaded);
   if (!positionsLoaded || !ecosystemLoaded || !connected || !ecosystem) {
     return (
       <div className={classes.spinContainer}>

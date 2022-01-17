@@ -137,9 +137,11 @@ const OpenOrderTableRow = ({
           side === Side.Bid ? classes.buyColor : classes.sellColor
         )}
       >
-        {side === Side.Bid ? "Buy" : "Ask"}
+        {side === Side.Bid ? "Buy" : "Sell"}
       </CssTableCell>
-      <CssTableCell className={classes.tableCell}>{size}</CssTableCell>
+      <CssTableCell className={classes.tableCell}>
+        {size / Math.pow(10, 6)}
+      </CssTableCell>
       <CssTableCell className={classes.tableCell}>
         {roundToDecimal(price, 4)}
       </CssTableCell>
@@ -166,7 +168,7 @@ const OpenOrdersTable = ({
   const classes = useStyles();
   const { connected } = useWallet();
 
-  if (!openOrdersLoaded || !openOrders) {
+  if (!openOrdersLoaded) {
     return (
       <div className={classes.spinContainer}>
         {connected ? <Spin size={50} /> : <WalletConnect />}

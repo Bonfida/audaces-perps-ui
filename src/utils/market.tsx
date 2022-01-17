@@ -15,12 +15,7 @@ import {
 import { PublicKey } from "@solana/web3.js";
 import { useAsyncData } from "./fetch-loop";
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
-import {
-  MarketState,
-  UserAccount,
-  getUserAccountsForOwner,
-  getDiscountAccount,
-} from "@audaces/perps";
+import { MarketState, UserAccount } from "@audaces/perps";
 import tuple from "immutable-tuple";
 import { apiGet, roundToDecimal, useLocalStorageState } from "./utils";
 
@@ -185,21 +180,6 @@ export const useVolume = (
 
 export const useLastTrades = () => {};
 
-export const useMarkPrice = () => {
-  const { marketState } = useMarket();
-  if (!marketState?.vQuoteAmount || !marketState?.vCoinAmount) {
-    return null;
-  }
-  return marketState.vQuoteAmount / marketState.vCoinAmount;
-};
-
-export const getFundingRate = (marketState: MarketState | null | undefined) => {
-  if (!marketState) {
-    return null;
-  }
-  return marketState.getFundingRatioLongShort();
-};
-
 export const useUserAccount = () => {
   const { userAccount } = useMarket();
   return userAccount;
@@ -236,46 +216,6 @@ export const useUserTrades = (marketAddress: PublicKey) => {
     fn,
     tuple("useUserTrades", marketAddress.toBase58(), connected)
   );
-};
-
-export const useUserFunding = () => {
-  const { userAccount } = useMarket();
-  const fn = async () => {
-    const result = await apiGet(
-      `${URL_API_FUNDING}${userAccount?.address.toBase58()}`
-    );
-    if (!result.success) {
-      throw new Error("Error fetching funding");
-    }
-    let data: FundingPayment[] = result.data;
-    let vide: FundingPayment[] = [];
-    data = data.reduce((unique, o) => {
-      // Server returning funding payment might contain duplicates. Checking signature for unicity
-      if (!unique.some((obj) => obj.signature === o.signature)) {
-        unique.push(o);
-      }
-      return unique;
-    }, vide);
-    return data;
-  };
-  return useAsyncData(
-    fn,
-    tuple("useUserFunding", userAccount?.address?.toBase58())
-  );
-};
-
-export const useFidaAmount = () => {
-  const { connected, publicKey } = useWallet();
-  const { connection } = useConnection();
-  const fn = async () => {
-    if (!publicKey) return;
-    const discountAccount = await getDiscountAccount(connection, publicKey);
-    if (!discountAccount) return 0;
-    const accountInfo = await connection.getParsedAccountInfo(discountAccount);
-    // @ts-ignore
-    return accountInfo.value?.data.parsed.info.tokenAmount.uiAmount;
-  };
-  return useAsyncData(fn, tuple("useFidaAmount", connection, connected));
 };
 
 export const useLeaderBoard = (
