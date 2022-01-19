@@ -136,6 +136,31 @@ code {
     url(./assets/fonts//rota-regular.woff2) format("woff2");
 }
 
+@-webkit-keyframes highlight {
+  from {
+    background-color: #2abdd2;
+  }
+  to {
+    background-color: #1a2029;
+  }
+}
+@-moz-keyframes highlight {
+  from {
+    background-color: #2abdd2;
+  }
+  to {
+    background-color: #1a2029;
+  }
+}
+@keyframes highlight {
+  from {
+    background-color: #2abdd2;
+  }
+  to {
+    background-color: #1a2029;
+  }
+}
+
 .flash {
   -moz-animation: highlight 0.5s ease 0s 1 alternate;
   -webkit-animation: highlight 0.5s ease 0s 1 alternate;
