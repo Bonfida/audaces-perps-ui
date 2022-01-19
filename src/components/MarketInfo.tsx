@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import getIcon from "../utils/icons";
-import { Grid, Typography, Menu, MenuItem, Fade } from "@material-ui/core";
+import { Typography, Menu, MenuItem, Fade } from "@material-ui/core";
 import { useMarket, useVolume, useUserAccount, MARKETS } from "../utils/market";
 import { roundToDecimal, useSmallScreen } from "../utils/utils";
 import Countdown from "react-countdown";

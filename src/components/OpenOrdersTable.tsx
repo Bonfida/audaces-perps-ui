@@ -140,10 +140,10 @@ const OpenOrderTableRow = ({
         {side === Side.Bid ? "Buy" : "Sell"}
       </CssTableCell>
       <CssTableCell className={classes.tableCell}>
-        {size / Math.pow(10, 6)}
+        {roundToDecimal(size / Math.pow(10, 6), 3)}
       </CssTableCell>
       <CssTableCell className={classes.tableCell}>
-        {roundToDecimal(price, 4)}
+        {roundToDecimal(price, 3)}
       </CssTableCell>
       <CssTableCell className={classes.deleteCell}>
         <Button onClick={handleDelete}>
