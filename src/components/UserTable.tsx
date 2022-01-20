@@ -123,6 +123,7 @@ const UserTable = () => {
       </TabPanel>
       <TabPanel value={tab} index={1}>
         <OpenOrdersTable
+          // TODO filter per market page
           openOrders={openOrders}
           openOrdersLoaded={openOrdersLoaded}
         />

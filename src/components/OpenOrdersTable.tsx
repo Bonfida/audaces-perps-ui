@@ -26,6 +26,7 @@ import { refreshAllCaches } from "../utils/fetch-loop";
 import { roundToDecimal } from "../utils/utils";
 import { IOpenOrder } from "@audaces/perps";
 import WalletConnect from "./WalletConnect";
+import { notify } from "../utils/notifications";
 
 const CssTableCell = withStyles({
   root: {
@@ -72,17 +73,85 @@ const useStyles = makeStyles({
   deleteCell: {
     padding: 0,
   },
+  cancelAllButton: {
+    color: "#FF3B69",
+    border: "1px solid  #FF3B69",
+    borderRadius: 5,
+    margin: 0,
+    fontSize: 14,
+    fontWeight: "bold",
+    height: 30,
+    width: 150,
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "centero",
+  },
+  cancelTableCell: {
+    width: 200,
+  },
 });
 
-const OpenOrdersTableHead = () => {
+const OpenOrdersTableHead = ({
+  openOrders,
+}: {
+  openOrders: IOpenOrder[] | null | undefined;
+}) => {
   const classes = useStyles();
+  const [loading, setLoading] = useState(false);
+  const { connection } = useConnection();
+  const { publicKey, connected, sendTransaction } = useWallet();
+
+  // TODO only cancel for the market of the page
+  const handleCancel = async () => {
+    if (!openOrders || !publicKey) return;
+    try {
+      setLoading(true);
+      const marketState = await MarketState.retrieve(
+        connection,
+        openOrders[0].market
+      );
+
+      const ordered = [...openOrders].sort(
+        (a, b) => a.orderIndex - b.orderIndex
+      );
+
+      for (let o of ordered) {
+        const ix = await cancelOrder(
+          publicKey,
+          o.market,
+          marketState,
+          ECOSYSTEM,
+          o.orderIndex,
+          AUDACES_ID
+        );
+        await sendTx(connection, publicKey, ix.instructions, sendTransaction);
+      }
+    } catch (err) {
+      console.log(err);
+      notify({ message: "Error sending cancel transaction" });
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <TableHead>
       <TableRow>
         <TableCell className={classes.tableCellTitle}>Side</TableCell>
         <TableCell className={classes.tableCellTitle}>Size</TableCell>
         <TableCell className={classes.tableCellTitle}>Price</TableCell>
-        <TableCell /> {/* Cancel column */}
+        {/* <TableCell /> */}
+        <TableCell
+          className={clsx(classes.tableCellTitle, classes.cancelTableCell)}
+        >
+          <Button
+            onClick={handleCancel}
+            variant="outlined"
+            className={classes.cancelAllButton}
+          >
+            {loading ? <Spin size={15} /> : "Cancel all"}
+          </Button>
+        </TableCell>
       </TableRow>
     </TableHead>
   );
@@ -178,7 +247,7 @@ const OpenOrdersTable = ({
   return (
     <TableContainer className={classes.container}>
       <Table>
-        <OpenOrdersTableHead />
+        <OpenOrdersTableHead openOrders={openOrders} />
         <TableBody>
           {openOrders?.map((o, idx) => {
             return (
