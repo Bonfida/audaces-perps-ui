@@ -16,16 +16,7 @@ import {
   Button,
 } from "@material-ui/core";
 import SwapHorizIcon from "@material-ui/icons/SwapHoriz";
-import {
-  placeOrder,
-  OrderType,
-  AUDACES_ID,
-  MARKET,
-  ECOSYSTEM,
-  Ecosystem,
-  MarketState,
-  Side,
-} from "@audaces/perps";
+import { placeOrder, OrderType, Side } from "@audaces/perps";
 import { notify } from "../utils/notifications";
 import { useWallet, useConnection } from "@solana/wallet-adapter-react";
 import { SelfTradeBehavior } from "@bonfida/aob";
@@ -34,6 +25,9 @@ import Spin from "./Spin";
 import { roundToDecimal } from "../utils/utils";
 import CustomSwitch from "./Switch";
 import { refreshAllCaches } from "../utils/fetch-loop";
+import { useMarket } from "../contexts/market";
+import { useMarkPrice } from "../hooks/useMarkPrice";
+import { PublicKey } from "@solana/web3.js";
 
 const CssAppBar = withStyles({
   root: {
@@ -210,9 +204,11 @@ const TradeForm = () => {
   const [loading, setLoading] = useState(false);
   const { sendTransaction, publicKey, connected } = useWallet();
   const { connection } = useConnection();
+  const { currentMarket, programId, marketState, ecosystem, ecosystemKey } =
+    useMarket();
+  const [markPrice] = useMarkPrice(new PublicKey(currentMarket.address));
 
-  const marketName = "BTC-PERP";
-  const marketPrice = 50_000;
+  const { name, address } = currentMarket;
 
   const handleChangeSide = (event: React.ChangeEvent<{}>, newValue: number) => {
     setSide(newValue);
@@ -248,8 +244,8 @@ const TradeForm = () => {
     if (uiOrderType === UiOrderType.Limit && price) {
       setBaseSize(value / price);
     }
-    if (uiOrderType === UiOrderType.Market && marketPrice) {
-      setBaseSize(value / marketPrice);
+    if (uiOrderType === UiOrderType.Market && markPrice) {
+      setBaseSize(value / markPrice);
     }
     setQuoteSize(value);
   };
@@ -263,8 +259,8 @@ const TradeForm = () => {
     if (uiOrderType === UiOrderType.Limit && price) {
       setQuoteSize(value * price);
     }
-    if (uiOrderType === UiOrderType.Market && marketPrice) {
-      setQuoteSize(value * marketPrice);
+    if (uiOrderType === UiOrderType.Market && markPrice) {
+      setQuoteSize(value * markPrice);
     }
     setBaseSize(value);
   };
@@ -278,7 +274,8 @@ const TradeForm = () => {
   };
 
   const handlePlaceOrder = async () => {
-    if (!publicKey || !price || !quoteSize) return;
+    if (!publicKey || !price || !quoteSize || !ecosystem || !marketState)
+      return;
     try {
       setLoading(true);
       const marketIndex = 0;
@@ -291,9 +288,6 @@ const TradeForm = () => {
         ? OrderType.IOC
         : OrderType.Limit;
 
-      const ecosystem = await Ecosystem.retrieve(connection, ECOSYSTEM);
-      const market = await MarketState.retrieve(connection, MARKET);
-
       const order_ix = await placeOrder(
         publicKey,
         side,
@@ -302,11 +296,11 @@ const TradeForm = () => {
         parsedPrice,
         SelfTradeBehavior.CancelProvide,
         orderType,
-        AUDACES_ID,
-        MARKET,
-        ECOSYSTEM,
+        programId,
+        new PublicKey(address),
+        ecosystemKey,
         ecosystem,
-        market,
+        marketState,
         undefined, // TODO discount account
         undefined, // TODO discount owner
         undefined // TODO referrer
@@ -329,11 +323,7 @@ const TradeForm = () => {
 
   return (
     <FloatingCard padding="0 0 0 0">
-      <Header
-        side={side}
-        handleChange={handleChangeSide}
-        marketName={marketName}
-      />
+      <Header side={side} handleChange={handleChangeSide} marketName={name} />
       <div className={classes.column}>
         <div className={classes.row}>
           <FormControl className={classes.formControl}>

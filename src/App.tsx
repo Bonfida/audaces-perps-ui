@@ -4,7 +4,7 @@ import { CssBaseline } from "@material-ui/core";
 import { theme } from "./theme";
 import { SnackbarProvider } from "notistack";
 import { LayoutProvider } from "./utils/layout";
-import { MarketProvider } from "./utils/market";
+import { MarketProvider } from "./contexts/market";
 import {
   ConnectionProvider,
   WalletProvider,

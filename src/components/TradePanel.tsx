@@ -9,7 +9,8 @@ import TableHead from "@material-ui/core/TableHead";
 import TableRow from "@material-ui/core/TableRow";
 import { PastTrade } from "../utils/types";
 import { withStyles } from "@material-ui/core";
-import { useMarket, useMarketTrades } from "../utils/market";
+// import { useMarket, useMarketTrades } from "../utils/market";
+import { useMarket } from "../contexts/market";
 import { roundToDecimal } from "../utils/utils";
 import LaunchIcon from "../assets/Link/explorer.svg";
 import { ExplorerLink } from "./Link";
@@ -124,8 +125,9 @@ const TradeTableRow = (props: PastTrade) => {
 
 const TradePanel = () => {
   const classes = useStyles();
-  const { marketAddress } = useMarket();
-  const [trades] = useMarketTrades(marketAddress);
+  const { currentMarket } = useMarket();
+  // const [trades] = useMarketTrades(marketAddress);
+  const trades = [];
 
   return (
     <FloatinCard>

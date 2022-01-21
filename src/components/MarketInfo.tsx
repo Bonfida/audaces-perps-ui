@@ -2,14 +2,14 @@ import React, { useState } from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import getIcon from "../utils/icons";
 import { Typography, Menu, MenuItem, Fade } from "@material-ui/core";
-import { useMarket, useVolume, useUserAccount, MARKETS } from "../utils/market";
+import { useVolume, useUserAccount, MARKETS } from "../utils/market";
 import { roundToDecimal, useSmallScreen } from "../utils/utils";
 import Countdown from "react-countdown";
 import useInterval from "../utils/useInterval";
 import ArrowDropDownIcon from "../assets/components/topbar/arrow-down.svg";
 import { Market } from "../utils/types";
 import { useHistory } from "react-router-dom";
-
+import { useMarket } from "../contexts/market";
 import { useOraclePrice } from "../hooks/useOralcePrice";
 import { useMarkPrice } from "../hooks/useMarkPrice";
 import { MARKET } from "@audaces/perps";
@@ -110,8 +110,8 @@ export const Header = () => {
   const classes = useStyles();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
-  const { marketName, setMarket } = useMarket();
-  const baseCurrency = marketName.split("-")[0];
+  const { currentMarket, setMarket } = useMarket();
+  const baseCurrency = currentMarket.name.split("-")[0];
   const history = useHistory();
   const xsScreen = useSmallScreen("xs");
 
@@ -137,7 +137,7 @@ export const Header = () => {
 
           {!xsScreen && (
             <Typography className={classes.marketName} align="center">
-              {marketName}
+              {currentMarket.name}
             </Typography>
           )}
 
@@ -169,7 +169,7 @@ export const Header = () => {
               onClick={() => handleClose(m)}
               style={{
                 background:
-                  marketName === m.name
+                  currentMarket.name === m.name
                     ? "rgba(211, 211, 211, 0.3)"
                     : undefined,
               }}

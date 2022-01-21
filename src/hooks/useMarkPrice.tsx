@@ -5,6 +5,7 @@ import { useConnection } from "@solana/wallet-adapter-react";
 import { PublicKey } from "@solana/web3.js";
 import * as math from "mathjs";
 import tuple from "immutable-tuple";
+import { useMarket } from "../contexts/market";
 
 export const useMarkPrice = (market: PublicKey) => {
   const { connection } = useConnection();
