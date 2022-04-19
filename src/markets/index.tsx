@@ -8,8 +8,8 @@ export interface IMarket {
 
 export const markets: IMarket[] = [
   {
-    ecosystem: new PublicKey("2EYdaTCkR7rs34aP7Zuw2sZtWygpCdpdhJrc1A27jbVc"),
-    address: new PublicKey("FcqNNpNVp31nBnNybbLDg3mCACVs9MmVAUNM4Hh61snr"),
+    ecosystem: new PublicKey("CvLNxPSEkEzNZbzqfS1jPnTwWdHfQZDngMkVmMa8hUbh"),
+    address: new PublicKey("H37WDqiVKkbf1MDoyEn7SHtDuMXoyyUtTbZHT9gjs97q"),
     name: "BTC/USD",
   },
 ];

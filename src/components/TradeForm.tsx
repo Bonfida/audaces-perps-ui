@@ -274,14 +274,24 @@ const TradeForm = () => {
   };
 
   const handlePlaceOrder = async () => {
-    if (!publicKey || !price || !quoteSize || !ecosystem || !marketState)
+    if (
+      !publicKey ||
+      !price ||
+      !quoteSize ||
+      !ecosystem ||
+      !marketState ||
+      !baseSize
+    ) {
       return;
+    }
     try {
       setLoading(true);
-      const marketIndex = 0;
+      const marketIndex = ecosystem.markets.findIndex(
+        (e) => e.address.toBase58() === address
+      );
       const parsedPrice =
         uiOrderType === UiOrderType.Market ? marketPriceFromSide(side) : price;
-      const parsedSize = quoteSize * Math.pow(10, 6);
+      const parsedSize = baseSize * Math.pow(10, marketState.baseDecimals);
       const orderType = postOnly
         ? OrderType.PostOnly
         : ioc || uiOrderType === UiOrderType.Market

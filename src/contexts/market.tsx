@@ -1,17 +1,15 @@
 import React, { useCallback, useContext } from "react";
 import { PublicKey } from "@solana/web3.js";
-import {
-  MarketState,
-  ECOSYSTEM,
-  AUDACES_ID,
-  Ecosystem,
-  MARKET,
-} from "@audaces/perps";
+import { MarketState, AUDACES_ID, Ecosystem } from "@audaces/perps";
 import { useConnection } from "@solana/wallet-adapter-react";
 import { useLocalStorageState } from "../utils/utils";
 import tuple from "immutable-tuple";
 import { useAsyncData } from "../utils/fetch-loop";
 
+export const ECOSYSTEM = new PublicKey(
+  "BbEnc2UWwFjoJpontjPkKUGGfMdhQ2JMgcRbcF5nNZUm"
+);
+const MARKET = new PublicKey("FcAimHWpaRpnDFLcq3Lg2srHBM6cZwiLJTg3PKqJAnvf");
 export interface Market {
   address: string;
   name: string;
@@ -21,6 +19,10 @@ const MARKETS = [
   {
     address: MARKET.toBase58(),
     name: "BTC-PERP",
+  },
+  {
+    address: "5eTXMWdgarYxhdq74XHhBw7N4Fwc8Wh23v6Gt9BvnQ22",
+    name: "SOL-PERP",
   },
 ];
 
@@ -54,6 +56,7 @@ export const MarketProvider = ({ children }) => {
       connection,
       new PublicKey(market.address)
     );
+    console.log(marketState);
     return marketState;
   }, [market.address, connection]);
 

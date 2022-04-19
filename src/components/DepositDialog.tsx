@@ -14,7 +14,6 @@ import OutlinedInput from "@material-ui/core/OutlinedInput";
 import {
   createUserAccount,
   AUDACES_ID,
-  ECOSYSTEM,
   UserAccount,
   addCollateral,
   Ecosystem,
@@ -29,6 +28,7 @@ import clsx from "clsx";
 import { refreshAllCaches } from "../utils/fetch-loop";
 import { useMargin } from "../hooks/useMargin";
 import { useEcosystem } from "../hooks/useEcosystem";
+import { ECOSYSTEM } from "../contexts/market";
 
 const CssInput = withStyles({
   input: {

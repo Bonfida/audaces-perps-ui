@@ -11,12 +11,7 @@ import {
 } from "@material-ui/core";
 import usdc from "../assets/crypto/usdc.png";
 import OutlinedInput from "@material-ui/core/OutlinedInput";
-import {
-  AUDACES_ID,
-  ECOSYSTEM,
-  withdrawCollateral,
-  Ecosystem,
-} from "@audaces/perps";
+import { AUDACES_ID, withdrawCollateral, Ecosystem } from "@audaces/perps";
 import { sendTx } from "../utils/send";
 import { useWallet, useConnection } from "@solana/wallet-adapter-react";
 import { USDC_MINT, roundToDecimal } from "../utils/utils";
@@ -27,6 +22,7 @@ import { useMargin } from "../hooks/useMargin";
 import { useUserAccount } from "../hooks/useUserAccount";
 import { useEcosystem } from "../hooks/useEcosystem";
 import clsx from "clsx";
+import { ECOSYSTEM } from "../contexts/market";
 
 const CssInput = withStyles({
   input: {

@@ -13,13 +13,7 @@ import Spin from "../components/Spin";
 import clsx from "clsx";
 import DeleteIcon from "@material-ui/icons/Delete";
 import { useWallet, useConnection } from "@solana/wallet-adapter-react";
-import {
-  Side,
-  cancelOrder,
-  ECOSYSTEM,
-  MarketState,
-  AUDACES_ID,
-} from "@audaces/perps";
+import { Side, cancelOrder, MarketState, AUDACES_ID } from "@audaces/perps";
 import { PublicKey } from "@solana/web3.js";
 import { sendTx } from "../utils/send";
 import { refreshAllCaches } from "../utils/fetch-loop";
@@ -27,6 +21,7 @@ import { roundToDecimal } from "../utils/utils";
 import { IOpenOrder } from "@audaces/perps";
 import WalletConnect from "./WalletConnect";
 import { notify } from "../utils/notifications";
+import { ECOSYSTEM } from "../contexts/market";
 
 const CssTableCell = withStyles({
   root: {
@@ -100,6 +95,7 @@ const OpenOrdersTableHead = ({
   const [loading, setLoading] = useState(false);
   const { connection } = useConnection();
   const { publicKey, connected, sendTransaction } = useWallet();
+  const showCancellAll = openOrders?.length && openOrders?.length > 0;
 
   // TODO only cancel for the market of the page
   const handleCancel = async () => {
@@ -110,12 +106,13 @@ const OpenOrdersTableHead = ({
         connection,
         openOrders[0].market
       );
-
+      console.log(1, openOrders[0].market.toBase58());
       const ordered = [...openOrders].sort(
         (a, b) => a.orderIndex - b.orderIndex
       );
 
       for (let o of ordered) {
+        console.log(2, o.market.toBase58());
         const ix = await cancelOrder(
           publicKey,
           o.market,
@@ -144,13 +141,15 @@ const OpenOrdersTableHead = ({
         <TableCell
           className={clsx(classes.tableCellTitle, classes.cancelTableCell)}
         >
-          <Button
-            onClick={handleCancel}
-            variant="outlined"
-            className={classes.cancelAllButton}
-          >
-            {loading ? <Spin size={15} /> : "Cancel all"}
-          </Button>
+          {showCancellAll && (
+            <Button
+              onClick={handleCancel}
+              variant="outlined"
+              className={classes.cancelAllButton}
+            >
+              {loading ? <Spin size={15} /> : "Cancel all"}
+            </Button>
+          )}
         </TableCell>
       </TableRow>
     </TableHead>

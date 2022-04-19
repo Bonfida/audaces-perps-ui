@@ -4,7 +4,7 @@ import { makeStyles } from "@material-ui/core";
 import { usePrevious } from "../hooks/usePrevious";
 import { useInterval } from "../hooks/useInterval";
 import { useOrderbook } from "../hooks/useOrderbook";
-import { MARKET } from "@audaces/perps";
+import { useMarket } from "../contexts/market";
 import { useMarkPrice } from "../hooks/useMarkPrice";
 import FloatingCard from "./FloatingCard";
 import { Price } from "@bonfida/aob";
@@ -12,6 +12,7 @@ import ArrowDownwardIcon from "@material-ui/icons/ArrowDownward";
 import ArrowUpwardIcon from "@material-ui/icons/ArrowUpward";
 import "../index.css";
 import { Side } from "@audaces/perps";
+import { PublicKey } from "@solana/web3.js";
 
 const bidColor = "rgba(65, 199, 122, 0.6)";
 const askColor = "rgba(242, 60, 105, 0.6)";
@@ -87,8 +88,9 @@ export default function Orderbook({
   onSize: () => void;
 }) {
   const classes = useStyles({})();
-  const [markPrice] = useMarkPrice(MARKET);
-  const [orderbook] = useOrderbook(MARKET);
+  const { currentMarket } = useMarket();
+  const [markPrice] = useMarkPrice(new PublicKey(currentMarket.address));
+  const [orderbook] = useOrderbook(new PublicKey(currentMarket.address));
   console.log(orderbook);
   //   const { baseCurrency, quoteCurrency } = useMarket();
 

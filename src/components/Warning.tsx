@@ -92,7 +92,7 @@ const REDIRECT_LINK = "https://google.com";
 export const Forbidden = () => {
   const [countryCode] = useCountryCode();
   const classes = useStyles();
-  if (!DISALLOWED_COUNTRIES.includes(countryCode)) {
+  if (!DISALLOWED_COUNTRIES.includes(countryCode) || true) {
     return null;
   }
   return (

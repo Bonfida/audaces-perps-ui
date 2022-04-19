@@ -12,6 +12,7 @@ export const useUserAccount = () => {
       return null;
     }
     const [key] = await UserAccount.findAddress(publicKey, AUDACES_ID);
+    console.log(`User account`, key.toBase58());
     return await UserAccount.retrieve(connection, key);
   };
 

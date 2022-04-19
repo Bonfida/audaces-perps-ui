@@ -10,7 +10,7 @@ const MAINNET_ENDPOINT = process.env.REACT_APP_CONNECTION!;
 
 export const USDC_MINT = new PublicKey(
   // "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"
-  "2WUS55f6vE725ur5EV13gLP5NdfwXdGFSXycRXE5s89X" // Devnet
+  "EzdGVhNn8qpA4b97cT1C5yxXo1fv51Jk2PBq9SrGFEe5" // Devnet
 );
 
 export const FIDA_MINT = "EchesyfXePKdLtoiZSL8pBe8Myagyy8ZRqsACNCFGnvp";

@@ -9,6 +9,7 @@ export const useOrderbook = (marketKey: PublicKey | undefined | null) => {
   const { connection } = useConnection();
   const fn = async () => {
     if (!marketKey) return;
+    console.log("OB marketKey.toBase58()", marketKey.toBase58());
     const marketState = await MarketState.retrieve(connection, marketKey);
     const aobMarketState = await aob.MarketState.retrieve(
       connection,

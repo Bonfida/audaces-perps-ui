@@ -133,35 +133,36 @@ const TradeRow = ({
 };
 
 const TradeTable = () => {
-  const classes = useStyles();
-  const { connected } = useWallet();
-  const { marketAddress } = useMarket();
-  const [pastTrades, pastTradesLoaded] = useUserTrades(marketAddress);
+  return null;
+  // const classes = useStyles();
+  // const { connected } = useWallet();
+  // const { marketAddress } = useMarket();
+  // const [pastTrades, pastTradesLoaded] = useUserTrades(marketAddress);
 
-  if (!connected || !pastTradesLoaded) {
-    return (
-      <div className={classes.spinContainer}>
-        {connected ? <Spin size={50} /> : <WalletConnect />}
-      </div>
-    );
-  }
+  // if (!connected || !pastTradesLoaded) {
+  //   return (
+  //     <div className={classes.spinContainer}>
+  //       {connected ? <Spin size={50} /> : <WalletConnect />}
+  //     </div>
+  //   );
+  // }
 
-  if (!pastTrades) {
-    return null;
-  }
+  // if (!pastTrades) {
+  //   return null;
+  // }
 
-  return (
-    <TableContainer className={classes.container}>
-      <Table>
-        <TradeTableHead />
-        <TableBody>
-          {pastTrades?.map((row, i) => {
-            return <TradeRow {...row} index={i} key={`trade-table-${i}`} />;
-          })}
-        </TableBody>
-      </Table>
-    </TableContainer>
-  );
+  // return (
+  //   <TableContainer className={classes.container}>
+  //     <Table>
+  //       <TradeTableHead />
+  //       <TableBody>
+  //         {pastTrades?.map((row, i) => {
+  //           return <TradeRow {...row} index={i} key={`trade-table-${i}`} />;
+  //         })}
+  //       </TableBody>
+  //     </Table>
+  //   </TableContainer>
+  // );
 };
 
 export default TradeTable;

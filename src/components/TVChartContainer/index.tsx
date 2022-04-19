@@ -35,13 +35,14 @@ export const TVChartContainer = () => {
   const [market] = useLocalStorageState("market", MARKETS[0]);
   // let datafeed = useTvDataFeed();
   const defaultProps: ChartContainerProps = {
-    symbol: "BTC-PERP",
+    // symbol: "BTC-PERP",
+    symbol: "AAPL",
     // @ts-ignore
     interval: "15",
     auto_save_delay: 5,
     theme: "Dark",
     containerId: "tv_chart_container",
-    datafeedUrl: "https://serum-api.bonfida.com/tv",
+    datafeedUrl: "https://demo_feed.tradingview.com",
     libraryPath: "/charting_library/",
     chartsStorageUrl: "https://saveload.tradingview.com",
     chartsStorageApiVersion: "1.1",
@@ -64,7 +65,8 @@ export const TVChartContainer = () => {
     });
 
     const widgetOptions: ChartingLibraryWidgetOptions = {
-      symbol: market.name,
+      // symbol: market.name,
+      symbol: "AAPL",
       // BEWARE: no trailing slash is expected in feed URL
       // tslint:disable-next-line:no-any
       // @ts-ignore
