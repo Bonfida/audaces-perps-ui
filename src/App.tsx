@@ -24,6 +24,8 @@ import {
 } from "@solana/wallet-adapter-wallets";
 import "react-grid-layout/css/styles.css";
 import "react-resizable/css/styles.css";
+import { getToken } from "./utils/rpc";
+import { tokenAuthFetchMiddleware } from "@strata-foundation/web3-token-auth";
 
 require("@solana/wallet-adapter-react-ui/styles.css");
 
@@ -54,7 +56,16 @@ const App = ({ children }: { children: React.ReactNode }) => {
   );
 
   return (
-    <ConnectionProvider endpoint={endpoint}>
+    <ConnectionProvider
+      endpoint={endpoint}
+      config={{
+        commitment: "processed",
+        wsEndpoint: process.env.REACT_APP_CONNECTION_WSS as string,
+        fetchMiddleware: tokenAuthFetchMiddleware({
+          getToken,
+        }),
+      }}
+    >
       <SnackbarProvider maxSnack={5} autoHideDuration={8000}>
         <WalletProvider wallets={wallets} autoConnect>
           <MarketProvider>
