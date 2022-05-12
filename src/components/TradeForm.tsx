@@ -677,7 +677,7 @@ const TradeForm = () => {
       <Grid container justify="center">
         {!!userAccount && userAccount.balance > 0 && (
           <Button
-            disabled={loading}
+            disabled={loading || userAccount.openPositions.length === 0}
             className={side === 0 ? classes.buyButton : classes.sellButton}
             onClick={connected ? onClick : connect}
           >

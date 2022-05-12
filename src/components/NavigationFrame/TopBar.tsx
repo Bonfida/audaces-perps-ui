@@ -21,6 +21,7 @@ import {
   useLocalStorageState,
 } from "../../utils/utils";
 import { Header } from "../MarketInfo";
+import Link from "../Link";
 
 const drawerWidth = 300;
 
@@ -120,6 +121,18 @@ const useStyles = makeStyles((theme: Theme) =>
       paddingLeft: 20,
       paddingRight: 20,
     },
+    warning: {
+      padding: 10,
+      background: "rgb(180 83 9)",
+      display: "flex",
+      justifyContent: "center",
+      alignItems: "center",
+    },
+    warningText: {
+      color: "#FFFFFF",
+      fontSize: 22,
+      fontWeight: 900,
+    },
   })
 );
 
@@ -133,6 +146,26 @@ const topBarElements = [
     href: "/leaderboard",
   },
 ];
+
+const Warning = () => {
+  const classes = useStyles();
+  return (
+    <div className={classes.warning}>
+      <div>
+        <span className={classes.warningText}>
+          Please read the post about the v2 migration
+        </span>{" "}
+        <Link
+          className={classes.warningText}
+          to={"https://forum.bonfida.org/t/migration-audaces-v2/1057"}
+          external
+        >
+          here
+        </Link>
+      </div>
+    </div>
+  );
+};
 
 const Sections = () => {
   const classes = useStyles();
@@ -379,12 +412,18 @@ const TopBar = () => {
   if (isTradePage) {
     return (
       <div style={{ display: "flex", flexDirection: "column", width: "100%" }}>
+        <Warning />
         <TopBarHomePage />
         <TopBarMarketPage />
       </div>
     );
   }
-  return <TopBarHomePage />;
+  return (
+    <>
+      <Warning />
+      <TopBarHomePage />
+    </>
+  );
 };
 
 export default TopBar;
